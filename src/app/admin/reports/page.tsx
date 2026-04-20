@@ -10,6 +10,29 @@ export default function AdminReportsPage() {
   const [endDate, setEndDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [isExportingTimesheets, setIsExportingTimesheets] = useState(false);
   const [isExportingLeaves, setIsExportingLeaves] = useState(false);
+  const [isExportingPayroll, setIsExportingPayroll] = useState(false);
+
+  const handleDownloadPayrollExcel = async () => {
+    setIsExportingPayroll(true);
+    try {
+      const response = await fetch('/api/reports/payroll');
+      if (!response.ok) throw new Error('Export failed');
+      
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Master_Payroll_Export_${endDate}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (e) {
+      console.error(e);
+      alert("Failed to export Master Payroll Excel.");
+    } finally {
+      setIsExportingPayroll(false);
+    }
+  };
 
   const handleDownloadTimesheets = async () => {
     setIsExportingTimesheets(true);
@@ -97,6 +120,28 @@ export default function AdminReportsPage() {
         <div className="p-6 space-y-6">
            <div className="grid md:grid-cols-2 gap-4">
               
+              {/* Master Payroll Excel Export Card */}
+              <div className="p-5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors cursor-pointer group flex items-start gap-4 md:col-span-2">
+                  <div className="bg-emerald-500/20 text-emerald-400 p-3 rounded-lg group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                     <FileSpreadsheet className="size-6" />
+                  </div>
+                  <div className="flex-1">
+                     <h3 className="font-bold text-white mb-1">Master Payroll Export (Consolidated CSV)</h3>
+                     <p className="text-sm text-slate-300 mb-4">
+                        Download the comprehensive enterprise payroll spreadsheet exactly matching the V2 specifications. Contains Attendance Summary and Detailed Daily Logs.
+                     </p>
+                     
+                     <button
+                        onClick={handleDownloadPayrollExcel}
+                        disabled={isExportingPayroll}
+                        className="flex items-center gap-2 text-sm font-semibold bg-emerald-600 text-white px-4 py-2.5 rounded-lg hover:bg-emerald-500 transition-colors w-full justify-center disabled:opacity-50"
+                     >
+                        {isExportingPayroll ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+                        {isExportingPayroll ? 'Generating Workbook...' : 'Download Master Payroll .CSV'}
+                     </button>
+                  </div>
+              </div>
+
               {/* Timesheets Export Card */}
               <div className="p-5 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors cursor-pointer group flex items-start gap-4">
                   <div className="bg-primary/20 text-primary p-3 rounded-lg group-hover:bg-primary group-hover:text-primary-foreground transition-colors">

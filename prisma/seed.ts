@@ -11,11 +11,11 @@ async function main() {
     await prisma.timeLog.deleteMany()
     await prisma.user.deleteMany()
 
-    // Create an Admin user
+    // Create the Official Company Admin user
     const admin = await prisma.user.create({
         data: {
-            email: 'admin@concertinahr.local',
-            name: 'System Admin',
+            email: 'joseff.tan@egrowthsystems.com',
+            name: 'Joseff Tan (Super Admin)',
             role: 'ADMIN',
             leaveBalances: {
                 create: [

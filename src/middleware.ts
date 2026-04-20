@@ -26,12 +26,26 @@ export default auth((req) => {
         return NextResponse.redirect(new URL("/", nextUrl.origin));
     }
 
-    // Optional: Role-based protection for /admin
+    // Role-based protection for /admin routes
     if (isLoggedIn && nextUrl.pathname.startsWith("/admin")) {
         const userRole = (req.auth?.user as any)?.role;
+        
+        // 1. Block regular employees entirely from /admin
         if (userRole !== "ADMIN" && userRole !== "MANAGER") {
-            // Redirect standard employees trying to access admin routes
             return NextResponse.redirect(new URL("/", nextUrl.origin));
+        }
+
+        // 2. Strict Supervisor (MANAGER) Restrictions
+        // Managers handle team tasks (Leaves, Reports, Schedules), but NOT global system settings.
+        if (userRole === "MANAGER") {
+            const restrictedManagerRoutes = ["/admin/holidays", "/admin/announcements"];
+            const isRestricted = restrictedManagerRoutes.some(route => 
+                nextUrl.pathname === route || nextUrl.pathname.startsWith(`${route}/`)
+            );
+            
+            if (isRestricted) {
+                return NextResponse.redirect(new URL("/", nextUrl.origin));
+            }
         }
     }
 
