@@ -13,7 +13,7 @@
   * [x] Implement NextAuth.js encrypted session management.
   * [x] Build Role-Based Access Control (RBAC) separating Admin, Supervisor, and Team Member routes.
   * [x] Secure API routes against unauthorized data fetching.
-* **Week 3: Time Tracking (Clock In/Out) Engine**
+* **Week 3: Time Tracking (Clock In/Out) Enginef**
   * [x] Build the Dashboard with dynamic, role-specific UI widgets.
   * [x] Implement core Clock In / Clock Out mutation logic.
   * [ ] Build "Anti-Duplicate" logic to prevent double clock-ins/outs based on active sessions.
