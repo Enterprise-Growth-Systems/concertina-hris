@@ -30,11 +30,6 @@ export default async function DashboardPage() {
     take: 5
   });
 
-  const latestAnnouncements = await prisma.announcement.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 3,
-    include: { author: true }
-  });
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       <div className="flex flex-col gap-2">
@@ -88,24 +83,6 @@ export default async function DashboardPage() {
                 </div>
                 <div className="text-xl font-bold text-primary">{leaveCreditsBalance}</div>
               </div>
-            </div>
-          </div>
-
-          {/* Company Announcements */ }
-          <div className="rounded-2xl border bg-card text-card-foreground shadow-sm p-6 line-clamp-none">
-            <h2 className="font-semibold text-lg mb-4 text-primary">Company News</h2>
-            <div className="space-y-4">
-              {latestAnnouncements.length === 0 ? (
-                <p className="text-xs text-muted-foreground italic">No new announcements at this time.</p>
-              ) : (
-                latestAnnouncements.map((news) => (
-                  <div key={news.id} className="p-4 rounded-xl border bg-background/50 hover:bg-muted/50 transition-colors">
-                    <h3 className="font-medium text-sm text-foreground">{news.title}</h3>
-                    <p className="text-[10px] text-muted-foreground mt-0.5 mb-2">{format(news.createdAt, "MMM d, yyyy")} by {news.author.name}</p>
-                    <p className="text-sm text-foreground/80 whitespace-pre-wrap">{news.content}</p>
-                  </div>
-                ))
-              )}
             </div>
           </div>
 

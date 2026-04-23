@@ -12,7 +12,6 @@ const EMP_ROUTES = [
     { name: "Timesheets", href: "/timesheets", icon: Clock },
     { name: "Schedules", href: "/schedule", icon: CalendarDays },
     { name: "PFFD Requests", href: "/leaves", icon: CalendarHeart },
-    { name: "Knowledge Base", href: "/docs", icon: BookOpen },
     { name: "Team Directory", href: "/directory", icon: BookUser },
     { name: "Company Holidays", href: "/holidays", icon: Calendar },
     { name: "My Profile", href: "/profile", icon: UserCircle },
@@ -24,7 +23,6 @@ const ADMIN_ROUTES = [
     { name: "Schedules Manager", href: "/admin/schedules", icon: CalendarDays },
     { name: "Holiday Manager", href: "/admin/holidays", icon: Calendar },
     { name: "Reports Dashboard", href: "/admin/reports", icon: ClipboardList },
-    { name: "Announcements", href: "/admin/announcements", icon: Megaphone },
 ];
 
 export function AppShell({ user, children }: { user: any, children: React.ReactNode }) {
