@@ -15,18 +15,12 @@ export default function AdminReportsPage() {
   const handleDownloadPayrollExcel = async () => {
     setIsExportingPayroll(true);
     try {
-      const response = await fetch('/api/reports/payroll');
-      if (!response.ok) throw new Error('Export failed');
+      // Direct navigation forces the browser's native download manager
+      // which strictly honors the server's filename and extension.
+      window.location.href = '/api/reports/payroll';
       
-      const text = await response.text();
-      const blob = new Blob([text], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `Master_Payroll_Export_${endDate}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Artificial delay just to show the spinner briefly
+      await new Promise(resolve => setTimeout(resolve, 800));
     } catch (e) {
       console.error(e);
       alert("Failed to export Master Payroll Excel.");
@@ -39,8 +33,7 @@ export default function AdminReportsPage() {
     setIsExportingTimesheets(true);
     try {
       const csvStr = await generateTimesheetReport(startDate, endDate);
-      const blob = new Blob([csvStr], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
+      const url = "data:text/csv;charset=utf-8," + encodeURIComponent(csvStr);
       const link = document.createElement("a");
       link.setAttribute("href", url);
       link.setAttribute("download", `timesheets_${startDate}_to_${endDate}.csv`);
@@ -59,8 +52,7 @@ export default function AdminReportsPage() {
     setIsExportingLeaves(true);
     try {
       const csvStr = await generateLeaveReport(startDate, endDate);
-      const blob = new Blob([csvStr], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
+      const url = "data:text/csv;charset=utf-8," + encodeURIComponent(csvStr);
       const link = document.createElement("a");
       link.setAttribute("href", url);
       link.setAttribute("download", `pffd_requests_${startDate}_to_${endDate}.csv`);
