@@ -24,8 +24,8 @@ export default function LoginPage() {
                             name="email"
                             type="email"
                             required
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                            placeholder="employee@concertinahr.local"
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 shadow-sm"
+                            placeholder="youremail@company.com"
                         />
                     </div>
                     <div className="space-y-2">
@@ -34,23 +34,14 @@ export default function LoginPage() {
                             name="password"
                             type="password"
                             required
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                            placeholder="Enter any password for demo"
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 shadow-sm"
+                            placeholder="••••••••"
                         />
                     </div>
-                    <SubmitButton className="w-full">
+                    <SubmitButton className="w-full shadow-md hover:shadow-lg transition-shadow">
                         Sign In
                     </SubmitButton>
                 </form>
-
-                <div className="mt-8 pt-6 border-t border-border/50 text-center space-y-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Demo Accounts Available</p>
-                    <div className="grid gap-1 text-[11px] text-muted-foreground">
-                        <p>admin@concertinahr.local</p>
-                        <p>manager@concertinahr.local</p>
-                        <p>employee@concertinahr.local</p>
-                    </div>
-                </div>
             </div>
         </div>
     );
