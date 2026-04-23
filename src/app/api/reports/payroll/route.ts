@@ -69,7 +69,7 @@ export async function GET(request: Request) {
             status: 200,
             headers: {
                 'Content-Type': 'text/csv; charset=utf-8',
-                'Content-Disposition': 'attachment; filename=Master_Payroll_Export.csv'
+                'Content-Disposition': 'attachment; filename="Master_Payroll_Export.csv"'
             }
         });
 

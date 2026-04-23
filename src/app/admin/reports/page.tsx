@@ -18,7 +18,8 @@ export default function AdminReportsPage() {
       const response = await fetch('/api/reports/payroll');
       if (!response.ok) throw new Error('Export failed');
       
-      const blob = await response.blob();
+      const text = await response.text();
+      const blob = new Blob([text], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.setAttribute("href", url);
