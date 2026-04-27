@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, UserCog, User, ShieldAlert } from "lucide-react";
+import { Plus, UserCog, User, ShieldAlert, Search } from "lucide-react";
 import { AddEmployeeForm } from "./add-employee-form";
 
 type EmployeeData = {
@@ -15,28 +15,49 @@ type EmployeeData = {
 
 export function EmployeeClientPage({ initialUsers }: { initialUsers: EmployeeData[] }) {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const filteredUsers = initialUsers.filter(user => 
+        user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-sm text-slate-300">
-                    <UserCog className="size-4" />
-                    <span>{initialUsers.length} Team Members</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-sm text-slate-300 shrink-0">
+                        <UserCog className="size-4" />
+                        <span>{filteredUsers.length} Team Members</span>
+                    </div>
+                    
+                    <div className="relative w-full sm:w-64 lg:w-80">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Search className="size-4 text-slate-500" />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search employees..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full bg-[#1A1D27] border border-slate-700 text-white rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm transition-all"
+                        />
+                    </div>
                 </div>
                 
                 <button 
                     onClick={() => setIsAddModalOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-white text-black rounded-lg hover:bg-slate-200 transition-colors shadow-sm"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-white text-black rounded-lg hover:bg-slate-200 transition-colors shadow-sm shrink-0"
                 >
                     <Plus className="size-4" />
                     Add Employee
                 </button>
             </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-[#11131A] overflow-hidden shadow-sm">
+            <div className="rounded-2xl border border-slate-800 bg-[#11131A] overflow-hidden shadow-sm min-h-[400px]">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
-                        <thead className="text-xs text-slate-400 uppercase bg-slate-900/50 border-b border-slate-800">
+                        <thead className="text-xs text-slate-400 uppercase bg-slate-900/50 border-b border-slate-800 sticky top-0 z-10">
                             <tr>
                                 <th className="px-6 py-4 font-semibold">Employee</th>
                                 <th className="px-6 py-4 font-semibold">Role</th>
@@ -45,7 +66,7 @@ export function EmployeeClientPage({ initialUsers }: { initialUsers: EmployeeDat
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800/50">
-                            {initialUsers.map((user) => (
+                            {filteredUsers.map((user) => (
                                 <tr key={user.id} className="hover:bg-slate-800/20 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
@@ -80,6 +101,12 @@ export function EmployeeClientPage({ initialUsers }: { initialUsers: EmployeeDat
                             ))}
                         </tbody>
                     </table>
+                    
+                    {filteredUsers.length === 0 && (
+                        <div className="p-12 text-center text-slate-500">
+                            No employees found matching "{searchQuery}".
+                        </div>
+                    )}
                 </div>
             </div>
 
