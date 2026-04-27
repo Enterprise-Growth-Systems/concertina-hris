@@ -1,8 +1,9 @@
 import { auth, signIn } from "@/auth";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { AuthError } from "next-auth";
 
-export default function LoginPage() {
+export default function LoginPage({ searchParams }: { searchParams: { error?: string } }) {
     return (
         <div className="flex min-h-screen items-center justify-center p-4 bg-background">
             <div className="w-full max-w-sm rounded-2xl border bg-card p-8 shadow-lg">
@@ -11,10 +12,24 @@ export default function LoginPage() {
                     <p className="text-sm text-muted-foreground mt-2">Sign in to manage your time and leaves.</p>
                 </div>
 
+                {searchParams?.error === "InvalidCredentials" && (
+                    <div className="bg-red-500/10 text-red-500 p-3 rounded-lg text-sm mb-6 border border-red-500/20 font-medium">
+                        Invalid email or password. Please try again.
+                    </div>
+                )}
+
                 <form
                     action={async (formData) => {
                         "use server";
-                        await signIn("credentials", formData);
+                        try {
+                            await signIn("credentials", formData);
+                        } catch (error) {
+                            if (error instanceof AuthError) {
+                                redirect("/login?error=InvalidCredentials");
+                            }
+                            // Rethrow all other errors (like NEXT_REDIRECT for successful logins)
+                            throw error;
+                        }
                     }}
                     className="space-y-4"
                 >
