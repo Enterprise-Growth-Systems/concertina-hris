@@ -9,7 +9,7 @@ import { toggleClockStatus, getClockStatus } from "@/app/actions/time";
 export function ClockWidget() {
     const [time, setTime] = useState<Date | null>(null);
     const [isClockedIn, setIsClockedIn] = useState(false);
-    const [isPending, startTransition] = useTransition();
+    const [isPending, setIsPending] = useState(false);
 
     useEffect(() => {
         // Initial fetch to get clock-in status from DB
@@ -25,13 +25,18 @@ export function ClockWidget() {
         return () => clearInterval(interval);
     }, []);
 
-    const handleToggleClock = () => {
-        startTransition(async () => {
+    const handleToggleClock = async () => {
+        if (isPending) return;
+        
+        setIsPending(true);
+        try {
             const res = await toggleClockStatus();
             if (res.success) {
                 setIsClockedIn(!isClockedIn);
             }
-        });
+        } finally {
+            setIsPending(false);
+        }
     };
 
     if (!time) {
