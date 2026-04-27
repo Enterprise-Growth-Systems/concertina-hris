@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, UserCog, User, ShieldAlert, Search } from "lucide-react";
+import { Plus, UserCog, User, ShieldAlert, Search, Trash2, Loader2 } from "lucide-react";
 import { AddEmployeeForm } from "./add-employee-form";
+import { deleteEmployee } from "@/app/actions/employees";
 
 type EmployeeData = {
     id: string;
@@ -16,11 +17,30 @@ type EmployeeData = {
 export function EmployeeClientPage({ initialUsers }: { initialUsers: EmployeeData[] }) {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [employeeToDelete, setEmployeeToDelete] = useState<EmployeeData | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const filteredUsers = initialUsers.filter(user => 
         user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
         user.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    const handleDelete = async () => {
+        if (!employeeToDelete) return;
+        setIsDeleting(true);
+        try {
+            const res = await deleteEmployee(employeeToDelete.id);
+            if (res.success) {
+                setEmployeeToDelete(null);
+            } else {
+                alert(res.error);
+            }
+        } catch (error) {
+            alert("Failed to delete employee.");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
 
     return (
         <div className="space-y-6">
@@ -63,11 +83,12 @@ export function EmployeeClientPage({ initialUsers }: { initialUsers: EmployeeDat
                                 <th className="px-6 py-4 font-semibold">Role</th>
                                 <th className="px-6 py-4 font-semibold text-center">PFFD Balance</th>
                                 <th className="px-6 py-4 font-semibold text-right">Joined</th>
+                                <th className="px-6 py-4 font-semibold text-right w-16"></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800/50">
                             {filteredUsers.map((user) => (
-                                <tr key={user.id} className="hover:bg-slate-800/20 transition-colors">
+                                <tr key={user.id} className="hover:bg-slate-800/20 transition-colors group">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <div className="size-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 shrink-0">
@@ -97,6 +118,15 @@ export function EmployeeClientPage({ initialUsers }: { initialUsers: EmployeeDat
                                     <td className="px-6 py-4 text-right text-slate-400 whitespace-nowrap">
                                         {user.joined}
                                     </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <button
+                                            onClick={() => setEmployeeToDelete(user)}
+                                            className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                            title="Delete Employee"
+                                        >
+                                            <Trash2 className="size-4" />
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -110,7 +140,7 @@ export function EmployeeClientPage({ initialUsers }: { initialUsers: EmployeeDat
                 </div>
             </div>
 
-            {/* Modal Overlay */}
+            {/* Add Employee Modal */}
             {isAddModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div 
@@ -126,6 +156,56 @@ export function EmployeeClientPage({ initialUsers }: { initialUsers: EmployeeDat
                         </div>
                         
                         <AddEmployeeForm onSuccess={() => setIsAddModalOpen(false)} />
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {employeeToDelete && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div 
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in" 
+                        onClick={() => !isDeleting && setEmployeeToDelete(null)}
+                    />
+                    <div className="relative bg-[#11131A] border border-red-500/20 rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in zoom-in-95 duration-200">
+                        <div className="mb-6">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="p-2 bg-red-500/10 text-red-500 rounded-full">
+                                    <Trash2 className="size-5" />
+                                </div>
+                                <h2 className="text-xl font-bold text-white">Delete Employee</h2>
+                            </div>
+                            <p className="text-sm text-slate-400">
+                                Are you absolutely sure you want to delete <strong className="text-white">{employeeToDelete.name}</strong>?
+                            </p>
+                            <p className="text-xs text-red-400 mt-2 p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                                This action is destructive. It will permanently delete their account along with all their historical time logs, schedules, and leave requests.
+                            </p>
+                        </div>
+                        
+                        <div className="flex items-center justify-end gap-3">
+                            <button
+                                onClick={() => setEmployeeToDelete(null)}
+                                disabled={isDeleting}
+                                className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-800 rounded-lg transition-colors border border-slate-700 disabled:opacity-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                disabled={isDeleting}
+                                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-sm disabled:opacity-50"
+                            >
+                                {isDeleting ? (
+                                    <>
+                                        <Loader2 className="size-4 animate-spin" />
+                                        Deleting...
+                                    </>
+                                ) : (
+                                    "Yes, Delete Account"
+                                )}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

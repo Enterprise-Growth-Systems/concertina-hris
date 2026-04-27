@@ -43,3 +43,39 @@ export async function addEmployee(formData: FormData) {
         return { success: false, error: "Email may already exist." };
     }
 }
+
+export async function deleteEmployee(userId: string) {
+    const session = await auth();
+    if (!session || !session.user || (session.user as any).role !== "ADMIN") {
+        throw new Error("Unauthorized: Only Admins can delete employees.");
+    }
+
+    // Prevent deleting yourself
+    if (userId === session.user.id) {
+        return { success: false, error: "You cannot delete your own account." };
+    }
+
+    try {
+        // Use a transaction to securely cascade delete all child records
+        await prisma.$transaction([
+            prisma.timeLog.deleteMany({ where: { userId } }),
+            prisma.leaveBalance.deleteMany({ where: { userId } }),
+            prisma.leaveRequest.deleteMany({ where: { userId } }),
+            prisma.schedule.deleteMany({ where: { userId } }),
+            prisma.auditLog.deleteMany({ where: { userId } }),
+            // Remove them as a manager from any direct reports
+            prisma.user.updateMany({ where: { managerId: userId }, data: { managerId: null } }),
+            // Delete the authored content or reassign? We'll delete for now.
+            prisma.announcement.deleteMany({ where: { authorId: userId } }),
+            prisma.page.deleteMany({ where: { authorId: userId } }),
+            // Finally delete the user
+            prisma.user.delete({ where: { id: userId } })
+        ]);
+
+        revalidatePath("/admin/employees");
+        return { success: true };
+    } catch (error: any) {
+        console.error("Failed to delete employee:", error);
+        return { success: false, error: "Database error occurred during deletion." };
+    }
+}
