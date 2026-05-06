@@ -60,8 +60,34 @@ export async function toggleClockStatus() {
         }
 
         // 2. User is clocking in (either standard, or after an auto-checkout)
-        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0, 0);
-        const isLate = now > startOfDay;
+        const todayDayOfWeek = now.getDay();
+        const schedule = await prisma.schedule.findUnique({
+            where: {
+                userId_dayOfWeek: {
+                    userId: employeeId,
+                    dayOfWeek: todayDayOfWeek,
+                }
+            }
+        });
+
+        let startHour = 9;
+        let startMinute = 0;
+
+        if (schedule && schedule.startTime) {
+            const [h, m] = schedule.startTime.split(':').map(Number);
+            if (!isNaN(h) && !isNaN(m)) {
+                startHour = h;
+                startMinute = m;
+            }
+        }
+
+        // Calculate their exact scheduled start time for today
+        const scheduledStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), startHour, startMinute, 0);
+        
+        // Add a 15-minute grace period buffer
+        const lateThreshold = new Date(scheduledStart.getTime() + 15 * 60000);
+        
+        const isLate = now > lateThreshold;
 
         await prisma.timeLog.create({
             data: {
