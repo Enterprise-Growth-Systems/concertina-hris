@@ -111,13 +111,15 @@ export async function updatePffdBalance(userId: string, newBalance: number) {
         });
 
         // Audit log the manual change
-        await prisma.auditLog.create({
-            data: {
-                action: "PFFD_MANUAL_ADJUST",
-                userId: session!.user!.id,
-                details: `Manually adjusted PFFD balance to ${newBalance} for user ${userId}`
-            }
-        });
+        if (session?.user?.id) {
+            await prisma.auditLog.create({
+                data: {
+                    action: "PFFD_MANUAL_ADJUST",
+                    userId: session.user.id,
+                    details: `Manually adjusted PFFD balance to ${newBalance} for user ${userId}`
+                }
+            });
+        }
 
         revalidatePath("/admin/employees");
         return { success: true };
