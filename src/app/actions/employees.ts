@@ -29,7 +29,7 @@ export async function addEmployee(formData: FormData) {
                 role,
                 leaveBalances: {
                     create: {
-                        leaveType: "LEAVE_CREDITS",
+                        leaveType: "PFFD",
                         balance: pffdBalance
                     }
                 }
@@ -77,5 +77,52 @@ export async function deleteEmployee(userId: string) {
     } catch (error: any) {
         console.error("Failed to delete employee:", error);
         return { success: false, error: "Database error occurred during deletion." };
+    }
+}
+
+export async function updatePffdBalance(userId: string, newBalance: number) {
+    const session = await auth();
+    const role = session?.user ? (session.user as any).role : null;
+    
+    if (role !== "ADMIN" && role !== "MANAGER") {
+        throw new Error("Unauthorized: Only Admins and Managers can edit PFFD balances.");
+    }
+
+    if (isNaN(newBalance) || newBalance < 0) {
+        return { success: false, error: "Invalid balance." };
+    }
+
+    try {
+        await prisma.leaveBalance.upsert({
+            where: {
+                userId_leaveType: {
+                    userId: userId,
+                    leaveType: "PFFD"
+                }
+            },
+            update: {
+                balance: newBalance
+            },
+            create: {
+                userId: userId,
+                leaveType: "PFFD",
+                balance: newBalance
+            }
+        });
+
+        // Audit log the manual change
+        await prisma.auditLog.create({
+            data: {
+                action: "PFFD_MANUAL_ADJUST",
+                userId: session!.user!.id,
+                details: `Manually adjusted PFFD balance to ${newBalance} for user ${userId}`
+            }
+        });
+
+        revalidatePath("/admin/employees");
+        return { success: true };
+    } catch (error) {
+        console.error("Failed to update PFFD balance:", error);
+        return { success: false, error: "Database error occurred." };
     }
 }

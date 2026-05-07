@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { format } from "date-fns";
+import { auth } from "@/auth";
 import { EmployeeClientPage } from "./components/employee-client-page";
 
 const prisma = new PrismaClient();
@@ -7,12 +8,15 @@ const prisma = new PrismaClient();
 export const dynamic = "force-dynamic";
 
 export default async function EmployeesPage() {
+    const session = await auth();
+    const currentUserRole = session?.user ? (session.user as any).role : "EMPLOYEE";
+
     // Fetch all users with their primary leave balance
     const users = await prisma.user.findMany({
         orderBy: { name: 'asc' },
         include: {
             leaveBalances: {
-                where: { leaveType: 'LEAVE_CREDITS' }
+                where: { leaveType: 'PFFD' }
             }
         }
     });
@@ -36,7 +40,7 @@ export default async function EmployeesPage() {
                 </p>
             </div>
 
-            <EmployeeClientPage initialUsers={formattedUsers} />
+            <EmployeeClientPage initialUsers={formattedUsers} currentUserRole={currentUserRole} />
         </div>
     );
 }

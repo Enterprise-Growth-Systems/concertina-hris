@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Plus, UserCog, User, ShieldAlert, Search, Trash2, Loader2 } from "lucide-react";
 import { AddEmployeeForm } from "./add-employee-form";
-import { deleteEmployee } from "@/app/actions/employees";
+import { deleteEmployee, updatePffdBalance } from "@/app/actions/employees";
 
 type EmployeeData = {
     id: string;
@@ -14,11 +14,16 @@ type EmployeeData = {
     joined: string;
 };
 
-export function EmployeeClientPage({ initialUsers }: { initialUsers: EmployeeData[] }) {
+export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialUsers: EmployeeData[], currentUserRole: string }) {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [employeeToDelete, setEmployeeToDelete] = useState<EmployeeData | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    
+    // PFFD Edit State
+    const [employeeToEdit, setEmployeeToEdit] = useState<EmployeeData | null>(null);
+    const [newPffdBalance, setNewPffdBalance] = useState<string>("");
+    const [isSavingPffd, setIsSavingPffd] = useState(false);
 
     const filteredUsers = initialUsers.filter(user => 
         user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -41,6 +46,25 @@ export function EmployeeClientPage({ initialUsers }: { initialUsers: EmployeeDat
             setIsDeleting(false);
         }
     };
+
+    const handleEditPffd = async () => {
+        if (!employeeToEdit || isNaN(parseFloat(newPffdBalance))) return;
+        setIsSavingPffd(true);
+        try {
+            const res = await updatePffdBalance(employeeToEdit.id, parseFloat(newPffdBalance));
+            if (res.success) {
+                setEmployeeToEdit(null);
+            } else {
+                alert(res.error);
+            }
+        } catch (error) {
+            alert("Failed to update PFFD balance.");
+        } finally {
+            setIsSavingPffd(false);
+        }
+    };
+
+    const canEdit = currentUserRole === "ADMIN" || currentUserRole === "MANAGER";
 
     return (
         <div className="space-y-6">
@@ -119,13 +143,29 @@ export function EmployeeClientPage({ initialUsers }: { initialUsers: EmployeeDat
                                         {user.joined}
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <button
-                                            onClick={() => setEmployeeToDelete(user)}
-                                            className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                                            title="Delete Employee"
-                                        >
-                                            <Trash2 className="size-4" />
-                                        </button>
+                                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            {canEdit && (
+                                                <button
+                                                    onClick={() => {
+                                                        setEmployeeToEdit(user);
+                                                        setNewPffdBalance(user.leaveBalance.toString());
+                                                    }}
+                                                    className="p-2 text-slate-500 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors"
+                                                    title="Edit PFFD Balance"
+                                                >
+                                                    <UserCog className="size-4" />
+                                                </button>
+                                            )}
+                                            {currentUserRole === "ADMIN" && (
+                                                <button
+                                                    onClick={() => setEmployeeToDelete(user)}
+                                                    className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                    title="Delete Employee"
+                                                >
+                                                    <Trash2 className="size-4" />
+                                                </button>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -203,6 +243,62 @@ export function EmployeeClientPage({ initialUsers }: { initialUsers: EmployeeDat
                                     </>
                                 ) : (
                                     "Yes, Delete Account"
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit PFFD Modal */}
+            {employeeToEdit && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div 
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in" 
+                        onClick={() => !isSavingPffd && setEmployeeToEdit(null)}
+                    />
+                    <div className="relative bg-[#11131A] border border-emerald-500/20 rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in zoom-in-95 duration-200">
+                        <div className="mb-6">
+                            <h2 className="text-xl font-bold text-white mb-1">Edit PFFD Balance</h2>
+                            <p className="text-sm text-slate-400">
+                                Update the PFFD balance for <strong className="text-white">{employeeToEdit.name}</strong>.
+                            </p>
+                        </div>
+                        
+                        <div className="space-y-4 mb-6">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-1.5">New PFFD Balance</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={newPffdBalance}
+                                    onChange={(e) => setNewPffdBalance(e.target.value)}
+                                    className="w-full bg-[#1A1D27] border border-slate-700 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                                    placeholder="e.g. 5.5"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-3">
+                            <button
+                                onClick={() => setEmployeeToEdit(null)}
+                                disabled={isSavingPffd}
+                                className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-800 rounded-lg transition-colors border border-slate-700 disabled:opacity-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleEditPffd}
+                                disabled={isSavingPffd || isNaN(parseFloat(newPffdBalance))}
+                                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors shadow-sm disabled:opacity-50"
+                            >
+                                {isSavingPffd ? (
+                                    <>
+                                        <Loader2 className="size-4 animate-spin" />
+                                        Saving...
+                                    </>
+                                ) : (
+                                    "Save Changes"
                                 )}
                             </button>
                         </div>

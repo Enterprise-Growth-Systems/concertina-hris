@@ -45,9 +45,51 @@ export async function toggleClockStatus() {
                 // We let it continue below to create their new clock-in for today!
             } else {
                 // Normal clock out for today
+                const clockInDayOfWeek = activeLog.clockIn.getDay();
+                const schedule = await prisma.schedule.findUnique({
+                    where: {
+                        userId_dayOfWeek: {
+                            userId: employeeId,
+                            dayOfWeek: clockInDayOfWeek,
+                        }
+                    }
+                });
+
+                let newStatus = activeLog.status;
+
+                if (schedule && schedule.endTime) {
+                    const [endH, endM] = schedule.endTime.split(':').map(Number);
+                    if (!isNaN(endH) && !isNaN(endM)) {
+                        let scheduledEnd = new Date(
+                            activeLog.clockIn.getFullYear(), 
+                            activeLog.clockIn.getMonth(), 
+                            activeLog.clockIn.getDate(), 
+                            endH, 
+                            endM, 
+                            0
+                        );
+                        
+                        // If endTime hour is less than clockIn hour, the shift crosses midnight
+                        if (endH < activeLog.clockIn.getHours() - 4) { // using -4 to be safe for 9am to 1am etc.
+                            scheduledEnd.setDate(scheduledEnd.getDate() + 1);
+                        }
+
+                        // Undertime if clocking out more than 15 minutes before the scheduled end
+                        const undertimeThreshold = new Date(scheduledEnd.getTime() - 15 * 60000);
+
+                        if (now < undertimeThreshold) {
+                            if (newStatus === "LATE") {
+                                newStatus = "LATE_AND_UNDERTIME";
+                            } else if (newStatus === "ON_TIME") {
+                                newStatus = "UNDERTIME";
+                            }
+                        }
+                    }
+                }
+
                 await prisma.timeLog.update({
                     where: { id: activeLog.id },
-                    data: { clockOut: now },
+                    data: { clockOut: now, status: newStatus },
                 });
 
                 await prisma.auditLog.create({
