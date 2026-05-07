@@ -9,7 +9,15 @@ export const dynamic = "force-dynamic";
 
 export default async function EmployeesPage() {
     const session = await auth();
-    const currentUserRole = session?.user ? (session.user as any).role : "EMPLOYEE";
+    let currentUserRole = "EMPLOYEE";
+    
+    if (session?.user?.id) {
+        const dbUser = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { role: true }
+        });
+        if (dbUser) currentUserRole = dbUser.role;
+    }
 
     // Fetch all users with their primary leave balance
     const users = await prisma.user.findMany({
