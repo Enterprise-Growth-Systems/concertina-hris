@@ -72,7 +72,7 @@ export async function generateLeaveReport(startDate: string, endDate: string) {
   
   requests.forEach(req => {
     const reasonStr = req.reason ? `"${req.reason.replace(/"/g, '""')}"` : "";
-    const typeStr = req.leaveType === "LEAVE_CREDITS" ? "PFFD Credits" : req.leaveType;
+    const typeStr = req.leaveType === "PFFD" ? "PFFD Credits" : req.leaveType;
     
     csv += `"${req.user.name}","${req.user.email}",${typeStr},${new Date(req.startDate).toISOString().split('T')[0]},${new Date(req.endDate).toISOString().split('T')[0]},${req.status},${reasonStr}\n`;
   });

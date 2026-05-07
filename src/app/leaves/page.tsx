@@ -42,7 +42,7 @@ export default async function LeavesPage() {
                             {balances.map((balance: any) => (
                                 <div key={balance.id} className="flex items-center justify-between p-3 rounded-lg bg-background/50 backdrop-blur border">
                                     <div>
-                                        <p className="font-medium text-sm capitalize">{balance.leaveType === 'LEAVE_CREDITS' ? 'PFFD Credits' : balance.leaveType.toLowerCase()}</p>
+                                        <p className="font-medium text-sm capitalize">{balance.leaveType === 'PFFD' ? 'PFFD Credits' : balance.leaveType.toLowerCase()}</p>
                                         <p className="text-xs text-muted-foreground">Available</p>
                                     </div>
                                     <div className="text-xl font-bold text-primary">{balance.balance}</div>

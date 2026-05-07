@@ -22,7 +22,7 @@ export default async function DashboardPage() {
     where: { userId: session.user.id }
   });
 
-  const leaveCreditsBalance = balances.find(b => b.leaveType === "LEAVE_CREDITS")?.balance || 0;
+  const leaveCreditsBalance = balances.find(b => b.leaveType === "PFFD")?.balance || 0;
 
   const recentLogs = await prisma.timeLog.findMany({
     where: { userId: session.user.id },
