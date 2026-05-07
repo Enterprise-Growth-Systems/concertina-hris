@@ -13,10 +13,10 @@
   * [x] Implement NextAuth.js encrypted session management.
   * [x] Build Role-Based Access Control (RBAC) separating Admin, Supervisor, and Team Member routes.
   * [x] Secure API routes against unauthorized data fetching.
-* **Week 3: Time Tracking (Clock In/Out) Enginef**
+* **Week 3: Time Tracking (Clock In/Out) Engine**
   * [x] Build the Dashboard with dynamic, role-specific UI widgets.
   * [x] Implement core Clock In / Clock Out mutation logic.
-  * [ ] Build "Anti-Duplicate" logic to prevent double clock-ins/outs based on active sessions.
+  * [x] Build "Anti-Duplicate" logic to prevent double clock-ins/outs based on active sessions.
 * **Week 4: PFFD (Pre-Funded Flex Days) Management**
   * [x] Build PFFD Request forms with date-range validation.
   * [x] Create the Admin/Supervisor Approval workflow dashboard.
@@ -31,7 +31,7 @@
 * **Week 6: Weekly Scheduling Architecture**
   * [x] Develop the Admin Schedule Manager to assign custom 7-day working hours per user.
   * [x] Build personalized employee schedule views.
-  * [ ] Code background logic to compare un-logged time against assigned schedules (for late/undertime calculations).
+  * [x] Code background logic to compare un-logged time against assigned schedules (for late/undertime calculations).
 * **Week 7: Company Holidays & Policy Integration**
   * [x] Build the unified Holiday Management module (Regular vs. Special Non-Working).
   * [ ] Link holiday database tables to the time-tracking engine so payroll automatically ignores missing logs on designated official holidays.
