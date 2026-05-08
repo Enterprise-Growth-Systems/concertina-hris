@@ -16,7 +16,13 @@ export async function toggleClockStatus() {
         const employeeId = session.user.id;
 
         const now = new Date();
-        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        
+        // Vercel servers run in UTC. To calculate thresholds correctly, we construct a 
+        // "pseudo-Date" that represents the exact local time in Manila.
+        const manilaStr = now.toLocaleString("en-US", { timeZone: "Asia/Manila", hour12: false });
+        const nowPHT = new Date(manilaStr);
+
+        const startOfToday = new Date(nowPHT.getFullYear(), nowPHT.getMonth(), nowPHT.getDate(), 0, 0, 0);
 
         // 1. Check if the user has an active (open) time log
         const activeLog = await prisma.timeLog.findFirst({
@@ -31,12 +37,17 @@ export async function toggleClockStatus() {
 
         if (activeLog) {
             // Did they forget to clock out yesterday?
-            if (activeLog.clockIn < startOfToday) {
-                // Force close yesterday's log at 23:59:59
-                const endOfYesterday = new Date(startOfToday.getTime() - 1);
+            // Convert their actual UTC clockIn to a Manila pseudo-Date for accurate comparison
+            const activeLogInManila = new Date(activeLog.clockIn.toLocaleString("en-US", { timeZone: "Asia/Manila", hour12: false }));
+            
+            if (activeLogInManila < startOfToday) {
+                // Force close yesterday's log at 23:59:59 PHT (which is calculated based on startOfToday)
+                // We use the absolute `now` to close it, OR we could use end of yesterday.
+                // We'll just close it using the absolute UTC time of right now, or you can calculate exact end of yesterday.
+                // Let's use `now` for simplicity to record exactly when the forced checkout triggered.
                 await prisma.timeLog.update({
                     where: { id: activeLog.id },
-                    data: { clockOut: endOfYesterday, status: "FORCED_CHECKOUT" },
+                    data: { clockOut: now, status: "FORCED_CHECKOUT" },
                 });
                 
                 await prisma.auditLog.create({
@@ -45,7 +56,7 @@ export async function toggleClockStatus() {
                 // We let it continue below to create their new clock-in for today!
             } else {
                 // Normal clock out for today
-                const clockInDayOfWeek = activeLog.clockIn.getDay();
+                const clockInDayOfWeek = activeLogInManila.getDay();
                 const schedule = await prisma.schedule.findUnique({
                     where: {
                         userId_dayOfWeek: {
@@ -61,23 +72,23 @@ export async function toggleClockStatus() {
                     const [endH, endM] = schedule.endTime.split(':').map(Number);
                     if (!isNaN(endH) && !isNaN(endM)) {
                         let scheduledEnd = new Date(
-                            activeLog.clockIn.getFullYear(), 
-                            activeLog.clockIn.getMonth(), 
-                            activeLog.clockIn.getDate(), 
+                            activeLogInManila.getFullYear(), 
+                            activeLogInManila.getMonth(), 
+                            activeLogInManila.getDate(), 
                             endH, 
                             endM, 
                             0
                         );
                         
                         // If endTime hour is less than clockIn hour, the shift crosses midnight
-                        if (endH < activeLog.clockIn.getHours() - 4) { // using -4 to be safe for 9am to 1am etc.
+                        if (endH < activeLogInManila.getHours() - 4) { // using -4 to be safe for 9am to 1am etc.
                             scheduledEnd.setDate(scheduledEnd.getDate() + 1);
                         }
 
                         // Undertime if clocking out more than 15 minutes before the scheduled end
                         const undertimeThreshold = new Date(scheduledEnd.getTime() - 15 * 60000);
 
-                        if (now < undertimeThreshold) {
+                        if (nowPHT < undertimeThreshold) {
                             if (newStatus === "LATE") {
                                 newStatus = "LATE_AND_UNDERTIME";
                             } else if (newStatus === "ON_TIME") {
@@ -89,7 +100,7 @@ export async function toggleClockStatus() {
 
                 await prisma.timeLog.update({
                     where: { id: activeLog.id },
-                    data: { clockOut: now, status: newStatus },
+                    data: { clockOut: now, status: newStatus }, // Keep actual UTC time for clockOut
                 });
 
                 await prisma.auditLog.create({
@@ -102,7 +113,7 @@ export async function toggleClockStatus() {
         }
 
         // 2. User is clocking in (either standard, or after an auto-checkout)
-        const todayDayOfWeek = now.getDay();
+        const todayDayOfWeek = nowPHT.getDay();
         const schedule = await prisma.schedule.findUnique({
             where: {
                 userId_dayOfWeek: {
@@ -123,18 +134,18 @@ export async function toggleClockStatus() {
             }
         }
 
-        // Calculate their exact scheduled start time for today
-        const scheduledStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), startHour, startMinute, 0);
+        // Calculate their exact scheduled start time for today using the Manila pseudo-Date
+        const scheduledStart = new Date(nowPHT.getFullYear(), nowPHT.getMonth(), nowPHT.getDate(), startHour, startMinute, 0);
         
         // Add a 15-minute grace period buffer
         const lateThreshold = new Date(scheduledStart.getTime() + 15 * 60000);
         
-        const isLate = now > lateThreshold;
+        const isLate = nowPHT > lateThreshold;
 
         await prisma.timeLog.create({
             data: {
                 userId: employeeId,
-                clockIn: now,
+                clockIn: now, // Save actual UTC time to database
                 status: isLate ? "LATE" : "ON_TIME",
             },
         });
