@@ -52,12 +52,14 @@ export default async function DashboardPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {recentLogs.map((log: any) => (
+                {recentLogs.map((log: any) => {
+                  const { formatInTimeZone } from 'date-fns-tz';
+                  return (
                   <div key={log.id} className="flex items-center justify-between p-3 rounded-lg border bg-background/50">
                     <div>
-                      <p className="font-medium text-sm">{format(log.clockIn, "MMM d, yyyy")}</p>
+                      <p className="font-medium text-sm">{formatInTimeZone(log.clockIn, 'Asia/Manila', "MMM d, yyyy")}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {format(log.clockIn, "h:mm a")} - {log.clockOut ? format(log.clockOut, "h:mm a") : <span className="text-primary italic">Active</span>}
+                        {formatInTimeZone(log.clockIn, 'Asia/Manila', "h:mm a")} - {log.clockOut ? formatInTimeZone(log.clockOut, 'Asia/Manila', "h:mm a") : <span className="text-primary italic">Active</span>}
                       </p>
                     </div>
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${log.status === "ON_TIME" ? "bg-emerald-500/10 text-emerald-500" : "bg-amber-500/10 text-amber-500"
@@ -65,7 +67,7 @@ export default async function DashboardPage() {
                       {log.status === "ON_TIME" ? "On Time" : "Late"}
                     </span>
                   </div>
-                ))}
+                )})}
               </div>
             )}
           </div>

@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
@@ -60,13 +61,13 @@ export default async function TimesheetsPage() {
                                     return (
                                         <tr key={log.id} className="hover:bg-muted/50 transition-colors">
                                             <td className="px-6 py-4 font-medium">
-                                                {format(log.clockIn, "MMM d, yyyy")}
+                                                {formatInTimeZone(log.clockIn, "Asia/Manila", "MMM d, yyyy")}
                                             </td>
                                             <td className="px-6 py-4 text-muted-foreground">
-                                                {format(log.clockIn, "h:mm a")}
+                                                {formatInTimeZone(log.clockIn, "Asia/Manila", "h:mm a")}
                                             </td>
                                             <td className="px-6 py-4 text-muted-foreground">
-                                                {log.clockOut ? format(log.clockOut, "h:mm a") : <span className="text-primary italic animate-pulse">Active</span>}
+                                                {log.clockOut ? formatInTimeZone(log.clockOut, "Asia/Manila", "h:mm a") : <span className="text-primary italic animate-pulse">Active</span>}
                                             </td>
                                             <td className="px-6 py-4 font-medium">
                                                 {duration}
