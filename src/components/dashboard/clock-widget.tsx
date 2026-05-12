@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useTransition } from "react";
-import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { Play, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toggleClockStatus, getClockStatus } from "@/app/actions/time";
@@ -60,11 +60,11 @@ export function ClockWidget() {
 
             <div className="p-6 lg:p-10 flex flex-col items-center justify-center text-center">
                 <div className="mb-8">
-                    <h2 className="text-6xl lg:text-8xl font-black tracking-tighter tabular-nums text-foreground drop-shadow-sm">
-                        {format(time, "HH:mm:ss")}
+                    <h2 className="text-5xl lg:text-7xl font-black tracking-tighter tabular-nums text-foreground drop-shadow-sm">
+                        {formatInTimeZone(time, 'Asia/Manila', "hh:mm:ss a")}
                     </h2>
                     <p className="text-lg text-muted-foreground font-medium mt-2 uppercase tracking-widest">
-                        {format(time, "EEEE, MMMM do")}
+                        {formatInTimeZone(time, 'Asia/Manila', "EEEE, MMMM do")}
                     </p>
                 </div>
 

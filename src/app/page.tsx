@@ -4,6 +4,8 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { PrismaClient } from "@prisma/client";
 import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
+import { Analytics } from "@vercel/analytics/react";
 
 const prisma = new PrismaClient();
 
@@ -53,7 +55,6 @@ export default async function DashboardPage() {
             ) : (
               <div className="space-y-3">
                 {recentLogs.map((log: any) => {
-                  const { formatInTimeZone } from 'date-fns-tz';
                   return (
                   <div key={log.id} className="flex items-center justify-between p-3 rounded-lg border bg-background/50">
                     <div>

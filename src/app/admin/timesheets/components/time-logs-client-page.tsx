@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { format, isSameDay, parseISO } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { Search, Filter, Calendar as CalendarIcon, X } from "lucide-react";
 
 type TimeLogData = {
@@ -153,13 +154,13 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
                                                 <div className="text-xs text-slate-500">{log.user.email}</div>
                                             </td>
                                             <td className="px-6 py-4 font-medium text-slate-300">
-                                                {format(new Date(log.clockIn), "MMM d, yyyy")}
+                                                {formatInTimeZone(new Date(log.clockIn), 'Asia/Manila', "MMM d, yyyy")}
                                             </td>
                                             <td className="px-6 py-4 text-slate-400">
-                                                {format(new Date(log.clockIn), "h:mm a")}
+                                                {formatInTimeZone(new Date(log.clockIn), 'Asia/Manila', "h:mm a")}
                                             </td>
                                             <td className="px-6 py-4 text-slate-400">
-                                                {log.clockOut ? format(new Date(log.clockOut), "h:mm a") : <span className="text-primary italic animate-pulse font-semibold">Active</span>}
+                                                {log.clockOut ? formatInTimeZone(new Date(log.clockOut), 'Asia/Manila', "h:mm a") : <span className="text-primary italic animate-pulse font-semibold">Active</span>}
                                             </td>
                                             <td className="px-6 py-4 font-medium text-slate-300">
                                                 {duration}
