@@ -33,32 +33,32 @@ export function AddEmployeeForm({ onSuccess }: { onSuccess: () => void }) {
             )}
             
             <div className="space-y-1">
-                <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Full Name</label>
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Full Name</label>
                 <input 
                     name="name" 
                     required 
-                    className="w-full bg-[#1A1D27] border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" 
+                    className="w-full bg-background border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" 
                     placeholder="Jane Doe" 
                 />
             </div>
 
             <div className="space-y-1">
-                <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Email Address</label>
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Email Address</label>
                 <input 
                     name="email" 
                     type="email" 
                     required 
-                    className="w-full bg-[#1A1D27] border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" 
+                    className="w-full bg-background border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" 
                     placeholder="jane.doe@company.com" 
                 />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">System Role</label>
+                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">System Role</label>
                     <select 
                         name="role" 
-                        className="w-full bg-[#1A1D27] border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none"
+                        className="w-full bg-background border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none"
                     >
                         <option value="EMPLOYEE">Employee</option>
                         <option value="MANAGER">Manager</option>
@@ -66,14 +66,14 @@ export function AddEmployeeForm({ onSuccess }: { onSuccess: () => void }) {
                     </select>
                 </div>
                 <div className="space-y-1">
-                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Starting PFFD</label>
+                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Starting PFFD</label>
                     <input 
                         name="pffdBalance" 
                         type="number" 
                         required 
                         min="0"
                         defaultValue="0"
-                        className="w-full bg-[#1A1D27] border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" 
+                        className="w-full bg-background border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" 
                     />
                 </div>
             </div>
@@ -82,14 +82,14 @@ export function AddEmployeeForm({ onSuccess }: { onSuccess: () => void }) {
                 <button 
                     type="button" 
                     onClick={onSuccess}
-                    className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors"
+                    className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                     Cancel
                 </button>
                 <button 
                     type="submit" 
                     disabled={isLoading}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-white text-black rounded-lg hover:bg-slate-200 transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
                 >
                     {isLoading && <Loader2 className="size-4 animate-spin" />}
                     {isLoading ? "Adding..." : "Add Employee"}
