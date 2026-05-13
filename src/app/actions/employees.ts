@@ -128,3 +128,67 @@ export async function updatePffdBalance(userId: string, newBalance: number) {
         return { success: false, error: "Database error occurred." };
     }
 }
+export async function updateEmployee(userId: string, data: { role?: string, pffdBalance?: number }) {
+    const session = await auth();
+    const currentUserRole = session?.user ? (session.user as any).role : null;
+    
+    if (currentUserRole !== "ADMIN" && currentUserRole !== "MANAGER") {
+        throw new Error("Unauthorized: Only Admins and Managers can edit employees.");
+    }
+
+    try {
+        const updateData: any = {};
+        if (data.role) {
+            // Only admins can change roles
+            if (currentUserRole === "ADMIN") {
+                updateData.role = data.role;
+            }
+        }
+
+        await prisma.$transaction([
+            // Update User fields (role)
+            ...(Object.keys(updateData).length > 0 ? [
+                prisma.user.update({
+                    where: { id: userId },
+                    data: updateData
+                })
+            ] : []),
+            // Update PFFD Balance
+            ...(data.pffdBalance !== undefined ? [
+                prisma.leaveBalance.upsert({
+                    where: {
+                        userId_leaveType: {
+                            userId: userId,
+                            leaveType: "PFFD"
+                        }
+                    },
+                    update: {
+                        balance: data.pffdBalance
+                    },
+                    create: {
+                        userId: userId,
+                        leaveType: "PFFD",
+                        balance: data.pffdBalance
+                    }
+                })
+            ] : [])
+        ]);
+
+        // Audit log the manual change
+        if (session?.user?.id) {
+            await prisma.auditLog.create({
+                data: {
+                    action: "EMPLOYEE_MANUAL_UPDATE",
+                    userId: session.user.id,
+                    details: `Updated employee ${userId}: ${JSON.stringify(data)}`
+                }
+            });
+        }
+
+        revalidatePath("/admin/employees");
+        return { success: true };
+    } catch (error) {
+        console.error("Failed to update employee:", error);
+        return { success: false, error: "Database error occurred." };
+    }
+}

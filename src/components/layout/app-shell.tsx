@@ -108,7 +108,6 @@ export function AppShell({ user, children }: { user: any, children: React.ReactN
                             {user?.name || "Employee"} 
                             {(user?.role === "ADMIN" || user?.role === "SUPERADMIN") && !(user?.name || "").toLowerCase().includes("admin") ? " (Admin)" : ""}
                         </p>
-                        <p className="text-xs text-muted-foreground mt-0.5 truncate pr-1" title={user?.email}>{user?.email}</p>
                     </div>
                 </div>
                 <form action={handleSignOut} className="w-full">
@@ -120,7 +119,6 @@ export function AppShell({ user, children }: { user: any, children: React.ReactN
             {/* Mobile-oriented signout block */}
             <div className="bg-primary/5 rounded-xl p-4 border border-primary/10 mt-auto shrink-0 lg:hidden mb-4">
                 <p className="text-sm font-medium text-foreground">{user?.name || "Employee"}</p>
-                <p className="text-xs text-muted-foreground mb-3 truncate max-w-full">{user?.email}</p>
                 <form action={handleSignOut}>
                     <button type="submit" className="w-full py-2 bg-destructive/10 rounded-md text-xs font-semibold text-destructive hover:bg-destructive/20 transition-colors">
                         Sign out

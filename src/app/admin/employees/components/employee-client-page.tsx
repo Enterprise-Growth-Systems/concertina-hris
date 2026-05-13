@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Plus, UserCog, User, ShieldAlert, Search, Trash2, Loader2 } from "lucide-react";
 import { AddEmployeeForm } from "./add-employee-form";
-import { deleteEmployee, updatePffdBalance } from "@/app/actions/employees";
+import { deleteEmployee, updateEmployee } from "@/app/actions/employees";
 
 type EmployeeData = {
     id: string;
@@ -20,10 +20,11 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
     const [employeeToDelete, setEmployeeToDelete] = useState<EmployeeData | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     
-    // PFFD Edit State
+    // Edit Employee State
     const [employeeToEdit, setEmployeeToEdit] = useState<EmployeeData | null>(null);
-    const [newPffdBalance, setNewPffdBalance] = useState<string>("");
-    const [isSavingPffd, setIsSavingPffd] = useState(false);
+    const [editRole, setEditRole] = useState<string>("");
+    const [editPffdBalance, setEditPffdBalance] = useState<string>("");
+    const [isSaving, setIsSaving] = useState(false);
 
     const filteredUsers = initialUsers.filter(user => 
         user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -47,20 +48,23 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
         }
     };
 
-    const handleEditPffd = async () => {
-        if (!employeeToEdit || isNaN(parseFloat(newPffdBalance))) return;
-        setIsSavingPffd(true);
+    const handleEditEmployee = async () => {
+        if (!employeeToEdit || isNaN(parseFloat(editPffdBalance))) return;
+        setIsSaving(true);
         try {
-            const res = await updatePffdBalance(employeeToEdit.id, parseFloat(newPffdBalance));
+            const res = await updateEmployee(employeeToEdit.id, {
+                role: editRole,
+                pffdBalance: parseFloat(editPffdBalance)
+            });
             if (res.success) {
                 setEmployeeToEdit(null);
             } else {
                 alert(res.error);
             }
         } catch (error) {
-            alert("Failed to update PFFD balance.");
+            alert("Failed to update employee.");
         } finally {
-            setIsSavingPffd(false);
+            setIsSaving(false);
         }
     };
 
@@ -148,10 +152,11 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
                                                 <button
                                                     onClick={() => {
                                                         setEmployeeToEdit(user);
-                                                        setNewPffdBalance(user.leaveBalance.toString());
+                                                        setEditRole(user.role);
+                                                        setEditPffdBalance(user.leaveBalance.toString());
                                                     }}
                                                     className="p-2 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                                                    title="Edit PFFD Balance"
+                                                    title="Edit Employee"
                                                 >
                                                     <UserCog className="size-4" />
                                                 </button>
@@ -250,29 +255,43 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
                 </div>
             )}
 
-            {/* Edit PFFD Modal */}
+            {/* Edit Employee Modal */}
             {employeeToEdit && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div 
                         className="fixed inset-0 bg-background/80 backdrop-blur-sm animate-in fade-in" 
-                        onClick={() => !isSavingPffd && setEmployeeToEdit(null)}
+                        onClick={() => !isSaving && setEmployeeToEdit(null)}
                     />
                     <div className="relative bg-card border rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in zoom-in-95 duration-200">
                         <div className="mb-6">
-                            <h2 className="text-xl font-bold text-foreground mb-1">Edit PFFD Balance</h2>
+                            <h2 className="text-xl font-bold text-foreground mb-1">Edit Employee</h2>
                             <p className="text-sm text-muted-foreground">
-                                Update the PFFD balance for <strong className="text-foreground">{employeeToEdit.name}</strong>.
+                                Update details for <strong className="text-foreground">{employeeToEdit.name}</strong>.
                             </p>
                         </div>
                         
                         <div className="space-y-4 mb-6">
+                            {currentUserRole === "ADMIN" && (
+                                <div>
+                                    <label className="block text-sm font-medium text-foreground mb-1.5">User Role</label>
+                                    <select
+                                        value={editRole}
+                                        onChange={(e) => setEditRole(e.target.value)}
+                                        className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                    >
+                                        <option value="EMPLOYEE">Employee</option>
+                                        <option value="MANAGER">Manager</option>
+                                        <option value="ADMIN">Admin</option>
+                                    </select>
+                                </div>
+                            )}
                             <div>
-                                <label className="block text-sm font-medium text-foreground mb-1.5">New PFFD Balance</label>
+                                <label className="block text-sm font-medium text-foreground mb-1.5">PFFD Balance</label>
                                 <input
                                     type="number"
                                     step="0.01"
-                                    value={newPffdBalance}
-                                    onChange={(e) => setNewPffdBalance(e.target.value)}
+                                    value={editPffdBalance}
+                                    onChange={(e) => setEditPffdBalance(e.target.value)}
                                     className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
                                     placeholder="e.g. 5.5"
                                 />
@@ -282,17 +301,17 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
                         <div className="flex items-center justify-end gap-3">
                             <button
                                 onClick={() => setEmployeeToEdit(null)}
-                                disabled={isSavingPffd}
+                                disabled={isSaving}
                                 className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted rounded-lg transition-colors border border-transparent disabled:opacity-50"
                             >
                                 Cancel
                             </button>
                             <button
-                                onClick={handleEditPffd}
-                                disabled={isSavingPffd || isNaN(parseFloat(newPffdBalance))}
+                                onClick={handleEditEmployee}
+                                disabled={isSaving || isNaN(parseFloat(editPffdBalance))}
                                 className="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors shadow-sm disabled:opacity-50"
                             >
-                                {isSavingPffd ? (
+                                {isSaving ? (
                                     <>
                                         <Loader2 className="size-4 animate-spin" />
                                         Saving...
