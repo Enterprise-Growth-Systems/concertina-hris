@@ -42,7 +42,7 @@ export default async function EmployeesPage() {
     return (
         <div className="max-w-5xl mx-auto space-y-8 py-8 px-4">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-white">Team Management</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-foreground">Team Management</h1>
                 <p className="text-muted-foreground mt-1 text-lg">
                     Add new employees, manage roles, and migrate starting PFFD balances.
                 </p>
