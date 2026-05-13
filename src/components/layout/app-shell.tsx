@@ -99,16 +99,16 @@ export function AppShell({ user, children }: { user: any, children: React.ReactN
             </nav>
 
             <div className="rounded-xl p-3 mt-auto shrink-0 hidden lg:flex items-center justify-between hover:bg-muted/50 transition-colors border border-transparent hover:border-border">
-                <div className="flex items-center gap-3 overflow-hidden">
+                <div className="flex items-center gap-3 flex-1 min-w-0 pr-2">
                     <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                         <span className="text-xs font-bold text-primary uppercase">{user?.name?.charAt(0) || "E"}</span>
                     </div>
-                    <div className="flex flex-col overflow-hidden">
-                        <p className="text-sm font-medium text-foreground truncate">{user?.name || "Employee"} {user?.role === "ADMIN" || user?.role === "SUPERADMIN" ? "(Admin)" : ""}</p>
-                        <p className="text-xs text-muted-foreground truncate max-w-full">{user?.email}</p>
+                    <div className="flex flex-col flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground leading-tight break-words">{user?.name || "Employee"} {user?.role === "ADMIN" || user?.role === "SUPERADMIN" ? "(Admin)" : ""}</p>
+                        <p className="text-xs text-muted-foreground break-all leading-tight mt-0.5">{user?.email}</p>
                     </div>
                 </div>
-                <form action={handleSignOut} className="ml-2">
+                <form action={handleSignOut} className="shrink-0">
                     <button type="submit" className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors" title="Log out">
                         <X className="size-4" />
                     </button>
