@@ -98,19 +98,22 @@ export function AppShell({ user, children }: { user: any, children: React.ReactN
                 )}
             </nav>
 
-            <div className="rounded-xl p-3 mt-auto shrink-0 hidden lg:flex items-center justify-between hover:bg-muted/50 transition-colors border border-transparent hover:border-border">
-                <div className="flex items-center gap-3 flex-1 min-w-0 pr-2">
-                    <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                        <span className="text-xs font-bold text-primary uppercase">{user?.name?.charAt(0) || "E"}</span>
+            <div className="rounded-xl p-3 mt-auto shrink-0 hidden lg:flex flex-col gap-3 bg-muted/30 border border-transparent hover:border-border transition-colors">
+                <div className="flex items-center gap-3">
+                    <div className="size-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
+                        <span className="text-sm font-bold text-primary uppercase">{user?.name?.charAt(0) || "E"}</span>
                     </div>
                     <div className="flex flex-col flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground leading-tight break-words">{user?.name || "Employee"} {user?.role === "ADMIN" || user?.role === "SUPERADMIN" ? "(Admin)" : ""}</p>
-                        <p className="text-xs text-muted-foreground break-all leading-tight mt-0.5">{user?.email}</p>
+                        <p className="text-sm font-semibold text-foreground leading-tight line-clamp-2">
+                            {user?.name || "Employee"} 
+                            {(user?.role === "ADMIN" || user?.role === "SUPERADMIN") && !(user?.name || "").toLowerCase().includes("admin") ? " (Admin)" : ""}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5 truncate pr-1" title={user?.email}>{user?.email}</p>
                     </div>
                 </div>
-                <form action={handleSignOut} className="shrink-0">
-                    <button type="submit" className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors" title="Log out">
-                        <X className="size-4" />
+                <form action={handleSignOut} className="w-full">
+                    <button type="submit" className="w-full flex items-center justify-center gap-2 py-2 bg-background hover:bg-destructive hover:text-white text-muted-foreground text-xs font-medium rounded-lg border shadow-sm transition-all duration-200">
+                        Sign out
                     </button>
                 </form>
             </div>
