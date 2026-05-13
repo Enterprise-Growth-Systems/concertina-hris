@@ -162,6 +162,9 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
                                                     className="p-2 text-muted-foreground hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                     title="Delete Employee"
                                                 >
+                                                    <Trash2 className="size-4" />
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>
