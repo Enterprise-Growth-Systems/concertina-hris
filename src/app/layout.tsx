@@ -21,7 +21,7 @@ export default async function RootLayout({
   const isLoggedIn = !!session?.user;
 
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body className={`${inter.className} min-h-screen bg-background antialiased flex`}>
         {isLoggedIn ? (
           <AppShell user={session?.user}>

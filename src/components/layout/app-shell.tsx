@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Menu, X, Clock, LayoutDashboard, CalendarHeart, Users, Settings, History, Megaphone, BookOpen, BookUser, UserCircle, Calendar, CalendarDays, ClipboardList } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { handleSignOut } from "@/app/actions/auth";
@@ -33,14 +34,17 @@ export function AppShell({ user, children }: { user: any, children: React.ReactN
 
     const NavContent = () => (
         <div className="flex flex-col h-full w-full">
-            <div className="flex items-center gap-2 pl-2">
-                <div className="size-8 shrink-0 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-                    <Clock className="size-5 text-primary-foreground" />
-                </div>
-                <span className="font-bold text-xl tracking-tight">Concertina HR</span>
+            <div className="flex flex-col gap-1 pl-2 mb-4">
+                <Image 
+                    src="/egs-logo.png" 
+                    alt="EGS Logo" 
+                    width={100} 
+                    height={40} 
+                    className="object-contain mb-2"
+                />
             </div>
 
-            <nav className="flex flex-col gap-1 flex-1 mt-8 lg:mt-6 overflow-y-auto pr-2 pb-4">
+            <nav className="flex flex-col gap-1 flex-1 mt-4 lg:mt-2 overflow-y-auto pr-2 pb-4">
                 <div className="text-xs font-semibold text-muted-foreground mb-2 px-2 uppercase tracking-wider">
                     Main Menu
                 </div>
@@ -94,12 +98,19 @@ export function AppShell({ user, children }: { user: any, children: React.ReactN
                 )}
             </nav>
 
-            <div className="bg-primary/5 rounded-xl p-4 border border-primary/10 mt-auto shrink-0 hidden lg:block">
-                <p className="text-sm font-medium text-foreground">{user?.name || "Employee"}</p>
-                <p className="text-xs text-muted-foreground mb-3 truncate max-w-full">{user?.email}</p>
-                <form action={handleSignOut}>
-                    <button type="submit" className="text-xs font-medium text-destructive hover:text-destructive/80 transition-colors">
-                        Sign out
+            <div className="rounded-xl p-3 border mt-auto shrink-0 hidden lg:flex items-center justify-between bg-card">
+                <div className="flex items-center gap-3 overflow-hidden">
+                    <div className="size-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                        <span className="text-xs font-bold text-muted-foreground uppercase">{user?.name?.charAt(0) || "E"}</span>
+                    </div>
+                    <div className="flex flex-col overflow-hidden">
+                        <p className="text-sm font-medium text-foreground truncate">{user?.name || "Employee"} {user?.role === "ADMIN" || user?.role === "SUPERADMIN" ? "(Admin)" : ""}</p>
+                        <p className="text-xs text-muted-foreground truncate max-w-full">{user?.email}</p>
+                    </div>
+                </div>
+                <form action={handleSignOut} className="ml-2">
+                    <button type="submit" className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors" title="Log out">
+                        <X className="size-4" />
                     </button>
                 </form>
             </div>
@@ -117,9 +128,9 @@ export function AppShell({ user, children }: { user: any, children: React.ReactN
     );
 
     return (
-        <div className="flex w-full min-h-screen">
+        <div className="flex w-full min-h-screen bg-background">
             {/* Desktop Sidebar */}
-            <aside className="hidden lg:flex w-64 flex-col border-r bg-card/50 backdrop-blur-md px-4 py-6 gap-8 sticky top-0 h-screen z-20">
+            <aside className="hidden lg:flex w-64 flex-col px-4 py-6 gap-8 sticky top-0 h-screen z-20">
                 <NavContent />
             </aside>
 
@@ -159,8 +170,10 @@ export function AppShell({ user, children }: { user: any, children: React.ReactN
                     </button>
                 </header>
 
-                <main className="flex-1 p-4 lg:p-8 shrink-0">
-                    {children}
+                <main className="flex-1 p-4 lg:p-6 lg:pl-0 shrink-0 flex flex-col">
+                    <div className="bg-card rounded-2xl border shadow-sm w-full flex-1 p-6 relative overflow-hidden">
+                        {children}
+                    </div>
                 </main>
             </div>
         </div>

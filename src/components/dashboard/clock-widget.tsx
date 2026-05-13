@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect } from "react";
 import { formatInTimeZone } from "date-fns-tz";
 import { Play, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,10 @@ export function ClockWidget() {
     const [isClockedIn, setIsClockedIn] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [hasLoadedStatus, setHasLoadedStatus] = useState(false);
+    
+    // Optional form state
+    const [projectInput, setProjectInput] = useState("");
+    const [notesInput, setNotesInput] = useState("");
 
     useEffect(() => {
         // Initial fetch to get clock-in status from DB
@@ -32,9 +36,15 @@ export function ClockWidget() {
         
         setIsPending(true);
         try {
+            // Note: In the future, we can pass projectInput and notesInput to the action
             const res = await toggleClockStatus();
             if (res.success) {
                 setIsClockedIn(!isClockedIn);
+                if (!isClockedIn) {
+                   // clear inputs on clock out
+                   setProjectInput("");
+                   setNotesInput("");
+                }
             }
         } finally {
             setIsPending(false);
@@ -43,7 +53,8 @@ export function ClockWidget() {
 
     if (!time) {
         return (
-            <div className="rounded-2xl border bg-card shadow-sm p-6 lg:p-10 flex flex-col items-center justify-center min-h-[300px] animate-pulse">
+            <div className="rounded-2xl border bg-card p-6 flex flex-col items-center justify-center min-h-[350px] animate-pulse">
+                <div className="h-8 w-32 bg-muted rounded-md mb-8"></div>
                 <div className="h-12 w-48 bg-muted rounded-lg mb-4"></div>
                 <div className="h-6 w-32 bg-muted rounded-md"></div>
             </div>
@@ -51,59 +62,77 @@ export function ClockWidget() {
     }
 
     return (
-        <div className="rounded-2xl border bg-card text-card-foreground shadow-sm relative overflow-hidden group">
-            {/* Decorative background blur */}
-            <div className={cn(
-                "absolute -inset-24 bg-gradient-to-tr opacity-20 blur-3xl transition-colors duration-1000 -z-10",
-                (hasLoadedStatus && isClockedIn) ? "from-primary/50 to-fuchsia-500/50" : "from-zinc-500/20 to-zinc-400/20"
-            )}></div>
-
-            <div className="p-6 lg:p-10 flex flex-col items-center justify-center text-center">
-                <div className="mb-8">
-                    <h2 className="text-5xl lg:text-7xl font-black tracking-tighter tabular-nums text-foreground drop-shadow-sm">
-                        {formatInTimeZone(time, 'Asia/Manila', "hh:mm:ss a")}
-                    </h2>
-                    <p className="text-lg text-muted-foreground font-medium mt-2 uppercase tracking-widest">
-                        {formatInTimeZone(time, 'Asia/Manila', "EEEE, MMMM do")}
-                    </p>
+        <div className="rounded-2xl border bg-card p-6 flex flex-col">
+            <div className="flex justify-between items-start mb-6">
+                <div>
+                    <h3 className="font-bold text-foreground text-sm">Clock-in</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">Live attendance tracker</p>
                 </div>
+                <span className="px-2.5 py-1 bg-muted rounded-md text-[10px] font-semibold text-muted-foreground border">
+                    {hasLoadedStatus ? (isClockedIn ? "Active" : "Ready") : "..."}
+                </span>
+            </div>
 
+            <div className="flex flex-col items-center justify-center mb-6">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">CURRENT TIME</p>
+                <h2 className="text-4xl font-bold tracking-tight text-foreground tabular-nums">
+                    {formatInTimeZone(time, 'Asia/Manila', "HH:mm:ss")}
+                </h2>
+                <p className="text-xs font-medium text-muted-foreground mt-1">
+                    {formatInTimeZone(time, 'Asia/Manila', "EEEE, MMM d")}
+                </p>
+            </div>
+
+            <div className="flex flex-col gap-3 mb-6">
+                <input 
+                    type="text" 
+                    placeholder="Project or work item (optional)" 
+                    value={projectInput}
+                    onChange={(e) => setProjectInput(e.target.value)}
+                    disabled={isClockedIn || !hasLoadedStatus}
+                    className="w-full text-sm px-4 py-2.5 rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50"
+                />
+                <input 
+                    type="text" 
+                    placeholder="Notes (optional)" 
+                    value={notesInput}
+                    onChange={(e) => setNotesInput(e.target.value)}
+                    disabled={isClockedIn || !hasLoadedStatus}
+                    className="w-full text-sm px-4 py-2.5 rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50"
+                />
+            </div>
+
+            <div className="flex flex-col items-center mt-auto">
                 {!hasLoadedStatus ? (
-                    <div className="h-[60px] w-[180px] bg-muted/50 rounded-full animate-pulse flex items-center justify-center border border-border">
-                        <div className="size-5 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin"></div>
-                    </div>
+                    <div className="h-10 w-32 bg-muted rounded-md animate-pulse"></div>
                 ) : (
                     <button
                         onClick={handleToggleClock}
                         disabled={isPending}
                         className={cn(
-                            "relative flex items-center justify-center gap-3 px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 transform shadow-lg overflow-hidden",
+                            "flex items-center justify-center gap-2 px-8 py-2.5 rounded-md font-bold text-sm transition-all w-40",
                             isClockedIn
-                                ? "bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:scale-105 shadow-destructive/20"
-                                : "bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-105 shadow-primary/20"
+                                ? "bg-muted text-foreground hover:bg-muted/80 border"
+                                : "bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         )}
                     >
                         {isPending ? (
-                            <div className="size-6 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                            <div className="size-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                         ) : (
                             <>
-                                <div className={cn(
-                                    "absolute inset-0 bg-white/20 translate-y-full transition-transform duration-300 group-hover:translate-y-0",
-                                    !isClockedIn && "group-hover:translate-y-0"
-                                )} />
-                                {isClockedIn ? <Square className="size-5 fill-current relative z-10" /> : <Play className="size-5 fill-current relative z-10" />}
-                                <span className="relative z-10">{isClockedIn ? "Clock Out" : "Clock In"}</span>
+                                {isClockedIn ? <Square className="size-4 fill-current" /> : <Play className="size-4 fill-current" />}
+                                <span>{isClockedIn ? "Clock-out" : "Clock-in"}</span>
                             </>
                         )}
                     </button>
                 )}
 
-                <p className="mt-6 text-sm text-muted-foreground font-medium min-h-[20px]">
+                <p className="mt-4 text-xs text-muted-foreground text-center">
                     {!hasLoadedStatus 
                         ? "Checking status..." 
                         : isClockedIn
-                            ? "You are currently clocked in. Have a great day!"
-                            : "Ready to start your day? Don't forget to clock in."}
+                            ? "You are currently clocked in and working."
+                            : "You are currently clocked out and ready to begin."}
                 </p>
             </div>
         </div>
