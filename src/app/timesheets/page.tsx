@@ -73,9 +73,9 @@ export default async function TimesheetsPage() {
                                                 {duration}
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${log.status === 'ON_TIME'
-                                                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400'
-                                                    : 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${log.status === 'ON_TIME'
+                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                    : 'bg-red-50 text-red-600 border border-red-200'
                                                     }`}>
                                                     {log.status === 'ON_TIME' ? 'On Time' : 'Late'}
                                                 </span>

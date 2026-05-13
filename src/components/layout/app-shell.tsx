@@ -98,10 +98,10 @@ export function AppShell({ user, children }: { user: any, children: React.ReactN
                 )}
             </nav>
 
-            <div className="rounded-xl p-3 border mt-auto shrink-0 hidden lg:flex items-center justify-between bg-card">
+            <div className="rounded-xl p-3 mt-auto shrink-0 hidden lg:flex items-center justify-between hover:bg-muted/50 transition-colors border border-transparent hover:border-border">
                 <div className="flex items-center gap-3 overflow-hidden">
-                    <div className="size-8 rounded-full bg-muted flex items-center justify-center shrink-0">
-                        <span className="text-xs font-bold text-muted-foreground uppercase">{user?.name?.charAt(0) || "E"}</span>
+                    <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <span className="text-xs font-bold text-primary uppercase">{user?.name?.charAt(0) || "E"}</span>
                     </div>
                     <div className="flex flex-col overflow-hidden">
                         <p className="text-sm font-medium text-foreground truncate">{user?.name || "Employee"} {user?.role === "ADMIN" || user?.role === "SUPERADMIN" ? "(Admin)" : ""}</p>

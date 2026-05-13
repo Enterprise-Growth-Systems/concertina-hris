@@ -70,40 +70,40 @@ export default function AdminReportsPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 py-8 px-4">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-white">Reporting Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Reporting Dashboard</h1>
         <p className="text-muted-foreground mt-1 text-lg">
           Generate and download CSV reports for payroll and analytics.
         </p>
       </div>
 
-      <div className="rounded-2xl border bg-[#11131A] text-card-foreground shadow-sm overflow-hidden border-slate-800">
-        <div className="p-6 border-b border-slate-800 bg-card/50 flex flex-col md:flex-row md:items-end gap-6">
+      <div className="rounded-2xl border bg-card text-card-foreground shadow-sm overflow-hidden">
+        <div className="p-6 border-b flex flex-col md:flex-row md:items-end gap-6">
           <div className="flex-1 space-y-4">
-             <h2 className="font-semibold text-xl text-white flex items-center gap-2">
+             <h2 className="font-semibold text-xl text-foreground flex items-center gap-2">
                  <CalendarIcon className="size-5 text-primary" />
                  Report Date Range
              </h2>
              
              <div className="flex items-center gap-4">
                 <div className="flex-1">
-                  <label htmlFor="startDate" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wider">Start Date</label>
+                  <label htmlFor="startDate" className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wider">Start Date</label>
                   <input 
                     type="date" 
                     id="startDate"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full bg-[#1A1D27] border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="w-full bg-background border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
                 </div>
-                <div className="text-slate-500 pt-5">to</div>
+                <div className="text-muted-foreground pt-5">to</div>
                 <div className="flex-1">
-                  <label htmlFor="endDate" className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wider">End Date</label>
+                  <label htmlFor="endDate" className="block text-xs font-medium text-muted-foreground mb-1.5 uppercase tracking-wider">End Date</label>
                   <input 
                     type="date" 
                     id="endDate"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full bg-[#1A1D27] border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="w-full bg-background border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
                 </div>
              </div>
@@ -114,13 +114,13 @@ export default function AdminReportsPage() {
            <div className="grid md:grid-cols-2 gap-4">
               
               {/* Master Payroll Excel Export Card */}
-              <div className="p-5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors cursor-pointer group flex items-start gap-4 md:col-span-2">
-                  <div className="bg-emerald-500/20 text-emerald-400 p-3 rounded-lg group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+              <div className="p-5 rounded-xl border border-emerald-500/30 bg-emerald-50 hover:bg-emerald-100 transition-colors cursor-pointer group flex items-start gap-4 md:col-span-2">
+                  <div className="bg-emerald-100 text-emerald-600 p-3 rounded-lg group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                      <FileSpreadsheet className="size-6" />
                   </div>
                   <div className="flex-1">
-                     <h3 className="font-bold text-white mb-1">Master Payroll Export (Consolidated CSV)</h3>
-                     <p className="text-sm text-slate-300 mb-4">
+                     <h3 className="font-bold text-emerald-900 mb-1">Master Payroll Export (Consolidated CSV)</h3>
+                     <p className="text-sm text-emerald-700/80 mb-4">
                         Download the comprehensive enterprise payroll spreadsheet exactly matching the V2 specifications. Contains Attendance Summary and Detailed Daily Logs.
                      </p>
                      
@@ -136,13 +136,13 @@ export default function AdminReportsPage() {
               </div>
 
               {/* Timesheets Export Card */}
-              <div className="p-5 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors cursor-pointer group flex items-start gap-4">
-                  <div className="bg-primary/20 text-primary p-3 rounded-lg group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+              <div className="p-5 rounded-xl border bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer group flex items-start gap-4">
+                  <div className="bg-primary/10 text-primary p-3 rounded-lg group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                      <FileSpreadsheet className="size-6" />
                   </div>
                   <div className="flex-1">
-                     <h3 className="font-bold text-white mb-1">Timesheet Logs</h3>
-                     <p className="text-xs text-slate-400 mb-4 line-clamp-2">
+                     <h3 className="font-bold text-foreground mb-1">Timesheet Logs</h3>
+                     <p className="text-xs text-muted-foreground mb-4 line-clamp-2">
                         Export raw clock-in/out records, status, and annotations for proper payroll alignment.
                      </p>
                      
@@ -158,13 +158,13 @@ export default function AdminReportsPage() {
               </div>
 
               {/* PFFD Export Card */}
-              <div className="p-5 rounded-xl border border-indigo-500/20 bg-indigo-500/5 hover:bg-indigo-500/10 transition-colors cursor-pointer group flex items-start gap-4">
-                  <div className="bg-indigo-500/20 text-indigo-400 p-3 rounded-lg group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+              <div className="p-5 rounded-xl border bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer group flex items-start gap-4">
+                  <div className="bg-indigo-100 text-indigo-600 p-3 rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                      <FileSpreadsheet className="size-6" />
                   </div>
                   <div className="flex-1">
-                     <h3 className="font-bold text-white mb-1">PFFD Requests</h3>
-                     <p className="text-xs text-slate-400 mb-4 line-clamp-2">
+                     <h3 className="font-bold text-foreground mb-1">PFFD Requests</h3>
+                     <p className="text-xs text-muted-foreground mb-4 line-clamp-2">
                         Export all Pre-Funded Flex Days and leaves tracking statuses and type balances.
                      </p>
                      
