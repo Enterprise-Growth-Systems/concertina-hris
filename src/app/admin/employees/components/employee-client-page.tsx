@@ -333,50 +333,7 @@ export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: 
                         <div className="space-y-4 mb-6">
                             {currentUserRole === "ADMIN" && (
                                 <>
-                                    <div>
-                                        <label className="block text-sm font-medium text-foreground mb-1.5">User Role</label>
-                                        <select
-                                            value={editRole}
-                                            onChange={(e) => setEditRole(e.target.value)}
-                                            className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                                        >
-                                            <option value="EMPLOYEE">Employee</option>
-                                            <option value="MANAGER">Manager</option>
-                                            <option value="ADMIN">Admin</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-foreground mb-1.5">Contact Number</label>
-                                        <input
-                                            type="text"
-                                            value={editContactNumber}
-                                            onChange={(e) => setEditContactNumber(e.target.value)}
-                                            className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                                            placeholder="+1 (555) 000-0000"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-foreground mb-1.5">Emergency Contact</label>
-                                        <input
-                                            type="text"
-                                            value={editEmergencyContact}
-                                            onChange={(e) => setEditEmergencyContact(e.target.value)}
-                                            className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                                            placeholder="Name & Number"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-foreground mb-1.5">Home Address</label>
-                                        <textarea
-                                            value={editAddress}
-                                            onChange={(e) => setEditAddress(e.target.value)}
-                                            rows={2}
-                                            className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                                            placeholder="123 Example St, City, Country"
-                                        />
-                                    </div>
-                                    
-                                    <div className="pt-4 mt-2 border-t border-border">
+                                    <div className="pb-4 mb-4 border-b border-border">
                                         <h3 className="text-sm font-bold text-foreground mb-4">Employment Details</h3>
                                         <div className="space-y-4">
                                             <div>
@@ -442,6 +399,49 @@ export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: 
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-foreground mb-1.5">User Role</label>
+                                        <select
+                                            value={editRole}
+                                            onChange={(e) => setEditRole(e.target.value)}
+                                            className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                        >
+                                            <option value="EMPLOYEE">Employee</option>
+                                            <option value="MANAGER">Manager</option>
+                                            <option value="ADMIN">Admin</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-foreground mb-1.5">Contact Number</label>
+                                        <input
+                                            type="text"
+                                            value={editContactNumber}
+                                            onChange={(e) => setEditContactNumber(e.target.value)}
+                                            className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                            placeholder="+1 (555) 000-0000"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-foreground mb-1.5">Emergency Contact</label>
+                                        <input
+                                            type="text"
+                                            value={editEmergencyContact}
+                                            onChange={(e) => setEditEmergencyContact(e.target.value)}
+                                            className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                            placeholder="Name & Number"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-foreground mb-1.5">Home Address</label>
+                                        <textarea
+                                            value={editAddress}
+                                            onChange={(e) => setEditAddress(e.target.value)}
+                                            rows={2}
+                                            className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                                            placeholder="123 Example St, City, Country"
+                                        />
                                     </div>
                                 </>
                             )}
