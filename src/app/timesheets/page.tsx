@@ -32,8 +32,8 @@ export default async function TimesheetsPage() {
 
     return (
         <div className="max-w-5xl mx-auto space-y-8">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Timesheets</h1>
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold tracking-tight text-foreground">Timesheets</h1>
                 <p className="text-muted-foreground mt-1 text-lg">
                     Review your attendance history.
                 </p>

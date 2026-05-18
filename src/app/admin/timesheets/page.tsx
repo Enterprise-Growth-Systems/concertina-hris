@@ -29,8 +29,8 @@ export default async function AdminTimesheetsPage() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-8 py-8 px-4">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight text-white">Company Time Logs</h1>
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold tracking-tight text-foreground">Company Time Logs</h1>
                 <p className="text-muted-foreground mt-1 text-lg">
                     Advanced Multi-Filter Search
                 </p>
