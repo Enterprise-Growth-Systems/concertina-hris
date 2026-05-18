@@ -17,7 +17,7 @@ export default function AdminReportsPage() {
     try {
       // Direct navigation forces the browser's native download manager
       // which strictly honors the server's filename and extension.
-      window.location.href = '/api/reports/payroll';
+      window.location.href = `/api/reports/payroll?startDate=${startDate}&endDate=${endDate}`;
       
       // Artificial delay just to show the spinner briefly
       await new Promise(resolve => setTimeout(resolve, 800));
