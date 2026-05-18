@@ -21,13 +21,7 @@ export default async function DashboardPage() {
   // Get the first name
   const firstName = session.user.name ? session.user.name.split(" ")[0] : "there";
   
-  // Date range for the top right pill (mocked to current week for display)
   const now = new Date();
-  const startOfWeek = new Date(now);
-  startOfWeek.setDate(now.getDate() - now.getDay() + 1); // Monday
-  const endOfWeek = new Date(now);
-  endOfWeek.setDate(startOfWeek.getDate() + 6); // Sunday
-  const dateRangeStr = `${formatInTimeZone(startOfWeek, 'Asia/Manila', 'MMM d')} - ${formatInTimeZone(endOfWeek, 'Asia/Manila', 'MMM d, yyyy')}`;
   
   const currentDayIndex = now.getDay();
   const currentDayName = DAYS[currentDayIndex];
@@ -47,20 +41,13 @@ export default async function DashboardPage() {
 
 
       {/* Welcome Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-        <div>
-          <h2 className="text-sm font-bold text-primary mb-1 tracking-widest uppercase">WELCOME</h2>
-          <h1 className="text-2xl font-bold text-foreground mb-1">{firstName}, here's your workday snapshot.</h1>
-        </div>
-        <div className="px-4 py-1.5 bg-muted rounded-full text-xs font-medium text-muted-foreground border">
-          {dateRangeStr}
-        </div>
+      <div className="mb-8 text-center md:text-left">
+        <h2 className="text-sm font-bold text-primary mb-1 tracking-widest uppercase">WELCOME</h2>
+        <h1 className="text-2xl font-bold text-foreground mb-1">{firstName}, here's your workday snapshot.</h1>
       </div>
 
       {/* Centered Content: Clock & Logs */}
       <div className="max-w-lg mx-auto w-full space-y-8 mb-8">
-        <ClockWidget />
-
         {/* Today's Schedule Box */}
         <div className="rounded-2xl border bg-card p-5 relative overflow-hidden transition-all bg-primary/5 border-primary shadow-sm shadow-primary/20">
           <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-bl-lg z-10">
@@ -90,6 +77,8 @@ export default async function DashboardPage() {
             )}
           </div>
         </div>
+
+        <ClockWidget />
 
         {/* Recent Time Logs Table */}
         <div className="rounded-2xl border bg-card p-6">
