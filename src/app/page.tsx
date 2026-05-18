@@ -48,54 +48,48 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Widgets Grid */}
-      <div className="grid lg:grid-cols-3 gap-6 mb-8">
-        {/* Col 1: Clock Widget */}
+      {/* Centered Content: Clock & Logs */}
+      <div className="max-w-lg mx-auto w-full space-y-8 mb-8">
         <ClockWidget />
-      </div>
 
-      {/* Recent Time Logs Table */}
-      <div className="rounded-2xl border bg-card p-6">
-        <h3 className="text-xs font-bold text-primary uppercase tracking-widest mb-1">RECENT TIME LOGS</h3>
-        <h2 className="text-xl font-bold text-foreground mb-6">Your latest activity</h2>
+        {/* Recent Time Logs Table */}
+        <div className="rounded-2xl border bg-card p-6">
+          <div className="text-center mb-6">
+            <h3 className="text-xs font-bold text-primary uppercase tracking-widest mb-1">RECENT TIME LOGS</h3>
+            <h2 className="text-xl font-bold text-foreground">Your latest activity</h2>
+          </div>
 
-        {recentLogs.length === 0 ? (
-          <div className="text-sm text-muted-foreground text-center py-12 border-t">
-            No recent activity to display.
-          </div>
-        ) : (
-          <div className="w-full overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="text-[10px] text-muted-foreground uppercase tracking-widest border-b">
-                <tr>
-                  <th className="px-4 py-3 font-semibold">DATE</th>
-                  <th className="px-4 py-3 font-semibold">TIME</th>
-                  <th className="px-4 py-3 font-semibold text-right">DURATION</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {recentLogs.map((log: any) => {
-                  const isLate = log.status === "LATE";
-                  // Mock duration for now
-                  const durationStr = log.clockOut ? "1m" : "0m";
-                  return (
-                    <tr key={log.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-4 py-4 font-medium text-foreground whitespace-nowrap">
-                        {formatInTimeZone(log.clockIn, 'Asia/Manila', "EEEE, MMM d")}
-                      </td>
-                      <td className="px-4 py-4 text-muted-foreground whitespace-nowrap">
-                        {formatInTimeZone(log.clockIn, 'Asia/Manila', "h:mm a")} - {log.clockOut ? formatInTimeZone(log.clockOut, 'Asia/Manila', "h:mm a") : <span className="text-primary italic">Active</span>} <span className="text-[10px]">(PHT)</span>
-                      </td>
-                      <td className="px-4 py-4 text-right text-muted-foreground">
-                        {durationStr}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+          {recentLogs.length === 0 ? (
+            <div className="text-sm text-muted-foreground text-center py-12 border-t">
+              No recent activity to display.
+            </div>
+          ) : (
+            <div className="w-full overflow-x-auto">
+              <table className="w-full text-sm text-center">
+                <thead className="text-[10px] text-muted-foreground uppercase tracking-widest border-b">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold text-left">DATE</th>
+                    <th className="px-4 py-3 font-semibold text-right">TIME</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {recentLogs.map((log: any) => {
+                    return (
+                      <tr key={log.id} className="hover:bg-muted/30 transition-colors">
+                        <td className="px-4 py-4 font-medium text-foreground whitespace-nowrap text-left">
+                          {formatInTimeZone(log.clockIn, 'Asia/Manila', "MMM d, yyyy")}
+                        </td>
+                        <td className="px-4 py-4 text-muted-foreground whitespace-nowrap text-right">
+                          {formatInTimeZone(log.clockIn, 'Asia/Manila', "h:mm a")} - {log.clockOut ? formatInTimeZone(log.clockOut, 'Asia/Manila', "h:mm a") : <span className="text-primary italic">Active</span>} <span className="text-[10px]">(PHT)</span>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
 
     </div>
