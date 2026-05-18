@@ -29,14 +29,31 @@ export async function generateTimesheetReport(startDate: string, endDate: string
     ]
   });
 
+  // Create events list for CSV
+  type LogEvent = { id: string; type: "IN" | "OUT"; time: Date; status?: string; user: { name: string; email: string; } };
+  const events: LogEvent[] = [];
+  logs.forEach((log: any) => {
+    if (log.clockOut) {
+      events.push({ id: `${log.id}-out`, type: "OUT", time: log.clockOut, user: log.user });
+    }
+    events.push({ id: `${log.id}-in`, type: "IN", time: log.clockIn, status: log.status, user: log.user });
+  });
+
+  // Re-sort by user then chronologically to match Sprout format
+  events.sort((a, b) => {
+    if (a.user.name !== b.user.name) return a.user.name.localeCompare(b.user.name);
+    return a.time.getTime() - b.time.getTime();
+  });
+
   // Create CSV String
-  let csv = "Employee Name,Email,Date,Clock In,Clock Out,Status\n";
+  let csv = "Employee Name,Email,Date,Type,Time,Status\n";
   
-  logs.forEach(log => {
-    const clockInStr = log.clockIn ? new Date(log.clockIn).toISOString() : "";
-    const clockOutStr = log.clockOut ? new Date(log.clockOut).toISOString() : "";
+  events.forEach(event => {
+    const dateStr = new Date(event.time).toISOString().split('T')[0]; // YYYY-MM-DD
+    const timeStr = new Date(event.time).toISOString(); // Full ISO string or just time if preferred, sticking to ISO for data integrity
+    const statusStr = event.type === 'IN' ? event.status : "";
     
-    csv += `"${log.user.name}","${log.user.email}",${new Date(log.clockIn).toISOString().split('T')[0]},${clockInStr},${clockOutStr},${log.status}\n`;
+    csv += `"${event.user.name}","${event.user.email}",${dateStr},${event.type},${timeStr},${statusStr}\n`;
   });
 
   return csv;

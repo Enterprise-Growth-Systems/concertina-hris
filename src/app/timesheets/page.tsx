@@ -20,12 +20,22 @@ export default async function TimesheetsPage() {
         take: 30, // Show last 30 logs
     });
 
+    const events: { type: "IN" | "OUT", time: Date, id: string, status?: string }[] = [];
+    timeLogs.forEach((log: any) => {
+        if (log.clockOut) {
+            events.push({ type: "OUT", time: log.clockOut, id: `${log.id}-out` });
+        }
+        events.push({ type: "IN", time: log.clockIn, id: `${log.id}-in`, status: log.status });
+    });
+
+    events.sort((a, b) => b.time.getTime() - a.time.getTime());
+
     return (
         <div className="max-w-5xl mx-auto space-y-8">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">Timesheets</h1>
                 <p className="text-muted-foreground mt-1 text-lg">
-                    Review your attendance history and total hours worked.
+                    Review your attendance history.
                 </p>
             </div>
 
@@ -35,50 +45,41 @@ export default async function TimesheetsPage() {
                         <thead className="bg-muted/50 text-muted-foreground border-b text-xs uppercase tracking-wider">
                             <tr>
                                 <th className="px-6 py-4 font-semibold">Date</th>
-                                <th className="px-6 py-4 font-semibold">Clock In</th>
-                                <th className="px-6 py-4 font-semibold">Clock Out</th>
-                                <th className="px-6 py-4 font-semibold">Duration</th>
-                                <th className="px-6 py-4 font-semibold">Status</th>
+                                <th className="px-6 py-4 font-semibold">Type</th>
+                                <th className="px-6 py-4 font-semibold">Time</th>
+                                <th className="px-6 py-4 font-semibold text-right">Status</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y">
-                            {timeLogs.length === 0 ? (
+                            {events.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
+                                    <td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">
                                         No time logs found.
                                     </td>
                                 </tr>
                             ) : (
-                                timeLogs.map((log: any) => {
-                                    let duration = "-";
-                                    if (log.clockOut) {
-                                        const diffMs = log.clockOut.getTime() - log.clockIn.getTime();
-                                        const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
-                                        const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                                        duration = `${diffHrs}h ${diffMins}m`;
-                                    }
-
+                                events.map((event) => {
                                     return (
-                                        <tr key={log.id} className="hover:bg-muted/50 transition-colors">
-                                            <td className="px-6 py-4 font-medium">
-                                                {formatInTimeZone(log.clockIn, "Asia/Manila", "MMM d, yyyy")}
-                                            </td>
-                                            <td className="px-6 py-4 text-muted-foreground">
-                                                {formatInTimeZone(log.clockIn, "Asia/Manila", "h:mm a")}
-                                            </td>
-                                            <td className="px-6 py-4 text-muted-foreground">
-                                                {log.clockOut ? formatInTimeZone(log.clockOut, "Asia/Manila", "h:mm a") : <span className="text-primary italic animate-pulse">Active</span>}
-                                            </td>
-                                            <td className="px-6 py-4 font-medium">
-                                                {duration}
+                                        <tr key={event.id} className="hover:bg-muted/50 transition-colors">
+                                            <td className="px-6 py-4 font-medium whitespace-nowrap">
+                                                <span className="text-lg font-bold">{formatInTimeZone(event.time, 'Asia/Manila', "d")}</span>
+                                                <span className="text-xs text-muted-foreground ml-2 uppercase">{formatInTimeZone(event.time, 'Asia/Manila', "EEE")}</span>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${log.status === 'ON_TIME'
-                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                    : 'bg-red-50 text-red-600 border border-red-200'
-                                                    }`}>
-                                                    {log.status === 'ON_TIME' ? 'On Time' : 'Late'}
-                                                </span>
+                                                <span className={`text-xs font-bold px-3 py-1 rounded-md ${event.type === 'IN' ? 'bg-primary/10 text-primary' : 'bg-amber-500/10 text-amber-600'}`}>{event.type}</span>
+                                            </td>
+                                            <td className="px-6 py-4 text-muted-foreground font-medium whitespace-nowrap">
+                                                {formatInTimeZone(event.time, 'Asia/Manila', "hh:mm:ss a")}
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                {event.status && event.type === 'IN' ? (
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${event.status === 'ON_TIME'
+                                                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                        : 'bg-red-50 text-red-600 border border-red-200'
+                                                        }`}>
+                                                        {event.status === 'ON_TIME' ? 'On Time' : 'Late'}
+                                                    </span>
+                                                ) : <span className="text-muted-foreground/30">-</span>}
                                             </td>
                                         </tr>
                                     );

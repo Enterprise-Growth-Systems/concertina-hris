@@ -36,6 +36,16 @@ export default async function DashboardPage() {
     where: { userId: session.user.id, dayOfWeek: currentDayIndex }
   });
 
+  const events: { type: "IN" | "OUT", time: Date, id: string }[] = [];
+  recentLogs.forEach((log: any) => {
+    if (log.clockOut) {
+      events.push({ type: "OUT", time: log.clockOut, id: `${log.id}-out` });
+    }
+    events.push({ type: "IN", time: log.clockIn, id: `${log.id}-in` });
+  });
+  
+  events.sort((a, b) => b.time.getTime() - a.time.getTime());
+
   return (
     <div className="max-w-7xl mx-auto flex flex-col h-full w-full">
 
@@ -87,7 +97,7 @@ export default async function DashboardPage() {
             <h2 className="text-xl font-bold text-foreground">Your latest activity</h2>
           </div>
 
-          {recentLogs.length === 0 ? (
+          {events.length === 0 ? (
             <div className="text-sm text-muted-foreground text-center py-12 border-t">
               No recent activity to display.
             </div>
@@ -97,18 +107,23 @@ export default async function DashboardPage() {
                 <thead className="text-[10px] text-muted-foreground uppercase tracking-widest border-b">
                   <tr>
                     <th className="px-4 py-3 font-semibold text-left">DATE</th>
+                    <th className="px-4 py-3 font-semibold text-center">TYPE</th>
                     <th className="px-4 py-3 font-semibold text-right">TIME</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/50">
-                  {recentLogs.map((log: any) => {
+                  {events.slice(0, 10).map((event) => {
                     return (
-                      <tr key={log.id} className="hover:bg-muted/30 transition-colors">
-                        <td className="px-4 py-4 font-medium text-foreground whitespace-nowrap text-left">
-                          {formatInTimeZone(log.clockIn, 'Asia/Manila', "MMM d, yyyy")}
+                      <tr key={event.id} className="hover:bg-muted/30 transition-colors">
+                        <td className="px-4 py-3 font-medium text-foreground whitespace-nowrap text-left">
+                          <span className="text-lg font-bold">{formatInTimeZone(event.time, 'Asia/Manila', "d")}</span>
+                          <span className="text-xs text-muted-foreground ml-1.5 uppercase">{formatInTimeZone(event.time, 'Asia/Manila', "EEE")}</span>
                         </td>
-                        <td className="px-4 py-4 text-muted-foreground whitespace-nowrap text-right">
-                          {formatInTimeZone(log.clockIn, 'Asia/Manila', "h:mm a")} - {log.clockOut ? formatInTimeZone(log.clockOut, 'Asia/Manila', "h:mm a") : <span className="text-primary italic">Active</span>} <span className="text-[10px]">(PHT)</span>
+                        <td className="px-4 py-3 text-center">
+                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${event.type === 'IN' ? 'bg-primary/10 text-primary' : 'bg-amber-500/10 text-amber-600'}`}>{event.type}</span>
+                        </td>
+                        <td className="px-4 py-3 text-foreground whitespace-nowrap text-right font-medium">
+                          {formatInTimeZone(event.time, 'Asia/Manila', "hh:mm:ss a")}
                         </td>
                       </tr>
                     )

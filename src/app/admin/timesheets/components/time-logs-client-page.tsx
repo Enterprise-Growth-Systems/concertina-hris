@@ -21,20 +21,30 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
     const [statusFilter, setStatusFilter] = useState("ALL");
     const [dateFilter, setDateFilter] = useState("");
 
-    const filteredLogs = initialLogs.filter(log => {
+    type LogEvent = { id: string; type: "IN" | "OUT"; time: Date; status?: string; user: { name: string; email: string; } };
+    const events: LogEvent[] = [];
+    initialLogs.forEach(log => {
+        if (log.clockOut) {
+            events.push({ id: `${log.id}-out`, type: "OUT", time: log.clockOut, user: log.user });
+        }
+        events.push({ id: `${log.id}-in`, type: "IN", time: log.clockIn, status: log.status, user: log.user });
+    });
+    events.sort((a, b) => b.time.getTime() - a.time.getTime());
+
+    const filteredLogs = events.filter(event => {
         // 1. Search Query Filter
         const matchesSearch = 
-            log.user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-            log.user.email.toLowerCase().includes(searchQuery.toLowerCase());
+            event.user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            event.user.email.toLowerCase().includes(searchQuery.toLowerCase());
         
         // 2. Status Filter
-        const matchesStatus = statusFilter === "ALL" || log.status === statusFilter;
+        const matchesStatus = statusFilter === "ALL" || event.status === statusFilter;
 
         // 3. Date Filter
         let matchesDate = true;
         if (dateFilter) {
             const selectedDate = parseISO(dateFilter);
-            matchesDate = isSameDay(new Date(log.clockIn), selectedDate);
+            matchesDate = isSameDay(new Date(event.time), selectedDate);
         }
 
         return matchesSearch && matchesStatus && matchesDate;
@@ -111,7 +121,7 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
 
             {/* Status Bar */}
             <div className="text-sm text-muted-foreground font-medium px-1">
-                Showing {filteredLogs.length} matching logs
+                Showing {filteredLogs.length} matching events
             </div>
 
             {/* Table */}
@@ -122,56 +132,47 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
                             <tr>
                                 <th className="px-6 py-4 font-semibold">Employee</th>
                                 <th className="px-6 py-4 font-semibold">Date</th>
-                                <th className="px-6 py-4 font-semibold">Clock In</th>
-                                <th className="px-6 py-4 font-semibold">Clock Out</th>
-                                <th className="px-6 py-4 font-semibold">Duration</th>
-                                <th className="px-6 py-4 font-semibold">Status</th>
+                                <th className="px-6 py-4 font-semibold">Type</th>
+                                <th className="px-6 py-4 font-semibold">Time</th>
+                                <th className="px-6 py-4 font-semibold text-right">Status</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
                             {filteredLogs.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
+                                    <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
                                         {hasActiveFilters 
-                                            ? "No logs found matching your specific filters." 
-                                            : "No active time logs found across the company."}
+                                            ? "No events found matching your specific filters." 
+                                            : "No active time events found across the company."}
                                     </td>
                                 </tr>
                             ) : (
-                                filteredLogs.map((log) => {
-                                    let duration = "-";
-                                    if (log.clockOut) {
-                                        const diffMs = new Date(log.clockOut).getTime() - new Date(log.clockIn).getTime();
-                                        const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
-                                        const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                                        duration = `${diffHrs}h ${diffMins}m`;
-                                    }
-
+                                filteredLogs.map((event) => {
                                     return (
-                                        <tr key={log.id} className="hover:bg-muted/30 transition-colors">
+                                        <tr key={event.id} className="hover:bg-muted/30 transition-colors">
                                             <td className="px-6 py-4">
-                                                <div className="font-medium text-foreground">{log.user.name}</div>
-                                                <div className="text-xs text-muted-foreground">{log.user.email}</div>
+                                                <div className="font-medium text-foreground">{event.user.name}</div>
+                                                <div className="text-xs text-muted-foreground">{event.user.email}</div>
                                             </td>
-                                            <td className="px-6 py-4 font-medium text-foreground/80">
-                                                {formatInTimeZone(new Date(log.clockIn), 'Asia/Manila', "MMM d, yyyy")}
-                                            </td>
-                                            <td className="px-6 py-4 text-muted-foreground">
-                                                {formatInTimeZone(new Date(log.clockIn), 'Asia/Manila', "h:mm a")}
-                                            </td>
-                                            <td className="px-6 py-4 text-muted-foreground">
-                                                {log.clockOut ? formatInTimeZone(new Date(log.clockOut), 'Asia/Manila', "h:mm a") : <span className="text-primary italic animate-pulse font-semibold">Active</span>}
-                                            </td>
-                                            <td className="px-6 py-4 font-medium text-foreground/80">
-                                                {duration}
+                                            <td className="px-6 py-4 font-medium whitespace-nowrap">
+                                                <span className="text-lg font-bold">{formatInTimeZone(new Date(event.time), 'Asia/Manila', "d")}</span>
+                                                <span className="text-xs text-muted-foreground ml-2 uppercase">{formatInTimeZone(new Date(event.time), 'Asia/Manila', "EEE")}</span>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${log.status === 'ON_TIME'
-                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                    : 'bg-orange-50 text-orange-700 border border-orange-200'
-                                                    }`}>
-                                                    {log.status === 'ON_TIME' ? 'On Time' : 'Late'}
-                                                </span>
+                                                <span className={`text-xs font-bold px-3 py-1 rounded-md ${event.type === 'IN' ? 'bg-primary/10 text-primary' : 'bg-amber-500/10 text-amber-600'}`}>{event.type}</span>
+                                            </td>
+                                            <td className="px-6 py-4 text-muted-foreground font-medium whitespace-nowrap">
+                                                {formatInTimeZone(new Date(event.time), 'Asia/Manila', "hh:mm:ss a")}
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                {event.status && event.type === 'IN' ? (
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${event.status === 'ON_TIME'
+                                                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                        : 'bg-orange-50 text-orange-700 border border-orange-200'
+                                                        }`}>
+                                                        {event.status === 'ON_TIME' ? 'On Time' : 'Late'}
+                                                    </span>
+                                                ) : <span className="text-muted-foreground/30">-</span>}
                                             </td>
                                         </tr>
                                     );
