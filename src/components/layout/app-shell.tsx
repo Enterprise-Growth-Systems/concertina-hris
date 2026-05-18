@@ -13,7 +13,6 @@ const EMP_ROUTES = [
     { name: "Timesheets", href: "/timesheets", icon: Clock },
     { name: "Schedules", href: "/schedule", icon: CalendarDays },
     { name: "PFFD Requests", href: "/leaves", icon: CalendarHeart },
-    { name: "Team Directory", href: "/directory", icon: BookUser },
     { name: "Company Holidays", href: "/holidays", icon: Calendar },
     { name: "My Profile", href: "/profile", icon: UserCircle },
 ];

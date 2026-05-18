@@ -11,10 +11,7 @@ export function ClockWidget() {
     const [isClockedIn, setIsClockedIn] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [hasLoadedStatus, setHasLoadedStatus] = useState(false);
-    
-    // Optional form state
-    const [projectInput, setProjectInput] = useState("");
-    const [notesInput, setNotesInput] = useState("");
+
 
     useEffect(() => {
         // Initial fetch to get clock-in status from DB
@@ -40,11 +37,6 @@ export function ClockWidget() {
             const res = await toggleClockStatus();
             if (res.success) {
                 setIsClockedIn(!isClockedIn);
-                if (!isClockedIn) {
-                   // clear inputs on clock out
-                   setProjectInput("");
-                   setNotesInput("");
-                }
             }
         } finally {
             setIsPending(false);
@@ -83,24 +75,6 @@ export function ClockWidget() {
                 </p>
             </div>
 
-            <div className="flex flex-col gap-3 mb-6">
-                <input 
-                    type="text" 
-                    placeholder="Project or work item (optional)" 
-                    value={projectInput}
-                    onChange={(e) => setProjectInput(e.target.value)}
-                    disabled={isClockedIn || !hasLoadedStatus}
-                    className="w-full text-sm px-4 py-2.5 rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50"
-                />
-                <input 
-                    type="text" 
-                    placeholder="Notes (optional)" 
-                    value={notesInput}
-                    onChange={(e) => setNotesInput(e.target.value)}
-                    disabled={isClockedIn || !hasLoadedStatus}
-                    className="w-full text-sm px-4 py-2.5 rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all disabled:opacity-50"
-                />
-            </div>
 
             <div className="flex flex-col items-center mt-auto">
                 {!hasLoadedStatus ? (

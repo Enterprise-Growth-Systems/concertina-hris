@@ -72,49 +72,39 @@ export default async function DashboardPage() {
         {/* Col 1: Clock Widget */}
         <ClockWidget />
 
-        {/* Col 2: Remaining Hours (Visual Mockup) */}
+        {/* Col 2: Logged today */}
         <div className="rounded-2xl border bg-card p-6 flex flex-col">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h3 className="font-bold text-foreground text-sm">Remaining hours</h3>
-              <p className="text-xs text-muted-foreground mt-0.5">Left to complete based on this week's schedule</p>
+              <h3 className="font-bold text-foreground text-sm">Logged today</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">Total time recorded today</p>
             </div>
-            <span className="px-2.5 py-1 bg-muted rounded-md text-[10px] font-semibold text-muted-foreground border">0% complete</span>
+            <span className="px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-md text-[10px] font-semibold border border-emerald-200">Today</span>
           </div>
 
-          <div className="mb-6">
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">HOURS LEFT</p>
-            <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-bold text-foreground">39</span>
+          <div className="flex flex-col items-center justify-center border-b pb-6 mb-6">
+             <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">TOTAL HOURS</p>
+             <div className="flex items-baseline gap-1">
+              <span className="text-4xl font-bold text-primary">0</span>
               <span className="text-sm font-bold text-muted-foreground">hrs</span>
-              <span className="text-3xl font-bold text-foreground ml-1">59</span>
+              <span className="text-4xl font-bold text-primary ml-1">00</span>
               <span className="text-sm font-bold text-muted-foreground">mins</span>
             </div>
           </div>
 
-          <div className="mb-6">
-            <div className="flex justify-between text-xs font-semibold mb-2">
-              <span className="text-muted-foreground">Weekly progress</span>
-              <span className="text-foreground">0% of 40h 00m</span>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="bg-muted/30 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">ENTRIES TODAY</p>
+              <p className="text-lg font-bold text-foreground">0</p>
             </div>
-            <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-              <div className="h-full bg-primary rounded-full w-[2%]"></div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mt-auto">
-            <div className="border rounded-xl p-3 flex flex-col items-center justify-center text-center">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">DAYS THIS WEEK</span>
-              <span className="text-xl font-bold text-foreground">5</span>
-            </div>
-            <div className="border rounded-xl p-3 flex flex-col items-center justify-center text-center">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">WEEKLY TARGET</span>
-              <span className="text-xl font-bold text-foreground">40h 00m</span>
+            <div className="bg-muted/30 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">STATUS</p>
+              <p className="text-sm font-bold text-muted-foreground">No logs</p>
             </div>
           </div>
           
-          <div className="mt-4 pt-4 border-t text-xs text-muted-foreground text-center">
-            Planned: 40h 00m / Worked: 0h 01m
+          <div className="mt-auto pt-4 text-[10px] text-muted-foreground text-center">
+            Calculated based on your active and completed logs for today.
           </div>
         </div>
 
