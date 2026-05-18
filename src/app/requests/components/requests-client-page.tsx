@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Plus, Clock, ExternalLink, Loader2, CalendarHeart } from "lucide-react";
 import { submitOvertime } from "@/app/actions/overtime";
 import { submitLeaveRequest } from "@/app/actions/leaves";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { format } from "date-fns";
+import { Pagination } from "@/components/ui/pagination";
 
 type OvertimeRequestData = {
     id: string;
@@ -43,6 +44,21 @@ export function RequestsClientPage({
     balances: LeaveBalanceData[] 
 }) {
     const [activeTab, setActiveTab] = useState<"PFFD" | "OVERTIME">("PFFD");
+    
+    // Pagination state
+    const [pffdPage, setPffdPage] = useState(1);
+    const [overtimePage, setOvertimePage] = useState(1);
+    const ITEMS_PER_PAGE = 20;
+
+    const totalPffdPages = Math.ceil(leaveRequests.length / ITEMS_PER_PAGE);
+    const paginatedLeaveRequests = useMemo(() => 
+        leaveRequests.slice((pffdPage - 1) * ITEMS_PER_PAGE, pffdPage * ITEMS_PER_PAGE),
+    [leaveRequests, pffdPage]);
+
+    const totalOvertimePages = Math.ceil(overtimeRequests.length / ITEMS_PER_PAGE);
+    const paginatedOvertimeRequests = useMemo(() => 
+        overtimeRequests.slice((overtimePage - 1) * ITEMS_PER_PAGE, overtimePage * ITEMS_PER_PAGE),
+    [overtimeRequests, overtimePage]);
     
     // Overtime Form State
     const [isOvertimeModalOpen, setIsOvertimeModalOpen] = useState(false);
@@ -199,14 +215,14 @@ export function RequestsClientPage({
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y">
-                                        {leaveRequests.length === 0 ? (
+                                        {paginatedLeaveRequests.length === 0 ? (
                                             <tr>
                                                 <td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">
                                                     No PFFD requests found.
                                                 </td>
                                             </tr>
                                         ) : (
-                                            leaveRequests.map((request: any) => (
+                                            paginatedLeaveRequests.map((request: any) => (
                                                 <tr key={request.id} className="hover:bg-muted/50 transition-colors">
                                                     <td className="px-6 py-4 font-medium capitalize">
                                                         {request.leaveType === 'LEAVE_CREDITS' ? 'PFFD Credits' : request.leaveType.toLowerCase()}
@@ -233,6 +249,11 @@ export function RequestsClientPage({
                                     </tbody>
                                 </table>
                             </div>
+                            <Pagination 
+                                currentPage={pffdPage}
+                                totalPages={totalPffdPages}
+                                onPageChange={setPffdPage}
+                            />
                         </div>
                     </div>
                 </div>
@@ -265,7 +286,7 @@ export function RequestsClientPage({
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border">
-                                    {overtimeRequests.map((req) => (
+                                    {paginatedOvertimeRequests.map((req) => (
                                         <tr key={req.id} className="hover:bg-muted/30 transition-colors">
                                             <td className="px-6 py-4 font-medium text-foreground whitespace-nowrap">
                                                 {req.dateRange}
@@ -303,12 +324,17 @@ export function RequestsClientPage({
                                 </tbody>
                             </table>
                             
-                            {overtimeRequests.length === 0 && (
+                            {paginatedOvertimeRequests.length === 0 && (
                                 <div className="p-12 text-center text-muted-foreground">
                                     You have no overtime requests history.
                                 </div>
                             )}
                         </div>
+                        <Pagination 
+                            currentPage={overtimePage}
+                            totalPages={totalOvertimePages}
+                            onPageChange={setOvertimePage}
+                        />
                     </div>
 
                     {/* File Overtime Modal */}

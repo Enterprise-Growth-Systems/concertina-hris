@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { TimesheetsClientPage } from "./components/timesheets-client-page";
 
 const prisma = new PrismaClient();
 
@@ -17,15 +18,15 @@ export default async function TimesheetsPage() {
     const timeLogs = await prisma.timeLog.findMany({
         where: { userId: session.user.id },
         orderBy: { clockIn: "desc" },
-        take: 30, // Show last 30 logs
+        take: 1000, // Fetch up to 1000 logs for client-side pagination
     });
 
-    const events: { type: "IN" | "OUT", time: Date, id: string, status?: string }[] = [];
+    const events: { type: "IN" | "OUT", time: Date, id: string }[] = [];
     timeLogs.forEach((log: any) => {
         if (log.clockOut) {
             events.push({ type: "OUT", time: log.clockOut, id: `${log.id}-out` });
         }
-        events.push({ type: "IN", time: log.clockIn, id: `${log.id}-in`, status: log.status });
+        events.push({ type: "IN", time: log.clockIn, id: `${log.id}-in` });
     });
 
     events.sort((a, b) => b.time.getTime() - a.time.getTime());
@@ -39,45 +40,7 @@ export default async function TimesheetsPage() {
                 </p>
             </div>
 
-            <div className="rounded-2xl border bg-card text-card-foreground shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-muted/50 text-muted-foreground border-b text-xs uppercase tracking-wider">
-                            <tr>
-                                <th className="px-6 py-4 font-semibold">Date</th>
-                                <th className="px-6 py-4 font-semibold">Type</th>
-                                <th className="px-6 py-4 font-semibold text-right">Time</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                            {events.length === 0 ? (
-                                <tr>
-                                    <td colSpan={3} className="px-6 py-8 text-center text-muted-foreground">
-                                        No time logs found.
-                                    </td>
-                                </tr>
-                            ) : (
-                                events.map((event) => {
-                                    return (
-                                        <tr key={event.id} className="hover:bg-muted/50 transition-colors">
-                                            <td className="px-6 py-4 font-medium whitespace-nowrap">
-                                                <span className="text-sm font-bold">{formatInTimeZone(event.time, 'Asia/Manila', "MMM d, yyyy")}</span>
-                                                <span className="text-xs text-muted-foreground ml-2 uppercase">{formatInTimeZone(event.time, 'Asia/Manila', "EEE")}</span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className={`text-xs font-bold px-3 py-1 rounded-md ${event.type === 'IN' ? 'bg-primary/10 text-primary' : 'bg-amber-500/10 text-amber-600'}`}>{event.type}</span>
-                                            </td>
-                                            <td className="px-6 py-4 text-muted-foreground font-medium whitespace-nowrap text-right">
-                                                {formatInTimeZone(event.time, 'Asia/Manila', "hh:mm:ss a")}
-                                            </td>
-                                        </tr>
-                                    );
-                                })
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <TimesheetsClientPage initialEvents={events} />
         </div>
     );
 }

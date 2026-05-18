@@ -1,18 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Search, X } from "lucide-react";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { upsertSchedule, upsertSpecialSchedule, deleteSpecialSchedule } from "@/app/actions/schedules";
+import { Pagination } from "@/components/ui/pagination";
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export function ScheduleClientPage({ initialUsers }: { initialUsers: any[] }) {
     const [searchQuery, setSearchQuery] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 20;
 
-    const filteredUsers = initialUsers.filter(user => 
-        user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredUsers = useMemo(() => {
+        return initialUsers.filter(user => 
+            user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            user.email.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }, [initialUsers, searchQuery]);
+
+    useMemo(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
+
+    const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+    const paginatedUsers = filteredUsers.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
     );
 
     return (
@@ -37,7 +52,7 @@ export function ScheduleClientPage({ initialUsers }: { initialUsers: any[] }) {
             </div>
 
             <div className="space-y-8 min-h-[400px]">
-                {filteredUsers.map((user: any) => (
+                {paginatedUsers.map((user: any) => (
                     <div key={user.id} className="rounded-2xl border bg-card text-card-foreground shadow-sm overflow-hidden">
                         <div className="p-4 border-b bg-muted/50 flex justify-between items-center sticky top-0 z-10 backdrop-blur-md">
                             <div>
@@ -145,11 +160,17 @@ export function ScheduleClientPage({ initialUsers }: { initialUsers: any[] }) {
                     </div>
                 ))}
 
-                {filteredUsers.length === 0 && (
+                {paginatedUsers.length === 0 && (
                     <div className="text-center text-muted-foreground py-12 bg-card rounded-2xl border">
                         No employees found matching "{searchQuery}".
                     </div>
                 )}
+                
+                <Pagination 
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
             </div>
         </div>
     );

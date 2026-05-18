@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ExternalLink, Check, X, Loader2 } from "lucide-react";
 import { updateOvertimeStatus } from "@/app/actions/overtime";
+import { Pagination } from "@/components/ui/pagination";
 
 type RequestData = {
     id: string;
@@ -19,6 +20,13 @@ type RequestData = {
 
 export function OvertimeApprovalsClient({ requests }: { requests: RequestData[] }) {
     const [processingId, setProcessingId] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 20;
+
+    const totalPages = Math.ceil(requests.length / ITEMS_PER_PAGE);
+    const paginatedRequests = useMemo(() => 
+        requests.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE),
+    [requests, currentPage]);
 
     const handleUpdateStatus = async (id: string, status: "APPROVED" | "REJECTED") => {
         setProcessingId(id);
@@ -48,7 +56,7 @@ export function OvertimeApprovalsClient({ requests }: { requests: RequestData[] 
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
-                        {requests.map((req) => (
+                        {paginatedRequests.map((req) => (
                             <tr key={req.id} className="hover:bg-muted/30 transition-colors">
                                 <td className="px-6 py-4">
                                     <div className="font-semibold text-foreground">{req.employeeName}</div>
@@ -106,12 +114,17 @@ export function OvertimeApprovalsClient({ requests }: { requests: RequestData[] 
                     </tbody>
                 </table>
                 
-                {requests.length === 0 && (
+                {paginatedRequests.length === 0 && (
                     <div className="p-12 text-center text-muted-foreground">
                         No overtime requests to review.
                     </div>
                 )}
             </div>
+            <Pagination 
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+            />
         </div>
     );
 }

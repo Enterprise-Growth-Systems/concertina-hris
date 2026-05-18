@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Plus, UserCog, User, ShieldAlert, Search, Trash2, Loader2 } from "lucide-react";
 import { AddEmployeeForm } from "./add-employee-form";
 import { deleteEmployee, updateEmployee } from "@/app/actions/employees";
+import { Pagination } from "@/components/ui/pagination";
 
 type EmployeeData = {
     id: string;
@@ -23,6 +24,10 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
     const [employeeToDelete, setEmployeeToDelete] = useState<EmployeeData | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 20;
+    
     // Edit Employee State
     const [employeeToEdit, setEmployeeToEdit] = useState<EmployeeData | null>(null);
     const [editRole, setEditRole] = useState<string>("");
@@ -32,9 +37,22 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
     const [editAddress, setEditAddress] = useState<string>("");
     const [isSaving, setIsSaving] = useState(false);
 
-    const filteredUsers = initialUsers.filter(user => 
-        user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredUsers = useMemo(() => {
+        return initialUsers.filter(user => 
+            user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            user.email.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }, [initialUsers, searchQuery]);
+
+    // Reset pagination when search changes
+    useMemo(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
+
+    const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+    const paginatedUsers = filteredUsers.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
     );
 
     const handleDelete = async () => {
@@ -124,7 +142,7 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
-                            {filteredUsers.map((user) => (
+                            {paginatedUsers.map((user) => (
                                 <tr key={user.id} className="hover:bg-muted/30 transition-colors group">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
@@ -195,6 +213,11 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
                         </div>
                     )}
                 </div>
+                <Pagination 
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
             </div>
 
             {/* Add Employee Modal */}

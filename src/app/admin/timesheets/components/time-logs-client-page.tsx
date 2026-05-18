@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { format, isSameDay, parseISO } from "date-fns";
+import { useState, useMemo } from "react";
+import { format, isSameDay, parseISO, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { Search, Filter, Calendar as CalendarIcon, X } from "lucide-react";
+import { Pagination } from "@/components/ui/pagination";
 
 type TimeLogData = {
     id: string;
@@ -17,7 +18,10 @@ type TimeLogData = {
 
 export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[] }) {
     const [searchQuery, setSearchQuery] = useState("");
-    const [dateFilter, setDateFilter] = useState("");
+    const [startDateFilter, setStartDateFilter] = useState("");
+    const [endDateFilter, setEndDateFilter] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 20;
 
     type LogEvent = { id: string; type: "IN" | "OUT"; time: Date; user: { name: string; email: string; } };
     const events: LogEvent[] = [];
@@ -29,28 +33,52 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
     });
     events.sort((a, b) => b.time.getTime() - a.time.getTime());
 
-    const filteredLogs = events.filter(event => {
-        // 1. Search Query Filter
-        const matchesSearch = 
-            event.user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-            event.user.email.toLowerCase().includes(searchQuery.toLowerCase());
-        
-        // 2. Date Filter
-        let matchesDate = true;
-        if (dateFilter) {
-            const selectedDate = parseISO(dateFilter);
-            matchesDate = isSameDay(new Date(event.time), selectedDate);
-        }
+    const filteredLogs = useMemo(() => {
+        return events.filter(event => {
+            // 1. Search Query Filter
+            const matchesSearch = 
+                event.user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                event.user.email.toLowerCase().includes(searchQuery.toLowerCase());
+            
+            // 2. Date Range Filter
+            let matchesDate = true;
+            if (startDateFilter || endDateFilter) {
+                const eventDate = new Date(event.time);
+                
+                if (startDateFilter && endDateFilter) {
+                    matchesDate = isWithinInterval(eventDate, {
+                        start: startOfDay(parseISO(startDateFilter)),
+                        end: endOfDay(parseISO(endDateFilter))
+                    });
+                } else if (startDateFilter) {
+                    matchesDate = eventDate >= startOfDay(parseISO(startDateFilter));
+                } else if (endDateFilter) {
+                    matchesDate = eventDate <= endOfDay(parseISO(endDateFilter));
+                }
+            }
 
-        return matchesSearch && matchesDate;
-    });
+            return matchesSearch && matchesDate;
+        });
+    }, [events, searchQuery, startDateFilter, endDateFilter]);
+
+    // Reset pagination when filters change
+    useMemo(() => {
+        setCurrentPage(1);
+    }, [searchQuery, startDateFilter, endDateFilter]);
+
+    const totalPages = Math.ceil(filteredLogs.length / ITEMS_PER_PAGE);
+    const paginatedLogs = filteredLogs.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
 
     const clearFilters = () => {
         setSearchQuery("");
-        setDateFilter("");
+        setStartDateFilter("");
+        setEndDateFilter("");
     };
 
-    const hasActiveFilters = searchQuery !== "" || dateFilter !== "";
+    const hasActiveFilters = searchQuery !== "" || startDateFilter !== "" || endDateFilter !== "";
 
     return (
         <div className="space-y-6">
@@ -73,17 +101,33 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
 
 
 
-                    {/* Date Picker */}
-                    <div className="relative w-full md:w-48">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <CalendarIcon className="size-4 text-muted-foreground" />
+                    {/* Date Range Picker */}
+                    <div className="flex items-center gap-2 w-full md:w-auto">
+                        <div className="relative w-full md:w-40">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <CalendarIcon className="size-4 text-muted-foreground" />
+                            </div>
+                            <input
+                                type="date"
+                                value={startDateFilter}
+                                onChange={(e) => setStartDateFilter(e.target.value)}
+                                className="w-full bg-background border text-foreground rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                aria-label="Start Date"
+                            />
                         </div>
-                        <input
-                            type="date"
-                            value={dateFilter}
-                            onChange={(e) => setDateFilter(e.target.value)}
-                            className="w-full bg-background border text-foreground rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        />
+                        <span className="text-muted-foreground text-sm font-medium">to</span>
+                        <div className="relative w-full md:w-40">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <CalendarIcon className="size-4 text-muted-foreground" />
+                            </div>
+                            <input
+                                type="date"
+                                value={endDateFilter}
+                                onChange={(e) => setEndDateFilter(e.target.value)}
+                                className="w-full bg-background border text-foreground rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                aria-label="End Date"
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -117,7 +161,7 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
-                            {filteredLogs.length === 0 ? (
+                            {paginatedLogs.length === 0 ? (
                                 <tr>
                                     <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
                                         {hasActiveFilters 
@@ -126,7 +170,7 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
                                     </td>
                                 </tr>
                             ) : (
-                                filteredLogs.map((event) => {
+                                paginatedLogs.map((event) => {
                                     return (
                                         <tr key={event.id} className="hover:bg-muted/30 transition-colors">
                                             <td className="px-6 py-4">
@@ -150,6 +194,11 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
                         </tbody>
                     </table>
                 </div>
+                <Pagination 
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
             </div>
         </div>
     );
