@@ -42,6 +42,8 @@ model User {
   assignedHolidays AssignedHoliday[] // Holidays specific to this user
   overtimeRequests OvertimeRequest[] // Overtime filed by user
   overtimeApprovals OvertimeRequest[] @relation("ManagerToOvertime") // Overtime approved by user as manager
+  manualTimeRequests ManualTimeRequest[] // Manual time entries filed by user
+  manualTimeApprovals ManualTimeRequest[] @relation("ManagerToManualTime") // Manual time entries approved by user as manager
   auditLogs        AuditLog[]     // Actions performed by user
 }
 
@@ -175,6 +177,20 @@ model OvertimeRequest {
   status        String   @default("PENDING") // PENDING, APPROVED, REJECTED
   managerId     String?  // The manager who approved/rejected
   manager       User?    @relation("ManagerToOvertime", fields: [managerId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ManualTimeRequest {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  logType       String   // e.g., "CLOCK_IN" or "CLOCK_OUT"
+  logDateTime   DateTime
+  reason        String
+  status        String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  managerId     String?  // The manager who approved/rejected
+  manager       User?    @relation("ManagerToManualTime", fields: [managerId], references: [id])
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }

@@ -57,12 +57,33 @@ export default async function RequestsPage() {
         where: { userId: employeeId },
     });
 
+    // Fetch Manual Time Data
+    const manualRequestsRaw = await prisma.manualTimeRequest.findMany({
+        where: { userId: employeeId },
+        orderBy: { createdAt: "desc" },
+        include: {
+            manager: {
+                select: { name: true }
+            }
+        }
+    });
+
+    const manualRequests = manualRequestsRaw.map(req => ({
+        id: req.id,
+        logType: req.logType,
+        logDateTime: req.logDateTime,
+        reason: req.reason,
+        status: req.status,
+        managerName: req.manager?.name || "Pending",
+        submittedOn: format(req.createdAt, 'MMM d, yyyy')
+    }));
+
     return (
         <div className="max-w-6xl mx-auto py-8 px-4">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold tracking-tight text-foreground">Employee Requests</h1>
                 <p className="text-muted-foreground mt-1 text-lg">
-                    Manage your Pre-Funded Flex Days and Overtime requests.
+                    Manage your Pre-Funded Flex Days, Overtime, and Manual Time requests.
                 </p>
             </div>
             
@@ -70,6 +91,7 @@ export default async function RequestsPage() {
                 overtimeRequests={overtimeRequests} 
                 leaveRequests={leaveRequests} 
                 balances={balances} 
+                manualRequests={manualRequests}
             />
         </div>
     );

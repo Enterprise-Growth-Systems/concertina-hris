@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { Plus, Clock, ExternalLink, Loader2, CalendarHeart } from "lucide-react";
 import { submitOvertime } from "@/app/actions/overtime";
 import { submitLeaveRequest } from "@/app/actions/leaves";
+import { submitManualTimeRequest } from "@/app/actions/manual-time";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { format } from "date-fns";
 import { Pagination } from "@/components/ui/pagination";
@@ -34,16 +35,28 @@ type LeaveBalanceData = {
     balance: number;
 };
 
+type ManualRequestData = {
+    id: string;
+    logType: string;
+    logDateTime: Date;
+    reason: string;
+    status: string;
+    managerName: string;
+    submittedOn: string;
+};
+
 export function RequestsClientPage({ 
     overtimeRequests, 
     leaveRequests, 
-    balances 
+    balances,
+    manualRequests
 }: { 
     overtimeRequests: OvertimeRequestData[], 
     leaveRequests: LeaveRequestData[], 
-    balances: LeaveBalanceData[] 
+    balances: LeaveBalanceData[],
+    manualRequests: ManualRequestData[]
 }) {
-    const [activeTab, setActiveTab] = useState<"PFFD" | "OVERTIME">("PFFD");
+    const [activeTab, setActiveTab] = useState<"PFFD" | "OVERTIME" | "MANUAL_TIME">("PFFD");
     
     // Pagination state
     const [pffdPage, setPffdPage] = useState(1);
@@ -59,6 +72,12 @@ export function RequestsClientPage({
     const paginatedOvertimeRequests = useMemo(() => 
         overtimeRequests.slice((overtimePage - 1) * ITEMS_PER_PAGE, overtimePage * ITEMS_PER_PAGE),
     [overtimeRequests, overtimePage]);
+    
+    const [manualPage, setManualPage] = useState(1);
+    const totalManualPages = Math.ceil(manualRequests.length / ITEMS_PER_PAGE);
+    const paginatedManualRequests = useMemo(() => 
+        manualRequests.slice((manualPage - 1) * ITEMS_PER_PAGE, manualPage * ITEMS_PER_PAGE),
+    [manualRequests, manualPage]);
     
     // Overtime Form State
     const [isOvertimeModalOpen, setIsOvertimeModalOpen] = useState(false);
@@ -95,6 +114,33 @@ export function RequestsClientPage({
         }
     };
 
+    // Manual Time Form State
+    const [manualLogType, setManualLogType] = useState("Clock In");
+    const [manualDateTime, setManualDateTime] = useState("");
+    const [manualReason, setManualReason] = useState("");
+    const [isSubmittingManual, setIsSubmittingManual] = useState(false);
+
+    const handleManualSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmittingManual(true);
+        try {
+            const formData = new FormData();
+            formData.append("logType", manualLogType);
+            formData.append("logDateTime", manualDateTime);
+            formData.append("reason", manualReason);
+            
+            const res = await submitManualTimeRequest(formData);
+            if (res.success) {
+                setManualLogType("Clock In"); setManualDateTime(""); setManualReason("");
+                window.location.reload();
+            } else {
+                alert(res.error);
+            }
+        } finally {
+            setIsSubmittingManual(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
             {/* Tab Navigation */}
@@ -110,6 +156,19 @@ export function RequestsClientPage({
                     <div className="flex items-center gap-2">
                         <CalendarHeart className="size-4" />
                         PFFD Requests
+                    </div>
+                </button>
+                <button
+                    onClick={() => setActiveTab("MANUAL_TIME")}
+                    className={`px-6 py-3 font-medium text-sm transition-colors border-b-2 ${
+                        activeTab === "MANUAL_TIME" 
+                        ? "border-primary text-primary" 
+                        : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30"
+                    }`}
+                >
+                    <div className="flex items-center gap-2">
+                        <Clock className="size-4" />
+                        Manual Entry
                     </div>
                 </button>
                 <button
@@ -394,6 +453,122 @@ export function RequestsClientPage({
                             </div>
                         </div>
                     )}
+                </div>
+            )}
+
+            {/* MANUAL TIME Tab Content */}
+            {activeTab === "MANUAL_TIME" && (
+                <div className="grid lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="lg:col-span-1 space-y-6">
+                        <div className="rounded-2xl border bg-card text-card-foreground shadow-sm p-6">
+                            <h2 className="font-semibold text-lg mb-1">Manual Time Entry</h2>
+                            <p className="text-sm text-muted-foreground mb-4">Forgot to log your time? Submit a manual request here.</p>
+                            
+                            <form onSubmit={handleManualSubmit} className="space-y-4">
+                                <div>
+                                    <label className="text-sm font-medium mb-1.5 block text-foreground">Missed Log Type</label>
+                                    <select
+                                        required
+                                        value={manualLogType}
+                                        onChange={(e) => setManualLogType(e.target.value)}
+                                        className="w-full bg-background border text-foreground rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50"
+                                    >
+                                        <option value="Clock In">Clock In</option>
+                                        <option value="Clock Out">Clock Out</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium mb-1.5 block text-foreground">Date and Time of missed log</label>
+                                    <input
+                                        type="datetime-local"
+                                        required
+                                        value={manualDateTime}
+                                        onChange={(e) => setManualDateTime(e.target.value)}
+                                        className="block h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                        style={{ colorScheme: 'light' }}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-sm font-medium mb-1.5 block text-foreground">
+                                        Reason for submission <span className="text-red-500">*</span>
+                                    </label>
+                                    <textarea
+                                        required
+                                        value={manualReason}
+                                        onChange={(e) => setManualReason(e.target.value)}
+                                        rows={3}
+                                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 resize-none"
+                                        placeholder="Please explain why you missed the log..."
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmittingManual}
+                                    className="w-full flex items-center justify-center gap-2 px-6 py-2 text-sm font-semibold bg-[#1a233a] hover:bg-[#1a233a]/90 text-white rounded-lg shadow-sm transition-colors disabled:opacity-50"
+                                >
+                                    {isSubmittingManual ? <><Loader2 className="size-4 animate-spin"/> Submitting...</> : "Submit Manual Time"}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div className="lg:col-span-2">
+                        <div className="bg-card border rounded-2xl overflow-hidden shadow-sm h-full flex flex-col">
+                            <div className="p-6 border-b">
+                                <h2 className="font-semibold text-lg">Manual Entry History</h2>
+                            </div>
+                            <div className="overflow-x-auto grow">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="text-xs text-muted-foreground uppercase bg-muted/50 border-b">
+                                        <tr>
+                                            <th className="px-6 py-4 font-semibold">Type</th>
+                                            <th className="px-6 py-4 font-semibold">Date & Time</th>
+                                            <th className="px-6 py-4 font-semibold text-center">Status</th>
+                                            <th className="px-6 py-4 font-semibold text-right">Submitted</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-border">
+                                        {paginatedManualRequests.map((req) => (
+                                            <tr key={req.id} className="hover:bg-muted/30 transition-colors">
+                                                <td className="px-6 py-4 font-medium text-foreground whitespace-nowrap">
+                                                    {req.logType}
+                                                </td>
+                                                <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
+                                                    {format(req.logDateTime, "MMM d, yyyy - h:mm a")}
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-bold border ${
+                                                        req.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                                                        req.status === 'REJECTED' ? 'bg-red-50 text-red-600 border-red-200' :
+                                                        'bg-amber-50 text-amber-600 border-amber-200'
+                                                    }`}>
+                                                        {req.status}
+                                                    </span>
+                                                    <div className="text-[10px] text-muted-foreground mt-1">
+                                                        {req.managerName}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-right text-muted-foreground whitespace-nowrap">
+                                                    {req.submittedOn}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                                
+                                {paginatedManualRequests.length === 0 && (
+                                    <div className="p-12 text-center text-muted-foreground">
+                                        You have no manual time entry history.
+                                    </div>
+                                )}
+                            </div>
+                            <Pagination 
+                                currentPage={manualPage}
+                                totalPages={totalManualPages}
+                                onPageChange={setManualPage}
+                            />
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
