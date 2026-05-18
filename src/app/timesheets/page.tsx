@@ -62,7 +62,7 @@ export default async function TimesheetsPage() {
                                     return (
                                         <tr key={event.id} className="hover:bg-muted/50 transition-colors">
                                             <td className="px-6 py-4 font-medium whitespace-nowrap">
-                                                <span className="text-lg font-bold">{formatInTimeZone(event.time, 'Asia/Manila', "d")}</span>
+                                                <span className="text-sm font-bold">{formatInTimeZone(event.time, 'Asia/Manila', "MMM d, yyyy")}</span>
                                                 <span className="text-xs text-muted-foreground ml-2 uppercase">{formatInTimeZone(event.time, 'Asia/Manila', "EEE")}</span>
                                             </td>
                                             <td className="px-6 py-4">

@@ -155,7 +155,7 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
                                                 <div className="text-xs text-muted-foreground">{event.user.email}</div>
                                             </td>
                                             <td className="px-6 py-4 font-medium whitespace-nowrap">
-                                                <span className="text-lg font-bold">{formatInTimeZone(new Date(event.time), 'Asia/Manila', "d")}</span>
+                                                <span className="text-sm font-bold">{formatInTimeZone(new Date(event.time), 'Asia/Manila', "MMM d, yyyy")}</span>
                                                 <span className="text-xs text-muted-foreground ml-2 uppercase">{formatInTimeZone(new Date(event.time), 'Asia/Manila', "EEE")}</span>
                                             </td>
                                             <td className="px-6 py-4">

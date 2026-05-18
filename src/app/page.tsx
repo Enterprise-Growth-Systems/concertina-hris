@@ -116,7 +116,7 @@ export default async function DashboardPage() {
                     return (
                       <tr key={event.id} className="hover:bg-muted/30 transition-colors">
                         <td className="px-4 py-3 font-medium text-foreground whitespace-nowrap text-left">
-                          <span className="text-lg font-bold">{formatInTimeZone(event.time, 'Asia/Manila', "d")}</span>
+                          <span className="text-sm font-bold">{formatInTimeZone(event.time, 'Asia/Manila', "MMM d, yyyy")}</span>
                           <span className="text-xs text-muted-foreground ml-1.5 uppercase">{formatInTimeZone(event.time, 'Asia/Manila', "EEE")}</span>
                         </td>
                         <td className="px-4 py-3 text-center">
