@@ -12,9 +12,10 @@ export async function submitLeaveRequest(formData: FormData) {
         const startDateStr = formData.get("startDate") as string;
         const endDateStr = formData.get("endDate") as string;
         const reason = formData.get("reason") as string;
+        const attachmentUrl = formData.get("attachmentUrl") as string;
 
-        if (!leaveType || !startDateStr || !endDateStr) {
-            return { success: false, error: "Missing required fields" };
+        if (!leaveType || !startDateStr || !endDateStr || !attachmentUrl || attachmentUrl.trim() === "") {
+            return { success: false, error: "Missing required fields, including Attachment Link" };
         }
 
         const startDate = new Date(startDateStr);
@@ -34,6 +35,7 @@ export async function submitLeaveRequest(formData: FormData) {
                 startDate,
                 endDate,
                 reason,
+                attachmentUrl,
                 status: "PENDING",
             },
         });

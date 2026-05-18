@@ -68,13 +68,14 @@ export async function generateLeaveReport(startDate: string, endDate: string) {
   });
 
   // Create CSV String
-  let csv = "Employee Name,Email,Type,Start Date,End Date,Status,Reason\n";
+  let csv = "Employee Name,Email,Type,Start Date,End Date,Status,Reason,Attachment Link\n";
   
   requests.forEach(req => {
     const reasonStr = req.reason ? `"${req.reason.replace(/"/g, '""')}"` : "";
     const typeStr = req.leaveType === "PFFD" ? "PFFD Credits" : req.leaveType;
+    const attachmentStr = req.attachmentUrl ? `"${req.attachmentUrl.replace(/"/g, '""')}"` : "";
     
-    csv += `"${req.user.name}","${req.user.email}",${typeStr},${new Date(req.startDate).toISOString().split('T')[0]},${new Date(req.endDate).toISOString().split('T')[0]},${req.status},${reasonStr}\n`;
+    csv += `"${req.user.name}","${req.user.email}",${typeStr},${new Date(req.startDate).toISOString().split('T')[0]},${new Date(req.endDate).toISOString().split('T')[0]},${req.status},${reasonStr},${attachmentStr}\n`;
   });
 
   return csv;

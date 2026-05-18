@@ -79,6 +79,21 @@ export default async function LeavesPage() {
                                 <label className="text-sm font-medium mb-1.5 block text-foreground" htmlFor="reason">Reason (Optional)</label>
                                 <textarea name="reason" id="reason" rows={3} className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"></textarea>
                             </div>
+                            
+                            <div className="p-4 rounded-xl border-2 border-primary/20 bg-primary/5">
+                                <label className="text-sm font-bold mb-1.5 block text-foreground" htmlFor="attachmentUrl">
+                                    Attachment Link <span className="text-muted-foreground font-normal">(Required)</span>
+                                </label>
+                                <input 
+                                    type="url" 
+                                    name="attachmentUrl" 
+                                    id="attachmentUrl" 
+                                    required 
+                                    placeholder="e.g. Google Drive Link to proof" 
+                                    className="block h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" 
+                                />
+                            </div>
+
                             <SubmitButton className="w-full mt-2">
                                 Submit Request
                             </SubmitButton>
