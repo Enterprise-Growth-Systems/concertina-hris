@@ -16,9 +16,13 @@ type EmployeeData = {
     contactNumber?: string | null;
     emergencyContact?: string | null;
     address?: string | null;
+    department?: string | null;
+    position?: string | null;
+    icId?: string | null;
+    managerId?: string | null;
 };
 
-export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialUsers: EmployeeData[], currentUserRole: string }) {
+export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: { initialUsers: EmployeeData[], currentUserRole: string, managers: { id: string, name: string }[] }) {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [employeeToDelete, setEmployeeToDelete] = useState<EmployeeData | null>(null);
@@ -35,6 +39,15 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
     const [editContactNumber, setEditContactNumber] = useState<string>("");
     const [editEmergencyContact, setEditEmergencyContact] = useState<string>("");
     const [editAddress, setEditAddress] = useState<string>("");
+    
+    // New Employment Details state
+    const [editName, setEditName] = useState<string>("");
+    const [editEmail, setEditEmail] = useState<string>("");
+    const [editDepartment, setEditDepartment] = useState<string>("");
+    const [editPosition, setEditPosition] = useState<string>("");
+    const [editIcId, setEditIcId] = useState<string>("");
+    const [editManagerId, setEditManagerId] = useState<string>("");
+
     const [isSaving, setIsSaving] = useState(false);
 
     const filteredUsers = useMemo(() => {
@@ -81,7 +94,13 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
                 pffdBalance: parseFloat(editPffdBalance),
                 contactNumber: editContactNumber,
                 emergencyContact: editEmergencyContact,
-                address: editAddress
+                address: editAddress,
+                name: editName,
+                email: editEmail,
+                department: editDepartment,
+                position: editPosition,
+                icId: editIcId,
+                managerId: editManagerId || null
             });
             if (res.success) {
                 setEmployeeToEdit(null);
@@ -184,6 +203,12 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
                                                         setEditContactNumber(user.contactNumber || "");
                                                         setEditEmergencyContact(user.emergencyContact || "");
                                                         setEditAddress(user.address || "");
+                                                        setEditName(user.name);
+                                                        setEditEmail(user.email);
+                                                        setEditDepartment(user.department || "");
+                                                        setEditPosition(user.position || "");
+                                                        setEditIcId(user.icId || "");
+                                                        setEditManagerId(user.managerId || "");
                                                     }}
                                                     className="p-2 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                                                     title="Edit Employee"
@@ -350,9 +375,77 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
                                             placeholder="123 Example St, City, Country"
                                         />
                                     </div>
+                                    
+                                    <div className="pt-4 mt-2 border-t border-border">
+                                        <h3 className="text-sm font-bold text-foreground mb-4">Employment Details</h3>
+                                        <div className="space-y-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1.5">Full Name</label>
+                                                <input
+                                                    type="text"
+                                                    value={editName}
+                                                    onChange={(e) => setEditName(e.target.value)}
+                                                    className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-1.5">Email Address</label>
+                                                <input
+                                                    type="email"
+                                                    value={editEmail}
+                                                    onChange={(e) => setEditEmail(e.target.value)}
+                                                    className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-foreground mb-1.5">Department</label>
+                                                    <input
+                                                        type="text"
+                                                        value={editDepartment}
+                                                        onChange={(e) => setEditDepartment(e.target.value)}
+                                                        className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-foreground mb-1.5">Position</label>
+                                                    <input
+                                                        type="text"
+                                                        value={editPosition}
+                                                        onChange={(e) => setEditPosition(e.target.value)}
+                                                        className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-foreground mb-1.5">IC ID</label>
+                                                    <input
+                                                        type="text"
+                                                        value={editIcId}
+                                                        onChange={(e) => setEditIcId(e.target.value)}
+                                                        className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-foreground mb-1.5">Manager</label>
+                                                    <select
+                                                        value={editManagerId}
+                                                        onChange={(e) => setEditManagerId(e.target.value)}
+                                                        className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                                    >
+                                                        <option value="">No Manager</option>
+                                                        {managers.filter(m => m.id !== employeeToEdit.id).map(manager => (
+                                                            <option key={manager.id} value={manager.id}>{manager.name}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </>
                             )}
-                            <div>
+                            <div className="pt-4 mt-2 border-t border-border">
                                 <label className="block text-sm font-medium text-foreground mb-1.5">PFFD Balance</label>
                                 <input
                                     type="number"

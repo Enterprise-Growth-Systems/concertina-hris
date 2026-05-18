@@ -29,6 +29,11 @@ export default async function EmployeesPage() {
         }
     });
 
+    const managers = users.filter(u => u.role === 'MANAGER' || u.role === 'ADMIN').map(u => ({
+        id: u.id,
+        name: u.name
+    }));
+
     // Flatten data for the client component
     const formattedUsers = users.map(u => ({
         id: u.id,
@@ -39,7 +44,11 @@ export default async function EmployeesPage() {
         joined: format(u.createdAt, 'MMM d, yyyy'),
         contactNumber: u.contactNumber,
         emergencyContact: u.emergencyContact,
-        address: u.address
+        address: u.address,
+        department: u.department,
+        position: u.position,
+        icId: u.icId,
+        managerId: u.managerId
     }));
 
     return (
@@ -51,7 +60,7 @@ export default async function EmployeesPage() {
                 </p>
             </div>
 
-            <EmployeeClientPage initialUsers={formattedUsers} currentUserRole={currentUserRole} />
+            <EmployeeClientPage initialUsers={formattedUsers} currentUserRole={currentUserRole} managers={managers} />
         </div>
     );
 }

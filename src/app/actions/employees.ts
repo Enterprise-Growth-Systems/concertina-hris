@@ -135,7 +135,13 @@ export async function updateEmployee(
         pffdBalance?: number,
         contactNumber?: string,
         emergencyContact?: string,
-        address?: string
+        address?: string,
+        name?: string,
+        email?: string,
+        department?: string,
+        position?: string,
+        icId?: string,
+        managerId?: string | null
     }
 ) {
     const session = await auth();
@@ -148,12 +154,18 @@ export async function updateEmployee(
     try {
         const updateData: any = {};
         
-        // Only admins can change roles and personal info
+        // Only admins can change roles, personal info, and employment details
         if (currentUserRole === "ADMIN") {
             if (data.role !== undefined) updateData.role = data.role;
             if (data.contactNumber !== undefined) updateData.contactNumber = data.contactNumber;
             if (data.emergencyContact !== undefined) updateData.emergencyContact = data.emergencyContact;
             if (data.address !== undefined) updateData.address = data.address;
+            if (data.name !== undefined) updateData.name = data.name;
+            if (data.email !== undefined) updateData.email = data.email;
+            if (data.department !== undefined) updateData.department = data.department;
+            if (data.position !== undefined) updateData.position = data.position;
+            if (data.icId !== undefined) updateData.icId = data.icId;
+            if (data.managerId !== undefined) updateData.managerId = data.managerId;
         }
 
         await prisma.$transaction([
