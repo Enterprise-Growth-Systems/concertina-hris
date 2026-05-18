@@ -3,10 +3,12 @@ import { redirect } from "next/navigation";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { AuthError } from "next-auth";
 
-export default function LoginPage({ searchParams }: { searchParams: { error?: string, t?: string } }) {
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string, t?: string }> }) {
+    const params = await searchParams;
+
     return (
         <div className="flex min-h-screen items-center justify-center p-4 bg-background">
-            <div className={`w-full max-w-sm rounded-2xl border bg-card p-8 shadow-lg ${searchParams?.error === "InvalidCredentials" ? "animate-shake border-red-500/50" : ""}`}>
+            <div key={params?.t || "card"} className="w-full max-w-sm rounded-2xl border bg-card p-8 shadow-lg">
                 <div className="mb-8 text-center">
                     <h1 className="text-2xl font-bold tracking-tight text-foreground">Concertina HR</h1>
                     <p className="text-sm text-muted-foreground mt-2">Sign in to manage your time and leaves.</p>
@@ -42,7 +44,7 @@ export default function LoginPage({ searchParams }: { searchParams: { error?: st
                     <div className="space-y-2">
                         <label className="text-sm font-medium">Password</label>
                         <input
-                            key={searchParams?.t ? `pw-err-${searchParams.t}` : "pw"}
+                            key={params?.t ? `pw-err-${params.t}` : "pw"}
                             name="password"
                             type="password"
                             required
@@ -53,6 +55,11 @@ export default function LoginPage({ searchParams }: { searchParams: { error?: st
                     <SubmitButton className="w-full shadow-md hover:shadow-lg transition-shadow">
                         Sign In
                     </SubmitButton>
+                    {params?.error === "InvalidCredentials" && (
+                        <p className="text-sm text-destructive text-center mt-4">
+                            Incorrect login details. Please try again.
+                        </p>
+                    )}
                 </form>
             </div>
         </div>
