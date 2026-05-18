@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X, Clock, LayoutDashboard, CalendarHeart, Users, Settings, History, Megaphone, BookOpen, BookUser, UserCircle, Calendar, CalendarDays, ClipboardList } from "lucide-react";
+import { Menu, X, Clock, LayoutDashboard, CalendarHeart, Users, Settings, History, Megaphone, BookOpen, BookUser, UserCircle, Calendar, CalendarDays, ClipboardList, ClipboardCheck } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -20,6 +20,7 @@ const ADMIN_ROUTES = [
     { name: "Time Logs", href: "/admin/timesheets", icon: History },
     { name: "Leave Approvals", href: "/admin/leaves", icon: CalendarHeart },
     { name: "Overtime Approvals", href: "/admin/overtime", icon: Clock },
+    { name: "Manual Time Approvals", href: "/admin/manual-time", icon: ClipboardCheck },
     { name: "Schedules Manager", href: "/admin/schedules", icon: CalendarDays },
     { name: "Holiday Manager", href: "/admin/holidays", icon: Calendar },
     { name: "Reports Dashboard", href: "/admin/reports", icon: ClipboardList },
