@@ -11,10 +11,8 @@ import { handleSignOut } from "@/app/actions/auth";
 const EMP_ROUTES = [
     { name: "Dashboard", href: "/", icon: LayoutDashboard },
     { name: "Timesheets", href: "/timesheets", icon: Clock },
-    { name: "Schedules", href: "/schedule", icon: CalendarDays },
     { name: "PFFD Requests", href: "/leaves", icon: CalendarHeart },
     { name: "Overtime", href: "/overtime", icon: Clock },
-    { name: "Company Holidays", href: "/holidays", icon: Calendar },
     { name: "My Profile", href: "/profile", icon: UserCircle },
 ];
 
