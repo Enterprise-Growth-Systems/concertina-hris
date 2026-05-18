@@ -19,7 +19,8 @@ export default async function AdminSchedulesPage() {
   const users = await prisma.user.findMany({
     orderBy: { name: 'asc' },
     include: {
-      schedules: true
+      schedules: true,
+      specialSchedules: true
     }
   });
 

@@ -128,7 +128,16 @@ export async function updatePffdBalance(userId: string, newBalance: number) {
         return { success: false, error: "Database error occurred." };
     }
 }
-export async function updateEmployee(userId: string, data: { role?: string, pffdBalance?: number }) {
+export async function updateEmployee(
+    userId: string, 
+    data: { 
+        role?: string, 
+        pffdBalance?: number,
+        contactNumber?: string,
+        emergencyContact?: string,
+        address?: string
+    }
+) {
     const session = await auth();
     const currentUserRole = session?.user ? (session.user as any).role : null;
     
@@ -138,11 +147,13 @@ export async function updateEmployee(userId: string, data: { role?: string, pffd
 
     try {
         const updateData: any = {};
-        if (data.role) {
-            // Only admins can change roles
-            if (currentUserRole === "ADMIN") {
-                updateData.role = data.role;
-            }
+        
+        // Only admins can change roles and personal info
+        if (currentUserRole === "ADMIN") {
+            if (data.role !== undefined) updateData.role = data.role;
+            if (data.contactNumber !== undefined) updateData.contactNumber = data.contactNumber;
+            if (data.emergencyContact !== undefined) updateData.emergencyContact = data.emergencyContact;
+            if (data.address !== undefined) updateData.address = data.address;
         }
 
         await prisma.$transaction([

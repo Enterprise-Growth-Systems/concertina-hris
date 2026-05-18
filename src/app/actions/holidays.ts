@@ -55,3 +55,47 @@ export async function deleteHoliday(holidayId: string) {
   revalidatePath("/holidays");
   revalidatePath("/");
 }
+
+export async function createAssignedHoliday(formData: FormData) {
+  const session = await auth();
+  const user = session?.user as any;
+
+  if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
+    throw new Error("Unauthorized");
+  }
+
+  const userId = formData.get("userId") as string;
+  const name = formData.get("name") as string;
+  const dateStr = formData.get("date") as string;
+  const description = formData.get("description") as string | null;
+
+  if (!userId || !name || !dateStr) {
+    throw new Error("Missing required fields.");
+  }
+
+  await prisma.assignedHoliday.create({
+    data: {
+      userId,
+      name,
+      date: new Date(dateStr),
+      description,
+    },
+  });
+
+  revalidatePath("/admin/holidays");
+}
+
+export async function deleteAssignedHoliday(holidayId: string) {
+  const session = await auth();
+  const user = session?.user as any;
+
+  if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.assignedHoliday.delete({
+    where: { id: holidayId },
+  });
+
+  revalidatePath("/admin/holidays");
+}

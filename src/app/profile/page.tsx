@@ -1,6 +1,5 @@
 import { auth } from "@/auth";
 import { PrismaClient } from "@prisma/client";
-import { updateProfile } from "@/app/actions/profile";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { PasswordForm } from "./components/password-form";
 
@@ -77,58 +76,34 @@ export default async function ProfilePage() {
         </div>
 
         <div className="space-y-8">
-          {/* Editable Personal Information */}
+          {/* Read-Only Personal Information */}
           <div className="bg-card border rounded-xl p-6 shadow-sm">
             <h2 className="text-xl font-semibold text-foreground mb-4">Personal Information</h2>
-            <form action={updateProfile} className="space-y-4">
+            <div className="space-y-4">
               <div>
-                 <label htmlFor="contactNumber" className="block text-sm font-medium text-muted-foreground mb-1">
+                 <label className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
                    Contact Number
                  </label>
-                 <input 
-                   type="text" 
-                   id="contactNumber" 
-                   name="contactNumber" 
-                   defaultValue={user.contactNumber || ""}
-                   className="w-full bg-background border text-foreground rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                   placeholder="+1 (555) 000-0000"
-                 />
+                 <div className="text-foreground mt-1">{user.contactNumber || "—"}</div>
               </div>
               
               <div>
-                 <label htmlFor="emergencyContact" className="block text-sm font-medium text-muted-foreground mb-1">
+                 <label className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
                    Emergency Contact
                  </label>
-                 <input 
-                   type="text" 
-                   id="emergencyContact" 
-                   name="emergencyContact" 
-                   defaultValue={user.emergencyContact || ""}
-                   className="w-full bg-background border text-foreground rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                   placeholder="Name & Number"
-                 />
+                 <div className="text-foreground mt-1">{user.emergencyContact || "—"}</div>
               </div>
 
               <div>
-                 <label htmlFor="address" className="block text-sm font-medium text-muted-foreground mb-1">
+                 <label className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
                    Home Address
                  </label>
-                 <textarea 
-                   id="address" 
-                   name="address" 
-                   defaultValue={user.address || ""}
-                   rows={3}
-                   className="w-full bg-background border text-foreground rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                   placeholder="123 Example St, City, Country"
-                 />
+                 <div className="text-foreground mt-1 whitespace-pre-wrap">{user.address || "—"}</div>
               </div>
-
-              <div className="pt-4">
-                <SubmitButton className="w-full">
-                  Save Changes
-                </SubmitButton>
-              </div>
-            </form>
+            </div>
+            <p className="text-xs text-muted-foreground mt-6">
+              Contact HR if any of your personal information needs to be updated.
+            </p>
           </div>
 
           {/* Security Settings (Change Password) */}

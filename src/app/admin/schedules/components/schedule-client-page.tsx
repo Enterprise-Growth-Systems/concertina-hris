@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { upsertSchedule } from "@/app/actions/schedules";
+import { upsertSchedule, upsertSpecialSchedule, deleteSpecialSchedule } from "@/app/actions/schedules";
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -90,6 +90,57 @@ export function ScheduleClientPage({ initialUsers }: { initialUsers: any[] }) {
                                 );
                             })}
                             </div>
+                        </div>
+
+                        <div className="p-4 border-t bg-muted/20">
+                            <h3 className="text-sm font-semibold mb-3 text-foreground">Special Schedule Override</h3>
+                            <p className="text-xs text-muted-foreground mb-4">Set a specific shift for a single date (e.g., overriding a holiday or weekend).</p>
+                            
+                            <form action={async (formData) => {
+                                await upsertSpecialSchedule(
+                                    user.id,
+                                    formData.get("date") as string,
+                                    formData.get("startTime") as string,
+                                    formData.get("endTime") as string,
+                                    formData.get("reason") as string
+                                );
+                            }} className="flex flex-col sm:flex-row items-end gap-4">
+                                <div className="flex-1 w-full sm:w-auto">
+                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Date</label>
+                                    <input type="date" name="date" required className="w-full bg-background border text-foreground rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50" />
+                                </div>
+                                <div className="w-full sm:w-32">
+                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Start Time</label>
+                                    <input type="time" name="startTime" required className="w-full bg-background border text-foreground rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50" />
+                                </div>
+                                <div className="w-full sm:w-32">
+                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">End Time</label>
+                                    <input type="time" name="endTime" required className="w-full bg-background border text-foreground rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50" />
+                                </div>
+                                <div className="flex-1 w-full sm:w-auto">
+                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Reason (Optional)</label>
+                                    <input type="text" name="reason" placeholder="e.g. Weekend OT" className="w-full bg-background border text-foreground rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50" />
+                                </div>
+                                <SubmitButton variant="default" className="w-full sm:w-24">
+                                    Add
+                                </SubmitButton>
+                            </form>
+
+                            {user.specialSchedules && user.specialSchedules.length > 0 && (
+                                <div className="mt-6">
+                                    <h4 className="text-xs font-bold text-foreground mb-2 uppercase tracking-widest">Active Overrides</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {user.specialSchedules.map((ss: any) => (
+                                            <div key={ss.id} className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary px-3 py-1.5 rounded-md text-xs font-medium">
+                                                <span>{new Date(ss.date).toLocaleDateString()}: {ss.startTime}-{ss.endTime} {ss.reason ? `(${ss.reason})` : ''}</span>
+                                                <button onClick={() => deleteSpecialSchedule(ss.id)} className="hover:text-destructive transition-colors ml-1">
+                                                    <X className="size-3" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 ))}

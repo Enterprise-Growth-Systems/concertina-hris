@@ -36,7 +36,10 @@ export default async function EmployeesPage() {
         email: u.email,
         role: u.role,
         leaveBalance: u.leaveBalances[0]?.balance || 0,
-        joined: format(u.createdAt, 'MMM d, yyyy')
+        joined: format(u.createdAt, 'MMM d, yyyy'),
+        contactNumber: u.contactNumber,
+        emergencyContact: u.emergencyContact,
+        address: u.address
     }));
 
     return (

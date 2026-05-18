@@ -12,6 +12,9 @@ type EmployeeData = {
     role: string;
     leaveBalance: number;
     joined: string;
+    contactNumber?: string | null;
+    emergencyContact?: string | null;
+    address?: string | null;
 };
 
 export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialUsers: EmployeeData[], currentUserRole: string }) {
@@ -24,6 +27,9 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
     const [employeeToEdit, setEmployeeToEdit] = useState<EmployeeData | null>(null);
     const [editRole, setEditRole] = useState<string>("");
     const [editPffdBalance, setEditPffdBalance] = useState<string>("");
+    const [editContactNumber, setEditContactNumber] = useState<string>("");
+    const [editEmergencyContact, setEditEmergencyContact] = useState<string>("");
+    const [editAddress, setEditAddress] = useState<string>("");
     const [isSaving, setIsSaving] = useState(false);
 
     const filteredUsers = initialUsers.filter(user => 
@@ -54,7 +60,10 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
         try {
             const res = await updateEmployee(employeeToEdit.id, {
                 role: editRole,
-                pffdBalance: parseFloat(editPffdBalance)
+                pffdBalance: parseFloat(editPffdBalance),
+                contactNumber: editContactNumber,
+                emergencyContact: editEmergencyContact,
+                address: editAddress
             });
             if (res.success) {
                 setEmployeeToEdit(null);
@@ -154,6 +163,9 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
                                                         setEmployeeToEdit(user);
                                                         setEditRole(user.role);
                                                         setEditPffdBalance(user.leaveBalance.toString());
+                                                        setEditContactNumber(user.contactNumber || "");
+                                                        setEditEmergencyContact(user.emergencyContact || "");
+                                                        setEditAddress(user.address || "");
                                                     }}
                                                     className="p-2 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                                                     title="Edit Employee"
@@ -272,18 +284,50 @@ export function EmployeeClientPage({ initialUsers, currentUserRole }: { initialU
                         
                         <div className="space-y-4 mb-6">
                             {currentUserRole === "ADMIN" && (
-                                <div>
-                                    <label className="block text-sm font-medium text-foreground mb-1.5">User Role</label>
-                                    <select
-                                        value={editRole}
-                                        onChange={(e) => setEditRole(e.target.value)}
-                                        className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                                    >
-                                        <option value="EMPLOYEE">Employee</option>
-                                        <option value="MANAGER">Manager</option>
-                                        <option value="ADMIN">Admin</option>
-                                    </select>
-                                </div>
+                                <>
+                                    <div>
+                                        <label className="block text-sm font-medium text-foreground mb-1.5">User Role</label>
+                                        <select
+                                            value={editRole}
+                                            onChange={(e) => setEditRole(e.target.value)}
+                                            className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                        >
+                                            <option value="EMPLOYEE">Employee</option>
+                                            <option value="MANAGER">Manager</option>
+                                            <option value="ADMIN">Admin</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-foreground mb-1.5">Contact Number</label>
+                                        <input
+                                            type="text"
+                                            value={editContactNumber}
+                                            onChange={(e) => setEditContactNumber(e.target.value)}
+                                            className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                            placeholder="+1 (555) 000-0000"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-foreground mb-1.5">Emergency Contact</label>
+                                        <input
+                                            type="text"
+                                            value={editEmergencyContact}
+                                            onChange={(e) => setEditEmergencyContact(e.target.value)}
+                                            className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                            placeholder="Name & Number"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-foreground mb-1.5">Home Address</label>
+                                        <textarea
+                                            value={editAddress}
+                                            onChange={(e) => setEditAddress(e.target.value)}
+                                            rows={2}
+                                            className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                                            placeholder="123 Example St, City, Country"
+                                        />
+                                    </div>
+                                </>
                             )}
                             <div>
                                 <label className="block text-sm font-medium text-foreground mb-1.5">PFFD Balance</label>

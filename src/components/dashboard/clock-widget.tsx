@@ -71,7 +71,7 @@ export function ClockWidget() {
                     {formatInTimeZone(time, 'Asia/Manila', "HH:mm:ss")}
                 </h2>
                 <p className="text-xs font-medium text-muted-foreground mt-1">
-                    {formatInTimeZone(time, 'Asia/Manila', "EEEE, MMM d")}
+                    {formatInTimeZone(time, 'Asia/Manila', "EEEE, MMM d")} (PHT)
                 </p>
             </div>
 

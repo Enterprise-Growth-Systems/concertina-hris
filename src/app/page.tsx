@@ -58,7 +58,7 @@ export default async function DashboardPage() {
           <h2 className="text-sm font-bold text-primary mb-1 tracking-widest uppercase">WELCOME</h2>
           <h1 className="text-2xl font-bold text-foreground mb-1">{firstName}, here's your workday snapshot.</h1>
           <p className="text-xs text-muted-foreground">
-            {session.user.role === "ADMIN" || session.user.role === "SUPERADMIN" ? "HR Manager" : "Employee"} | {currentDateStr}
+            {(session.user as any).role === "ADMIN" || (session.user as any).role === "SUPERADMIN" ? "HR Manager" : "Employee"} | {currentDateStr}
           </p>
         </div>
         <div className="px-4 py-1.5 bg-muted rounded-full text-xs font-medium text-muted-foreground border">
@@ -189,7 +189,7 @@ export default async function DashboardPage() {
                         {formatInTimeZone(log.clockIn, 'Asia/Manila', "EEEE, MMM d")}
                       </td>
                       <td className="px-4 py-4 text-muted-foreground whitespace-nowrap">
-                        {formatInTimeZone(log.clockIn, 'Asia/Manila', "h:mm a")} - {log.clockOut ? formatInTimeZone(log.clockOut, 'Asia/Manila', "h:mm a") : <span className="text-primary italic">Active</span>}
+                        {formatInTimeZone(log.clockIn, 'Asia/Manila', "h:mm a")} - {log.clockOut ? formatInTimeZone(log.clockOut, 'Asia/Manila', "h:mm a") : <span className="text-primary italic">Active</span>} <span className="text-[10px]">(PHT)</span>
                       </td>
                       <td className="px-4 py-4 text-muted-foreground">
                         {log.notes || "No details"}

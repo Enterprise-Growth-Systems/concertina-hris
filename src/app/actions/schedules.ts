@@ -32,3 +32,39 @@ export async function upsertSchedule(userId: string, dayOfWeek: number, startTim
   revalidatePath("/admin/schedules");
   revalidatePath("/schedule");
 }
+
+export async function upsertSpecialSchedule(userId: string, dateStr: string, startTime: string, endTime: string, reason?: string) {
+  const session = await auth();
+  const user = session?.user as any;
+
+  if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
+    throw new Error("Unauthorized");
+  }
+
+  const date = new Date(dateStr);
+
+  await prisma.specialSchedule.upsert({
+    where: {
+      userId_date: { userId, date },
+    },
+    update: { startTime, endTime, reason },
+    create: { userId, date, startTime, endTime, reason },
+  });
+
+  revalidatePath("/admin/schedules");
+  revalidatePath("/schedule");
+}
+
+export async function deleteSpecialSchedule(id: string) {
+  const session = await auth();
+  const user = session?.user as any;
+
+  if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.specialSchedule.delete({ where: { id } });
+
+  revalidatePath("/admin/schedules");
+  revalidatePath("/schedule");
+}

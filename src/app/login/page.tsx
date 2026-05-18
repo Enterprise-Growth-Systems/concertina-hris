@@ -12,11 +12,6 @@ export default function LoginPage({ searchParams }: { searchParams: { error?: st
                     <p className="text-sm text-muted-foreground mt-2">Sign in to manage your time and leaves.</p>
                 </div>
 
-                {searchParams?.error === "InvalidCredentials" && (
-                    <div className="bg-red-500/10 text-red-500 p-3 rounded-lg text-sm mb-6 border border-red-500/20 font-medium">
-                        Invalid email or password. Please try again.
-                    </div>
-                )}
 
                 <form
                     action={async (formData) => {
