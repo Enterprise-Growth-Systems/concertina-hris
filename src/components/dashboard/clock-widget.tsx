@@ -86,8 +86,8 @@ export function ClockWidget() {
                         className={cn(
                             "flex items-center justify-center gap-2 px-8 py-2.5 rounded-md font-bold text-sm transition-all w-40",
                             isClockedIn
-                                ? "bg-muted text-foreground hover:bg-muted/80 border"
-                                : "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                : "bg-emerald-600 text-white hover:bg-emerald-700"
                         )}
                     >
                         {isPending ? (

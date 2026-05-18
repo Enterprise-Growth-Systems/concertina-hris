@@ -103,7 +103,7 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
 
                     {/* Date Range Picker */}
                     <div className="flex items-center gap-2 w-full md:w-auto">
-                        <div className="relative w-full md:w-40">
+                        <div className="relative w-full md:w-48">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <CalendarIcon className="size-4 text-muted-foreground" />
                             </div>
@@ -116,7 +116,7 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
                             />
                         </div>
                         <span className="text-muted-foreground text-sm font-medium">to</span>
-                        <div className="relative w-full md:w-40">
+                        <div className="relative w-full md:w-48">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <CalendarIcon className="size-4 text-muted-foreground" />
                             </div>

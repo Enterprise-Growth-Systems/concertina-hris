@@ -64,7 +64,7 @@ export function TimesheetsClientPage({ initialEvents }: { initialEvents: LogEven
             {/* Filter Control Panel */}
             <div className="bg-card border rounded-2xl p-4 shadow-sm flex flex-col md:flex-row gap-4 items-end md:items-center justify-between">
                 <div className="flex items-center gap-2 w-full md:w-auto flex-wrap">
-                    <div className="relative w-full md:w-40">
+                    <div className="relative w-full md:w-48">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <CalendarIcon className="size-4 text-muted-foreground" />
                         </div>
@@ -77,7 +77,7 @@ export function TimesheetsClientPage({ initialEvents }: { initialEvents: LogEven
                         />
                     </div>
                     <span className="text-muted-foreground text-sm font-medium">to</span>
-                    <div className="relative w-full md:w-40">
+                    <div className="relative w-full md:w-48">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <CalendarIcon className="size-4 text-muted-foreground" />
                         </div>
