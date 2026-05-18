@@ -3,10 +3,10 @@ import { redirect } from "next/navigation";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { AuthError } from "next-auth";
 
-export default function LoginPage({ searchParams }: { searchParams: { error?: string } }) {
+export default function LoginPage({ searchParams }: { searchParams: { error?: string, t?: string } }) {
     return (
         <div className="flex min-h-screen items-center justify-center p-4 bg-background">
-            <div className="w-full max-w-sm rounded-2xl border bg-card p-8 shadow-lg">
+            <div className={`w-full max-w-sm rounded-2xl border bg-card p-8 shadow-lg ${searchParams?.error === "InvalidCredentials" ? "animate-shake border-red-500/50" : ""}`}>
                 <div className="mb-8 text-center">
                     <h1 className="text-2xl font-bold tracking-tight text-foreground">Concertina HR</h1>
                     <p className="text-sm text-muted-foreground mt-2">Sign in to manage your time and leaves.</p>
@@ -20,7 +20,8 @@ export default function LoginPage({ searchParams }: { searchParams: { error?: st
                             await signIn("credentials", formData);
                         } catch (error) {
                             if (error instanceof AuthError) {
-                                redirect("/login?error=InvalidCredentials");
+                                // Add a timestamp to the error to force re-render/re-shake if they fail again
+                                redirect(`/login?error=InvalidCredentials&t=${Date.now()}`);
                             }
                             // Rethrow all other errors (like NEXT_REDIRECT for successful logins)
                             throw error;
@@ -41,6 +42,7 @@ export default function LoginPage({ searchParams }: { searchParams: { error?: st
                     <div className="space-y-2">
                         <label className="text-sm font-medium">Password</label>
                         <input
+                            key={searchParams?.t ? `pw-err-${searchParams.t}` : "pw"}
                             name="password"
                             type="password"
                             required
