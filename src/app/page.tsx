@@ -27,21 +27,11 @@ export default async function DashboardPage() {
   const dateRangeStr = `${formatInTimeZone(startOfWeek, 'Asia/Manila', 'MMM d')} - ${formatInTimeZone(endOfWeek, 'Asia/Manila', 'MMM d, yyyy')}`;
   const currentDateStr = formatInTimeZone(now, 'Asia/Manila', 'MMM d, yyyy | h:mm a');
 
-  const balances = await prisma.leaveBalance.findMany({
-    where: { userId: session.user.id }
-  });
-
-  const leaveCreditsBalance = balances.find(b => b.leaveType === "PFFD")?.balance || 0;
-
   const recentLogs = await prisma.timeLog.findMany({
     where: { userId: session.user.id },
     orderBy: { clockIn: "desc" },
     take: 5
   });
-
-  // Calculate simple stats for the UI
-  const timeEntriesCount = recentLogs.length;
-  const latestStatus = recentLogs[0]?.status === "ON_TIME" ? "On Time" : recentLogs[0]?.status === "LATE" ? "Late" : "N/A";
 
   return (
     <div className="max-w-7xl mx-auto flex flex-col h-full w-full">
@@ -66,95 +56,10 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* 3-Column Grid */}
+      {/* Widgets Grid */}
       <div className="grid lg:grid-cols-3 gap-6 mb-8">
-        
         {/* Col 1: Clock Widget */}
         <ClockWidget />
-
-        {/* Col 2: Logged today */}
-        <div className="rounded-2xl border bg-card p-6 flex flex-col">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h3 className="font-bold text-foreground text-sm">Logged today</h3>
-              <p className="text-xs text-muted-foreground mt-0.5">Total time recorded today</p>
-            </div>
-            <span className="px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-md text-[10px] font-semibold border border-emerald-200">Today</span>
-          </div>
-
-          <div className="flex flex-col items-center justify-center border-b pb-6 mb-6">
-             <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">TOTAL HOURS</p>
-             <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-bold text-primary">0</span>
-              <span className="text-sm font-bold text-muted-foreground">hrs</span>
-              <span className="text-4xl font-bold text-primary ml-1">00</span>
-              <span className="text-sm font-bold text-muted-foreground">mins</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div className="bg-muted/30 rounded-xl p-3 flex flex-col items-center justify-center text-center">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">ENTRIES TODAY</p>
-              <p className="text-lg font-bold text-foreground">0</p>
-            </div>
-            <div className="bg-muted/30 rounded-xl p-3 flex flex-col items-center justify-center text-center">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">STATUS</p>
-              <p className="text-sm font-bold text-muted-foreground">No logs</p>
-            </div>
-          </div>
-          
-          <div className="mt-auto pt-4 text-[10px] text-muted-foreground text-center">
-            Calculated based on your active and completed logs for today.
-          </div>
-        </div>
-
-        {/* Col 3: Logged this week */}
-        <div className="rounded-2xl border bg-card p-6 flex flex-col">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h3 className="font-bold text-foreground text-sm">Logged this week</h3>
-              <p className="text-xs text-muted-foreground mt-0.5">Total time recorded this week</p>
-            </div>
-            <span className="px-2.5 py-1 bg-muted rounded-md text-[10px] font-semibold text-muted-foreground border">This week</span>
-          </div>
-
-          <div className="flex flex-col items-center justify-center border-b pb-6 mb-6">
-             <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">TOTAL HOURS</p>
-             <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-bold text-primary">0</span>
-              <span className="text-sm font-bold text-muted-foreground">hrs</span>
-              <span className="text-4xl font-bold text-primary ml-1">01</span>
-              <span className="text-sm font-bold text-muted-foreground">mins</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div className="bg-muted/30 rounded-xl p-3">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">TIME ENTRIES</p>
-              <p className="text-lg font-bold text-foreground">{timeEntriesCount}</p>
-            </div>
-            <div className="bg-muted/30 rounded-xl p-3">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">LATEST STATUS</p>
-              <p className={`text-sm font-bold ${latestStatus === 'Late' ? 'text-destructive' : 'text-emerald-600'}`}>{latestStatus}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-muted/30 rounded-xl p-3">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">TODAY</p>
-              <p className="text-sm font-bold text-foreground">No logs today</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">0h 00m logged</p>
-            </div>
-            <div className="bg-muted/30 rounded-xl p-3">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">PFFD BALANCE</p>
-              <p className="text-xl font-bold text-foreground">{leaveCreditsBalance}</p>
-            </div>
-          </div>
-
-          <div className="mt-auto pt-4 text-[10px] text-muted-foreground">
-            Includes completed entries recorded during the current week.
-          </div>
-        </div>
       </div>
 
       {/* Recent Time Logs Table */}
