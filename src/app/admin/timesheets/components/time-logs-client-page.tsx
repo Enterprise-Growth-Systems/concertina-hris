@@ -21,7 +21,7 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
     const [startDateFilter, setStartDateFilter] = useState("");
     const [endDateFilter, setEndDateFilter] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const ITEMS_PER_PAGE = 20;
+    const ITEMS_PER_PAGE = 100;
 
     type LogEvent = { id: string; type: "IN" | "OUT"; time: Date; user: { name: string; email: string; } };
     const events: LogEvent[] = [];
