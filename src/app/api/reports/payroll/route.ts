@@ -23,15 +23,13 @@ export async function GET(request: Request) {
         
         // 1. Attendance Summary Section
         csvString += "--- ATTENDANCE SUMMARY ---\n";
-        csvString += "Employee Name,Email,Total Hours,Missing Clock-Outs,Late Logs,Approved PFFD Used\n";
+        csvString += "Employee Name,Email,Total Hours,Missing Clock-Outs,Approved PFFD Used\n";
         
         users.forEach(user => {
             let totalHoursRendered = 0;
             let missingOuts = 0;
-            let lateLogs = 0;
 
             user.timeLogs.forEach(log => {
-                if (log.status === 'LATE') lateLogs++;
                 if (log.clockOut) {
                     const hoursWorked = (new Date(log.clockOut).getTime() - new Date(log.clockIn).getTime()) / (1000 * 60 * 60);
                     totalHoursRendered += hoursWorked;
@@ -40,14 +38,14 @@ export async function GET(request: Request) {
                 }
             });
 
-            csvString += `"${user.name}","${user.email}","${totalHoursRendered.toFixed(2)}","${missingOuts}","${lateLogs}","${user.leaveRequests.length}"\n`;
+            csvString += `"${user.name}","${user.email}","${totalHoursRendered.toFixed(2)}","${missingOuts}","${user.leaveRequests.length}"\n`;
         });
 
         csvString += "\n\n";
 
         // 2. Detailed Daily Logs Section
         csvString += "--- DETAILED DAILY LOGS ---\n";
-        csvString += "Employee Name,Date,Clock In,Clock Out,Hours Worked,Status\n";
+        csvString += "Employee Name,Date,Clock In,Clock Out,Hours Worked\n";
 
         users.forEach(user => {
             user.timeLogs.forEach(log => {
@@ -61,7 +59,7 @@ export async function GET(request: Request) {
                     hoursWorked = (new Date(log.clockOut).getTime() - new Date(log.clockIn).getTime()) / (1000 * 60 * 60);
                 }
 
-                csvString += `"${user.name}","${dateStr}","${clockInStr}","${clockOutStr}","${hoursWorked > 0 ? hoursWorked.toFixed(2) : 'N/A'}","${log.status}"\n`;
+                csvString += `"${user.name}","${dateStr}","${clockInStr}","${clockOutStr}","${hoursWorked > 0 ? hoursWorked.toFixed(2) : 'N/A'}"\n`;
             });
         });
 

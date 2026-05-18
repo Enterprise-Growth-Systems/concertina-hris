@@ -30,13 +30,13 @@ export async function generateTimesheetReport(startDate: string, endDate: string
   });
 
   // Create events list for CSV
-  type LogEvent = { id: string; type: "IN" | "OUT"; time: Date; status?: string; user: { name: string; email: string; } };
+  type LogEvent = { id: string; type: "IN" | "OUT"; time: Date; user: { name: string; email: string; } };
   const events: LogEvent[] = [];
   logs.forEach((log: any) => {
     if (log.clockOut) {
       events.push({ id: `${log.id}-out`, type: "OUT", time: log.clockOut, user: log.user });
     }
-    events.push({ id: `${log.id}-in`, type: "IN", time: log.clockIn, status: log.status, user: log.user });
+    events.push({ id: `${log.id}-in`, type: "IN", time: log.clockIn, user: log.user });
   });
 
   // Re-sort by user then chronologically to match Sprout format
@@ -46,14 +46,13 @@ export async function generateTimesheetReport(startDate: string, endDate: string
   });
 
   // Create CSV String
-  let csv = "Employee Name,Email,Date,Type,Time,Status\n";
+  let csv = "Employee Name,Email,Date,Type,Time\n";
   
   events.forEach(event => {
     const dateStr = new Date(event.time).toISOString().split('T')[0]; // YYYY-MM-DD
     const timeStr = new Date(event.time).toISOString(); // Full ISO string or just time if preferred, sticking to ISO for data integrity
-    const statusStr = event.type === 'IN' ? event.status : "";
     
-    csv += `"${event.user.name}","${event.user.email}",${dateStr},${event.type},${timeStr},${statusStr}\n`;
+    csv += `"${event.user.name}","${event.user.email}",${dateStr},${event.type},${timeStr}\n`;
   });
 
   return csv;

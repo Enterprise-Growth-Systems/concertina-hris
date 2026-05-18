@@ -51,7 +51,6 @@ model TimeLog {
   user      User      @relation(fields: [userId], references: [id])
   clockIn   DateTime  @default(now())
   clockOut  DateTime?
-  status    String    @default("ON_TIME") // e.g., ON_TIME, LATE
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }

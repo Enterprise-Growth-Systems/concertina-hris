@@ -9,7 +9,6 @@ type TimeLogData = {
     id: string;
     clockIn: Date;
     clockOut: Date | null;
-    status: string;
     user: {
         name: string;
         email: string;
@@ -18,16 +17,15 @@ type TimeLogData = {
 
 export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[] }) {
     const [searchQuery, setSearchQuery] = useState("");
-    const [statusFilter, setStatusFilter] = useState("ALL");
     const [dateFilter, setDateFilter] = useState("");
 
-    type LogEvent = { id: string; type: "IN" | "OUT"; time: Date; status?: string; user: { name: string; email: string; } };
+    type LogEvent = { id: string; type: "IN" | "OUT"; time: Date; user: { name: string; email: string; } };
     const events: LogEvent[] = [];
     initialLogs.forEach(log => {
         if (log.clockOut) {
             events.push({ id: `${log.id}-out`, type: "OUT", time: log.clockOut, user: log.user });
         }
-        events.push({ id: `${log.id}-in`, type: "IN", time: log.clockIn, status: log.status, user: log.user });
+        events.push({ id: `${log.id}-in`, type: "IN", time: log.clockIn, user: log.user });
     });
     events.sort((a, b) => b.time.getTime() - a.time.getTime());
 
@@ -37,26 +35,22 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
             event.user.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
             event.user.email.toLowerCase().includes(searchQuery.toLowerCase());
         
-        // 2. Status Filter
-        const matchesStatus = statusFilter === "ALL" || event.status === statusFilter;
-
-        // 3. Date Filter
+        // 2. Date Filter
         let matchesDate = true;
         if (dateFilter) {
             const selectedDate = parseISO(dateFilter);
             matchesDate = isSameDay(new Date(event.time), selectedDate);
         }
 
-        return matchesSearch && matchesStatus && matchesDate;
+        return matchesSearch && matchesDate;
     });
 
     const clearFilters = () => {
         setSearchQuery("");
-        setStatusFilter("ALL");
         setDateFilter("");
     };
 
-    const hasActiveFilters = searchQuery !== "" || statusFilter !== "ALL" || dateFilter !== "";
+    const hasActiveFilters = searchQuery !== "" || dateFilter !== "";
 
     return (
         <div className="space-y-6">
@@ -77,21 +71,7 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
                         />
                     </div>
 
-                    {/* Status Dropdown */}
-                    <div className="relative w-full md:w-48">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Filter className="size-4 text-muted-foreground" />
-                        </div>
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            className="w-full bg-background border text-foreground rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none"
-                        >
-                            <option value="ALL">All Statuses</option>
-                            <option value="ON_TIME">On Time</option>
-                            <option value="LATE">Late</option>
-                        </select>
-                    </div>
+
 
                     {/* Date Picker */}
                     <div className="relative w-full md:w-48">
@@ -133,14 +113,13 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
                                 <th className="px-6 py-4 font-semibold">Employee</th>
                                 <th className="px-6 py-4 font-semibold">Date</th>
                                 <th className="px-6 py-4 font-semibold">Type</th>
-                                <th className="px-6 py-4 font-semibold">Time</th>
-                                <th className="px-6 py-4 font-semibold text-right">Status</th>
+                                <th className="px-6 py-4 font-semibold text-right">Time</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
                             {filteredLogs.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
+                                    <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
                                         {hasActiveFilters 
                                             ? "No events found matching your specific filters." 
                                             : "No active time events found across the company."}
@@ -161,18 +140,8 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
                                             <td className="px-6 py-4">
                                                 <span className={`text-xs font-bold px-3 py-1 rounded-md ${event.type === 'IN' ? 'bg-primary/10 text-primary' : 'bg-amber-500/10 text-amber-600'}`}>{event.type}</span>
                                             </td>
-                                            <td className="px-6 py-4 text-muted-foreground font-medium whitespace-nowrap">
+                                            <td className="px-6 py-4 text-muted-foreground font-medium whitespace-nowrap text-right">
                                                 {formatInTimeZone(new Date(event.time), 'Asia/Manila', "hh:mm:ss a")}
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                {event.status && event.type === 'IN' ? (
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${event.status === 'ON_TIME'
-                                                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                        : 'bg-orange-50 text-orange-700 border border-orange-200'
-                                                        }`}>
-                                                        {event.status === 'ON_TIME' ? 'On Time' : 'Late'}
-                                                    </span>
-                                                ) : <span className="text-muted-foreground/30">-</span>}
                                             </td>
                                         </tr>
                                     );
