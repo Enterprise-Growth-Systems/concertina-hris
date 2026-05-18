@@ -3,11 +3,14 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { PrismaClient } from "@prisma/client";
 import { formatInTimeZone } from "date-fns-tz";
-import { LayoutDashboard } from "lucide-react";
+import { format } from "date-fns";
+import { LayoutDashboard, CalendarDays, Clock } from "lucide-react";
 
 const prisma = new PrismaClient();
 
 export const dynamic = "force-dynamic";
+
+const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -25,12 +28,18 @@ export default async function DashboardPage() {
   const endOfWeek = new Date(now);
   endOfWeek.setDate(startOfWeek.getDate() + 6); // Sunday
   const dateRangeStr = `${formatInTimeZone(startOfWeek, 'Asia/Manila', 'MMM d')} - ${formatInTimeZone(endOfWeek, 'Asia/Manila', 'MMM d, yyyy')}`;
-  const currentDateStr = formatInTimeZone(now, 'Asia/Manila', 'MMM d, yyyy | h:mm a');
+  
+  const currentDayIndex = now.getDay();
+  const currentDayName = DAYS[currentDayIndex];
 
   const recentLogs = await prisma.timeLog.findMany({
     where: { userId: session.user.id },
     orderBy: { clockIn: "desc" },
     take: 5
+  });
+
+  const todaySchedule = await prisma.schedule.findFirst({
+    where: { userId: session.user.id, dayOfWeek: currentDayIndex }
   });
 
   return (
@@ -51,6 +60,36 @@ export default async function DashboardPage() {
       {/* Centered Content: Clock & Logs */}
       <div className="max-w-lg mx-auto w-full space-y-8 mb-8">
         <ClockWidget />
+
+        {/* Today's Schedule Box */}
+        <div className="rounded-2xl border bg-card p-5 relative overflow-hidden transition-all bg-primary/5 border-primary shadow-sm shadow-primary/20">
+          <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-bl-lg z-10">
+            Today
+          </div>
+          
+          <div className="flex items-center gap-3 mb-4">
+            <div className="size-10 rounded-lg flex items-center justify-center bg-primary text-primary-foreground">
+              <CalendarDays className="size-5" />
+            </div>
+            <div className="font-semibold text-lg text-foreground">{currentDayName} Schedule</div>
+          </div>
+
+          <div className="space-y-3">
+            {todaySchedule ? (
+              <div className="flex items-center gap-2 text-foreground/80">
+                <Clock className="size-4 text-primary" />
+                <span className="font-medium text-sm">
+                  {format(new Date(`1970-01-01T${todaySchedule.startTime}`), "h:mm a")} - {format(new Date(`1970-01-01T${todaySchedule.endTime}`), "h:mm a")}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-muted-foreground italic">
+                <Clock className="size-4 opacity-50" />
+                <span className="text-sm">Off Duty</span>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Recent Time Logs Table */}
         <div className="rounded-2xl border bg-card p-6">
