@@ -35,21 +35,13 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto flex flex-col h-full w-full">
-      {/* Top Header */}
-      <div className="flex items-center gap-2 mb-6 text-muted-foreground pb-4 border-b">
-        <LayoutDashboard className="size-4" />
-        <h1 className="font-semibold text-sm">Dashboard</h1>
-        <span className="text-sm font-normal">Your daily snapshot of time logs, leave credits, and activity.</span>
-      </div>
+
 
       {/* Welcome Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
           <h2 className="text-sm font-bold text-primary mb-1 tracking-widest uppercase">WELCOME</h2>
           <h1 className="text-2xl font-bold text-foreground mb-1">{firstName}, here's your workday snapshot.</h1>
-          <p className="text-xs text-muted-foreground">
-            {(session.user as any).role === "ADMIN" || (session.user as any).role === "SUPERADMIN" ? "HR Manager" : "Employee"} | {currentDateStr}
-          </p>
         </div>
         <div className="px-4 py-1.5 bg-muted rounded-full text-xs font-medium text-muted-foreground border">
           {dateRangeStr}
@@ -78,8 +70,6 @@ export default async function DashboardPage() {
                 <tr>
                   <th className="px-4 py-3 font-semibold">DATE</th>
                   <th className="px-4 py-3 font-semibold">TIME</th>
-                  <th className="px-4 py-3 font-semibold">DETAILS</th>
-                  <th className="px-4 py-3 font-semibold text-right">STATUS</th>
                   <th className="px-4 py-3 font-semibold text-right">DURATION</th>
                 </tr>
               </thead>
@@ -95,14 +85,6 @@ export default async function DashboardPage() {
                       </td>
                       <td className="px-4 py-4 text-muted-foreground whitespace-nowrap">
                         {formatInTimeZone(log.clockIn, 'Asia/Manila', "h:mm a")} - {log.clockOut ? formatInTimeZone(log.clockOut, 'Asia/Manila', "h:mm a") : <span className="text-primary italic">Active</span>} <span className="text-[10px]">(PHT)</span>
-                      </td>
-                      <td className="px-4 py-4 text-muted-foreground">
-                        {log.notes || "No details"}
-                      </td>
-                      <td className="px-4 py-4 text-right">
-                        <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold ${isLate ? "bg-red-50 text-destructive" : "bg-emerald-50 text-emerald-600"}`}>
-                          {isLate ? "Late" : "On Time"}
-                        </span>
                       </td>
                       <td className="px-4 py-4 text-right text-muted-foreground">
                         {durationStr}
