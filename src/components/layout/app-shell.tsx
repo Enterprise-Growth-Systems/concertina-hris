@@ -16,11 +16,9 @@ const EMP_ROUTES = [
 ];
 
 const ADMIN_ROUTES = [
-    { name: "Team Management", href: "/admin/employees", icon: Users },
+    { name: "Management", href: "/admin/management", icon: Users },
     { name: "Time Logs", href: "/admin/timesheets", icon: History },
     { name: "Approvals", href: "/admin/approvals", icon: ClipboardCheck },
-    { name: "Schedules Manager", href: "/admin/schedules", icon: CalendarDays },
-    { name: "Holiday Manager", href: "/admin/holidays", icon: Calendar },
     { name: "Reports Dashboard", href: "/admin/reports", icon: ClipboardList },
 ];
 
