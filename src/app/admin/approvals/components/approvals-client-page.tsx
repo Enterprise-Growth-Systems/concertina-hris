@@ -177,6 +177,13 @@ export function ApprovalsClientPage({
                                                 {request.reason && (
                                                     <p className="text-sm mt-3 pt-3 border-t italic text-muted-foreground max-w-2xl">"{request.reason}"</p>
                                                 )}
+                                                {request.attachmentUrl && (
+                                                    <div className="mt-2">
+                                                        <a href={request.attachmentUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-sm font-medium inline-flex items-center gap-1">
+                                                            View Attachment
+                                                        </a>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             <div className="flex sm:flex-col gap-2 shrink-0">
@@ -203,6 +210,7 @@ export function ApprovalsClientPage({
                                             <th className="px-6 py-4 font-semibold">Employee</th>
                                             <th className="px-6 py-4 font-semibold">Type</th>
                                             <th className="px-6 py-4 font-semibold">Duration</th>
+                                            <th className="px-6 py-4 font-semibold">Details</th>
                                             <th className="px-6 py-4 font-semibold">Status</th>
                                         </tr>
                                     </thead>
@@ -215,6 +223,15 @@ export function ApprovalsClientPage({
                                                     <td className="px-6 py-4 font-semibold">{request.user.name}</td>
                                                     <td className="px-6 py-4 capitalize">{request.leaveType === 'LEAVE_CREDITS' ? 'PFFD Credits' : request.leaveType.toLowerCase()}</td>
                                                     <td className="px-6 py-4 text-muted-foreground">{format(request.startDate, "MMM d")} - {format(request.endDate, "MMM d, yyyy")}</td>
+                                                    <td className="px-6 py-4">
+                                                        {request.attachmentUrl ? (
+                                                            <a href={request.attachmentUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs flex items-center gap-1">
+                                                                View Attachment
+                                                            </a>
+                                                        ) : (
+                                                            <span className="text-muted-foreground text-xs">No attachment</span>
+                                                        )}
+                                                    </td>
                                                     <td className="px-6 py-4">
                                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${request.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-800' : 'bg-destructive/10 text-destructive'}`}>
                                                             {request.status}
