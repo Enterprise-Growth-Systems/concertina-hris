@@ -9,8 +9,9 @@ import { AdminScopeToggle } from "@/components/admin/admin-scope-toggle";
 const prisma = new PrismaClient();
 export const dynamic = "force-dynamic";
 
-export default async function AdminApprovalsPage({ searchParams }: { searchParams: { view?: string } }) {
+export default async function AdminApprovalsPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
     const session = await auth();
+    const resolvedParams = await searchParams;
     if (!session || !session.user) {
         redirect("/login");
     }
@@ -24,7 +25,7 @@ export default async function AdminApprovalsPage({ searchParams }: { searchParam
         redirect("/");
     }
 
-    const isDirectScope = searchParams.view === "direct" || currentUser.role === "MANAGER";
+    const isDirectScope = resolvedParams.view === "direct" || currentUser.role === "MANAGER";
     
     const managerWhereClause = isDirectScope
         ? { user: { managerId: currentUser.id } } 

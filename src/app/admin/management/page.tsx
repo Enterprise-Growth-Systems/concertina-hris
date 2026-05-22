@@ -9,8 +9,9 @@ import { AdminScopeToggle } from "@/components/admin/admin-scope-toggle";
 const prisma = new PrismaClient();
 export const dynamic = "force-dynamic";
 
-export default async function AdminManagementPage({ searchParams }: { searchParams: { view?: string } }) {
+export default async function AdminManagementPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
     const session = await auth();
+    const resolvedParams = await searchParams;
     let currentUserRole = "EMPLOYEE";
     
     if (session?.user?.id) {
@@ -25,7 +26,7 @@ export default async function AdminManagementPage({ searchParams }: { searchPara
         redirect("/");
     }
 
-    const isDirectScope = searchParams.view === "direct" || currentUserRole === "MANAGER";
+    const isDirectScope = resolvedParams.view === "direct" || currentUserRole === "MANAGER";
     const userWhereClause = isDirectScope ? { managerId: session.user.id } : {};
 
     // 1. Fetch Team (Users) Data

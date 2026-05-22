@@ -9,14 +9,15 @@ const prisma = new PrismaClient();
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminTimesheetsPage({ searchParams }: { searchParams: { view?: string } }) {
+export default async function AdminTimesheetsPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
     const session = await auth();
+    const resolvedParams = await searchParams;
     const user = session?.user as any;
     if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
         redirect("/login");
     }
 
-    const isDirectScope = searchParams.view === "direct" || user.role === "MANAGER";
+    const isDirectScope = resolvedParams.view === "direct" || user.role === "MANAGER";
     const managerWhereClause = isDirectScope ? { user: { managerId: user.id } } : {};
 
     const timeLogs = await prisma.timeLog.findMany({
