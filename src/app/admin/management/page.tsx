@@ -4,10 +4,12 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { ManagementClientPage } from "./components/management-client-page";
 
+import { AdminScopeToggle } from "@/components/admin/admin-scope-toggle";
+
 const prisma = new PrismaClient();
 export const dynamic = "force-dynamic";
 
-export default async function AdminManagementPage() {
+export default async function AdminManagementPage({ searchParams }: { searchParams: { view?: string } }) {
     const session = await auth();
     let currentUserRole = "EMPLOYEE";
     
@@ -23,8 +25,12 @@ export default async function AdminManagementPage() {
         redirect("/");
     }
 
+    const isDirectScope = searchParams.view === "direct" || currentUserRole === "MANAGER";
+    const userWhereClause = isDirectScope ? { managerId: session.user.id } : {};
+
     // 1. Fetch Team (Users) Data
     const users = await prisma.user.findMany({
+        where: userWhereClause,
         orderBy: { name: 'asc' },
         include: {
             leaveBalances: {
@@ -72,11 +78,14 @@ export default async function AdminManagementPage() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-8 py-8 px-4">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight text-foreground">Management Dashboard</h1>
-                <p className="text-muted-foreground mt-1 text-lg">
-                    Manage team members, schedules, and holidays.
-                </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">Management Dashboard</h1>
+                    <p className="text-muted-foreground mt-1 text-lg">
+                        Manage team members, schedules, and holidays.
+                    </p>
+                </div>
+                <AdminScopeToggle role={currentUserRole} />
             </div>
             
             <ManagementClientPage 

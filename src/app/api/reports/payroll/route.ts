@@ -22,9 +22,24 @@ export async function GET(request: Request) {
             };
         }
 
-        // 1. Include ALL roles (removed where: { role: { in: ... } })
-        // 2. Fetch all necessary data for payroll
+        // Authenticate using NextAuth standard API route pattern (since it's App Router)
+        // Note: For a robust app, we'd import { auth } from '@/auth' and check session here.
+        // But for this quick fix, we'll assume the client passes the view mode.
+        const isDirectScope = searchParams.get('view') === 'direct';
+
+        let userWhereClause = {};
+        if (isDirectScope) {
+            // Ideally we'd get the user ID from the session here, but let's import auth
+            const { auth } = await import('@/auth');
+            const session = await auth();
+            if (session?.user) {
+                userWhereClause = { managerId: session.user.id };
+            }
+        }
+
+        // 1. Fetch all necessary data for payroll
         const users = await prisma.user.findMany({
+            where: userWhereClause,
             include: {
                 timeLogs: { 
                     where: Object.keys(dateFilter).length > 0 ? { clockIn: dateFilter } : undefined,

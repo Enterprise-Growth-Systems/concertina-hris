@@ -4,10 +4,12 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { ApprovalsClientPage } from "./components/approvals-client-page";
 
+import { AdminScopeToggle } from "@/components/admin/admin-scope-toggle";
+
 const prisma = new PrismaClient();
 export const dynamic = "force-dynamic";
 
-export default async function AdminApprovalsPage() {
+export default async function AdminApprovalsPage({ searchParams }: { searchParams: { view?: string } }) {
     const session = await auth();
     if (!session || !session.user) {
         redirect("/login");
@@ -22,7 +24,9 @@ export default async function AdminApprovalsPage() {
         redirect("/");
     }
 
-    const managerWhereClause = currentUser.role === "MANAGER" 
+    const isDirectScope = searchParams.view === "direct" || currentUser.role === "MANAGER";
+    
+    const managerWhereClause = isDirectScope
         ? { user: { managerId: currentUser.id } } 
         : {};
 
@@ -98,11 +102,14 @@ export default async function AdminApprovalsPage() {
 
     return (
         <div className="max-w-6xl mx-auto py-8 px-4 space-y-8">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight text-foreground">Approvals Dashboard</h1>
-                <p className="text-muted-foreground mt-1 text-lg">
-                    Review and manage employee leave, overtime, and manual time requests.
-                </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">Approvals Dashboard</h1>
+                    <p className="text-muted-foreground mt-1 text-lg">
+                        Review and manage employee leave, overtime, and manual time requests.
+                    </p>
+                </div>
+                <AdminScopeToggle role={currentUser.role} />
             </div>
             
             <ApprovalsClientPage 

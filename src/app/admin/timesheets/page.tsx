@@ -3,18 +3,24 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { TimeLogsClientPage } from "./components/time-logs-client-page";
 
+import { AdminScopeToggle } from "@/components/admin/admin-scope-toggle";
+
 const prisma = new PrismaClient();
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminTimesheetsPage() {
+export default async function AdminTimesheetsPage({ searchParams }: { searchParams: { view?: string } }) {
     const session = await auth();
     const user = session?.user as any;
     if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
         redirect("/login");
     }
 
+    const isDirectScope = searchParams.view === "direct" || user.role === "MANAGER";
+    const managerWhereClause = isDirectScope ? { user: { managerId: user.id } } : {};
+
     const timeLogs = await prisma.timeLog.findMany({
+        where: managerWhereClause,
         include: {
             user: {
                 select: {
@@ -29,11 +35,14 @@ export default async function AdminTimesheetsPage() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-8 py-8 px-4">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold tracking-tight text-foreground">Company Time Logs</h1>
-                <p className="text-muted-foreground mt-1 text-lg">
-                    Advanced Multi-Filter Search
-                </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">{isDirectScope ? "My Team's Time Logs" : "Company Time Logs"}</h1>
+                    <p className="text-muted-foreground mt-1 text-lg">
+                        Advanced Multi-Filter Search
+                    </p>
+                </div>
+                <AdminScopeToggle role={user.role} />
             </div>
 
             <TimeLogsClientPage initialLogs={timeLogs} />

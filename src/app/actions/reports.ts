@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 
 const prisma = new PrismaClient();
 
-export async function generateTimesheetReport(startDate: string, endDate: string) {
+export async function generateTimesheetReport(startDate: string, endDate: string, isDirectScope: boolean = false) {
   const session = await auth();
   const user = session?.user as any;
 
@@ -13,12 +13,15 @@ export async function generateTimesheetReport(startDate: string, endDate: string
     throw new Error("Unauthorized");
   }
 
+  const managerWhereClause = isDirectScope || user.role === "MANAGER" ? { managerId: user.id } : {};
+
   const logs = await prisma.timeLog.findMany({
     where: {
       clockIn: {
         gte: new Date(`${startDate}T00:00:00.000Z`),
         lte: new Date(`${endDate}T23:59:59.999Z`),
       },
+      user: managerWhereClause
     },
     include: {
       user: true,
@@ -58,13 +61,15 @@ export async function generateTimesheetReport(startDate: string, endDate: string
   return csv;
 }
 
-export async function generateLeaveReport(startDate: string, endDate: string) {
+export async function generateLeaveReport(startDate: string, endDate: string, isDirectScope: boolean = false) {
   const session = await auth();
   const user = session?.user as any;
 
   if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
     throw new Error("Unauthorized");
   }
+
+  const managerWhereClause = isDirectScope || user.role === "MANAGER" ? { managerId: user.id } : {};
 
   const requests = await prisma.leaveRequest.findMany({
     where: {
@@ -73,7 +78,8 @@ export async function generateLeaveReport(startDate: string, endDate: string) {
       },
       endDate: {
         lte: new Date(`${endDate}T23:59:59.999Z`),
-      }
+      },
+      user: managerWhereClause
     },
     include: {
       user: true,
