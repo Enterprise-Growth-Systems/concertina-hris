@@ -1,8 +1,8 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { Users, UserCircle } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useTransition } from "react";
+import { Users, UserCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AdminScopeToggleProps {
@@ -10,8 +10,10 @@ interface AdminScopeToggleProps {
 }
 
 export function AdminScopeToggle({ role }: AdminScopeToggleProps) {
+    const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const [isPending, startTransition] = useTransition();
     
     // Only ADMIN or SUPERADMIN get the toggle switch
     if (role !== "ADMIN" && role !== "SUPERADMIN") {
@@ -40,34 +42,40 @@ export function AdminScopeToggle({ role }: AdminScopeToggleProps) {
         return `${pathname}?${params.toString()}`;
     };
 
+    const handleNavigate = (viewUrl: string) => {
+        startTransition(() => {
+            router.push(viewUrl);
+        });
+    };
+
     return (
         <div className="inline-flex items-center p-1 bg-muted/50 rounded-xl border relative z-50">
-            <Link
-                href={getCompanyUrl()}
-                prefetch={false}
+            <button
+                onClick={() => handleNavigate(getCompanyUrl())}
+                disabled={!isDirect || isPending}
                 className={cn(
                     "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                     !isDirect
                         ? "bg-background text-foreground shadow-sm pointer-events-none"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-50"
                 )}
             >
-                <Users className="size-4" />
+                {isPending && isDirect ? <Loader2 className="size-4 animate-spin" /> : <Users className="size-4" />}
                 Company Wide
-            </Link>
-            <Link
-                href={getDirectUrl()}
-                prefetch={false}
+            </button>
+            <button
+                onClick={() => handleNavigate(getDirectUrl())}
+                disabled={isDirect || isPending}
                 className={cn(
                     "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                     isDirect
                         ? "bg-background text-foreground shadow-sm pointer-events-none"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-50"
                 )}
             >
-                <UserCircle className="size-4" />
+                {isPending && !isDirect ? <Loader2 className="size-4 animate-spin" /> : <UserCircle className="size-4" />}
                 My Direct Reports
-            </Link>
+            </button>
         </div>
     );
 }
