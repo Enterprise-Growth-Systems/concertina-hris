@@ -105,7 +105,7 @@ export function RequestsClientPage({
                 const path = `overtime/${Date.now()}_${attachmentFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
                 const { url, error } = await uploadFileToSupabase(attachmentFile, path);
                 if (error) {
-                    alert('Error uploading file. Please try again.');
+                    alert(`Upload Error: ${(error as any).message || error}`);
                     setIsSubmittingOvertime(false);
                     return;
                 }
@@ -146,7 +146,7 @@ export function RequestsClientPage({
                 const path = `pffd/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
                 const { url, error } = await uploadFileToSupabase(file, path);
                 if (error) {
-                    alert('Error uploading file. Please try again.');
+                    alert(`Upload Error: ${(error as any).message || error}`);
                     setIsSubmittingPffd(false);
                     return;
                 }
