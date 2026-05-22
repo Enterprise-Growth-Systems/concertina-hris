@@ -2,7 +2,10 @@ import { createClient } from '@supabase/supabase-js';
 
 // Clean up the URL just in case it has /rest/v1/ or a trailing slash accidentally copied
 const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseUrl = rawUrl.replace(/\/rest\/v1\/?$/, '').replace(/\/$/, '');
+let supabaseUrl = rawUrl.replace(/\/rest\/v1\/?$/, '').replace(/\/$/, '');
+if (supabaseUrl && !supabaseUrl.startsWith('http')) {
+  supabaseUrl = `https://${supabaseUrl}`;
+}
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
