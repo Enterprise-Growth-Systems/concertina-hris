@@ -1,6 +1,7 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Users, UserCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -9,7 +10,6 @@ interface AdminScopeToggleProps {
 }
 
 export function AdminScopeToggle({ role }: AdminScopeToggleProps) {
-    const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
     
@@ -26,42 +26,48 @@ export function AdminScopeToggle({ role }: AdminScopeToggleProps) {
     const currentView = searchParams.get("view");
     const isDirect = currentView === "direct";
 
-    const setView = (view: "company" | "direct") => {
+    // Helper to generate the URL for the 'company' view (removes the 'view' param)
+    const getCompanyUrl = () => {
         const params = new URLSearchParams(searchParams);
-        if (view === "direct") {
-            params.set("view", "direct");
-        } else {
-            params.delete("view");
-        }
-        router.push(`${pathname}?${params.toString()}`);
+        params.delete("view");
+        return `${pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+    };
+
+    // Helper to generate the URL for the 'direct' view (sets the 'view' param)
+    const getDirectUrl = () => {
+        const params = new URLSearchParams(searchParams);
+        params.set("view", "direct");
+        return `${pathname}?${params.toString()}`;
     };
 
     return (
-        <div className="inline-flex items-center p-1 bg-muted/50 rounded-xl border">
-            <button
-                onClick={() => setView("company")}
+        <div className="inline-flex items-center p-1 bg-muted/50 rounded-xl border relative z-50">
+            <Link
+                href={getCompanyUrl()}
+                prefetch={false}
                 className={cn(
                     "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                     !isDirect
-                        ? "bg-background text-foreground shadow-sm"
+                        ? "bg-background text-foreground shadow-sm pointer-events-none"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
             >
                 <Users className="size-4" />
                 Company Wide
-            </button>
-            <button
-                onClick={() => setView("direct")}
+            </Link>
+            <Link
+                href={getDirectUrl()}
+                prefetch={false}
                 className={cn(
                     "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                     isDirect
-                        ? "bg-background text-foreground shadow-sm"
+                        ? "bg-background text-foreground shadow-sm pointer-events-none"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
             >
                 <UserCircle className="size-4" />
                 My Direct Reports
-            </button>
+            </Link>
         </div>
     );
 }
