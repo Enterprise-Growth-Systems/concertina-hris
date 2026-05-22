@@ -8,6 +8,7 @@ import { submitManualTimeRequest } from "@/app/actions/manual-time";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { format } from "date-fns";
 import { Pagination } from "@/components/ui/pagination";
+import { uploadFileToSupabase } from "@/lib/supabase-client";
 
 type OvertimeRequestData = {
     id: string;
@@ -86,7 +87,7 @@ export function RequestsClientPage({
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
     const [reason, setReason] = useState("");
-    const [attachmentUrl, setAttachmentUrl] = useState("");
+    const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
     const [isSubmittingOvertime, setIsSubmittingOvertime] = useState(false);
 
     const handleOvertimeSubmit = async (e: React.FormEvent) => {
@@ -99,12 +100,22 @@ export function RequestsClientPage({
             formData.append("startTime", startTime);
             formData.append("endTime", endTime);
             formData.append("reason", reason);
-            formData.append("attachmentUrl", attachmentUrl);
+            
+            if (attachmentFile) {
+                const path = `overtime/${Date.now()}_${attachmentFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                const { url, error } = await uploadFileToSupabase(attachmentFile, path);
+                if (error) {
+                    alert('Error uploading file. Please try again.');
+                    setIsSubmittingOvertime(false);
+                    return;
+                }
+                formData.append("attachmentUrl", url || "");
+            }
             
             const res = await submitOvertime(formData);
             if (res.success) {
                 setIsOvertimeModalOpen(false);
-                setStartDate(""); setEndDate(""); setStartTime(""); setEndTime(""); setReason(""); setAttachmentUrl("");
+                setStartDate(""); setEndDate(""); setStartTime(""); setEndTime(""); setReason(""); setAttachmentFile(null);
                 window.location.reload(); // Quick refresh to show new data
             } else {
                 alert(res.error);
@@ -119,6 +130,42 @@ export function RequestsClientPage({
     const [manualDateTime, setManualDateTime] = useState("");
     const [manualReason, setManualReason] = useState("");
     const [isSubmittingManual, setIsSubmittingManual] = useState(false);
+
+    const [isSubmittingPffd, setIsSubmittingPffd] = useState(false);
+
+    const handlePffdSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsSubmittingPffd(true);
+        try {
+            const formData = new FormData(e.currentTarget);
+            
+            const fileInput = e.currentTarget.elements.namedItem('attachmentFile') as HTMLInputElement;
+            const file = fileInput?.files?.[0];
+            
+            if (file) {
+                const path = `pffd/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                const { url, error } = await uploadFileToSupabase(file, path);
+                if (error) {
+                    alert('Error uploading file. Please try again.');
+                    setIsSubmittingPffd(false);
+                    return;
+                }
+                formData.append('attachmentUrl', url || '');
+            }
+
+            const res = await submitLeaveRequest(formData);
+            if (res.success) {
+                window.location.reload();
+            } else {
+                alert(res.error);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("An error occurred. Please try again.");
+        } finally {
+            setIsSubmittingPffd(false);
+        }
+    };
 
     const handleManualSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -212,9 +259,7 @@ export function RequestsClientPage({
                         {/* Request Form */}
                         <div className="rounded-2xl border bg-card text-card-foreground shadow-sm p-6">
                             <h2 className="font-semibold text-lg mb-4">New Request</h2>
-                            <form action={async (formData) => {
-                                await submitLeaveRequest(formData);
-                            }} className="space-y-4">
+                            <form onSubmit={handlePffdSubmit} className="space-y-4">
                                 <div>
                                     <label className="text-sm font-medium mb-1.5 block" htmlFor="leaveType">Time-Off Type</label>
                                     <input type="hidden" name="leaveType" value="LEAVE_CREDITS" id="leaveType" />
@@ -238,22 +283,22 @@ export function RequestsClientPage({
                                 </div>
                                 
                                 <div className="p-4 rounded-xl border-2 border-primary/20 bg-primary/5">
-                                    <label className="text-sm font-bold mb-1.5 block text-foreground" htmlFor="attachmentUrl">
-                                        Attachment Link <span className="text-muted-foreground font-normal">(Required)</span>
+                                    <label className="text-sm font-bold mb-1.5 block text-foreground" htmlFor="attachmentFile">
+                                        Attachment Proof <span className="text-muted-foreground font-normal">(Required, JPG/PNG)</span>
                                     </label>
                                     <input 
-                                        type="url" 
-                                        name="attachmentUrl" 
-                                        id="attachmentUrl" 
+                                        type="file" 
+                                        name="attachmentFile" 
+                                        id="attachmentFile" 
                                         required 
-                                        placeholder="e.g. Google Drive Link to proof" 
-                                        className="block h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" 
+                                        accept=".jpg,.jpeg,.png"
+                                        className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90" 
                                     />
                                 </div>
 
-                                <SubmitButton className="w-full mt-2">
-                                    Submit Request
-                                </SubmitButton>
+                                <button type="submit" disabled={isSubmittingPffd} className="w-full mt-2 flex items-center justify-center gap-2 px-6 py-2 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg shadow-sm transition-colors disabled:opacity-50 h-10">
+                                    {isSubmittingPffd ? <><Loader2 className="size-4 animate-spin"/> Submitting...</> : "Submit Request"}
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -437,8 +482,14 @@ export function RequestsClientPage({
                                         <textarea required value={reason} onChange={e => setReason(e.target.value)} rows={3} className="w-full bg-background border text-foreground rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 resize-none" placeholder="Provide details on why overtime is required..." />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-foreground mb-1.5">Attachment Link <span className="text-muted-foreground font-normal">(Required)</span></label>
-                                        <input type="url" required value={attachmentUrl} onChange={e => setAttachmentUrl(e.target.value)} className="w-full bg-background border text-foreground rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50" placeholder="e.g. Google Drive Link to proof" />
+                                        <label className="block text-sm font-medium text-foreground mb-1.5">Attachment Proof <span className="text-muted-foreground font-normal">(Required, JPG/PNG)</span></label>
+                                        <input 
+                                            type="file" 
+                                            required 
+                                            accept=".jpg,.jpeg,.png"
+                                            onChange={e => setAttachmentFile(e.target.files?.[0] || null)} 
+                                            className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90" 
+                                        />
                                     </div>
 
                                     <div className="flex justify-end gap-3 pt-4 border-t mt-6">
