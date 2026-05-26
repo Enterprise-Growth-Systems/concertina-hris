@@ -445,8 +445,8 @@ export function RequestsClientPage({
                     {isOvertimeModalOpen && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                             <div className="fixed inset-0 bg-background/80 backdrop-blur-sm" onClick={() => !isSubmittingOvertime && setIsOvertimeModalOpen(false)} />
-                            <div className="relative bg-card border rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in zoom-in-95 duration-200">
-                                <div className="flex items-center gap-3 mb-6">
+                            <div className="relative bg-card border rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+                                <div className="flex items-center gap-3 mb-6 shrink-0">
                                     <div className="p-2 bg-primary/10 text-primary rounded-xl">
                                         <Clock className="size-5" />
                                     </div>

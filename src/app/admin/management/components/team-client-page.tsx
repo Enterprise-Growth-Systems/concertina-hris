@@ -252,8 +252,8 @@ export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: 
                         className="fixed inset-0 bg-background/80 backdrop-blur-sm animate-in fade-in" 
                         onClick={() => setIsAddModalOpen(false)}
                     />
-                    <div className="relative bg-card border rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in zoom-in-95 duration-200">
-                        <div className="mb-6">
+                    <div className="relative bg-card border rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+                        <div className="mb-6 shrink-0">
                             <h2 className="text-xl font-bold text-foreground">Add New Employee</h2>
                             <p className="text-sm text-muted-foreground mt-1">
                                 Enter details and migrate their starting PFFD balance from Sprout. The default password will be <code className="text-foreground bg-muted px-1 rounded">concertina2026</code>.
@@ -272,8 +272,8 @@ export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: 
                         className="fixed inset-0 bg-background/80 backdrop-blur-sm animate-in fade-in" 
                         onClick={() => !isDeleting && setEmployeeToDelete(null)}
                     />
-                    <div className="relative bg-card border border-red-200 rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in zoom-in-95 duration-200">
-                        <div className="mb-6">
+                    <div className="relative bg-card border border-red-200 rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+                        <div className="mb-6 shrink-0">
                             <div className="flex items-center gap-3 mb-2">
                                 <div className="p-2 bg-red-50 text-red-600 rounded-full">
                                     <Trash2 className="size-5" />
@@ -322,8 +322,8 @@ export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: 
                         className="fixed inset-0 bg-background/80 backdrop-blur-sm animate-in fade-in" 
                         onClick={() => !isSaving && setEmployeeToEdit(null)}
                     />
-                    <div className="relative bg-card border rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in zoom-in-95 duration-200">
-                        <div className="mb-6">
+                    <div className="relative bg-card border rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+                        <div className="mb-6 shrink-0">
                             <h2 className="text-xl font-bold text-foreground mb-1">Edit Employee</h2>
                             <p className="text-sm text-muted-foreground">
                                 Update details for <strong className="text-foreground">{employeeToEdit.name}</strong>.
