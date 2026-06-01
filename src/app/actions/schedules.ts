@@ -11,7 +11,18 @@ export async function upsertSchedule(userId: string, dayOfWeek: number, startTim
   const user = session?.user as any;
 
   if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
-    throw new Error("Unauthorized: Only Admins can manage schedules.");
+    throw new Error("Unauthorized: Only Admins and Managers can manage schedules.");
+  }
+
+  // Enforce Manager ownership scope
+  if (user.role === "MANAGER") {
+    const targetUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { managerId: true }
+    });
+    if (!targetUser || targetUser.managerId !== user.id) {
+      throw new Error("Unauthorized: You can only modify schedules for your direct reports.");
+    }
   }
 
   // Allow clearing a schedule for a specific day by passing empty times
@@ -41,6 +52,17 @@ export async function upsertSpecialSchedule(userId: string, dateStr: string, sta
     throw new Error("Unauthorized");
   }
 
+  // Enforce Manager ownership scope
+  if (user.role === "MANAGER") {
+    const targetUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { managerId: true }
+    });
+    if (!targetUser || targetUser.managerId !== user.id) {
+      throw new Error("Unauthorized: You can only modify special schedules for your direct reports.");
+    }
+  }
+
   const date = new Date(dateStr);
 
   await prisma.specialSchedule.upsert({
@@ -61,6 +83,18 @@ export async function deleteSpecialSchedule(id: string) {
 
   if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
     throw new Error("Unauthorized");
+  }
+
+  // Enforce Manager ownership scope
+  if (user.role === "MANAGER") {
+    const specialSchedule = await prisma.specialSchedule.findUnique({
+      where: { id },
+      include: { user: { select: { managerId: true } } }
+    });
+    
+    if (!specialSchedule || specialSchedule.user.managerId !== user.id) {
+      throw new Error("Unauthorized: You can only delete special schedules for your direct reports.");
+    }
   }
 
   await prisma.specialSchedule.delete({ where: { id } });

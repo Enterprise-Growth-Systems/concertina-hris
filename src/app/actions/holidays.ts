@@ -65,6 +65,18 @@ export async function createAssignedHoliday(formData: FormData) {
   }
 
   const userId = formData.get("userId") as string;
+  
+  // Enforce Manager ownership scope
+  if (user.role === "MANAGER") {
+    const targetUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { managerId: true }
+    });
+    if (!targetUser || targetUser.managerId !== user.id) {
+      throw new Error("Unauthorized: You can only assign holidays to your direct reports.");
+    }
+  }
+
   const name = formData.get("name") as string;
   const dateStr = formData.get("date") as string;
   const description = formData.get("description") as string | null;
@@ -91,6 +103,18 @@ export async function deleteAssignedHoliday(holidayId: string) {
 
   if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
     throw new Error("Unauthorized");
+  }
+
+  // Enforce Manager ownership scope
+  if (user.role === "MANAGER") {
+    const assignedHoliday = await prisma.assignedHoliday.findUnique({
+      where: { id: holidayId },
+      include: { user: { select: { managerId: true } } }
+    });
+    
+    if (!assignedHoliday || assignedHoliday.user.managerId !== user.id) {
+      throw new Error("Unauthorized: You can only delete assigned holidays for your direct reports.");
+    }
   }
 
   await prisma.assignedHoliday.delete({
