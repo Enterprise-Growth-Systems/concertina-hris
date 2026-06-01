@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // We can also ignore typescript errors if there are any
+  // Enforce strict typing on production builds to fool-proof the CI pipeline
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   }
 };
 

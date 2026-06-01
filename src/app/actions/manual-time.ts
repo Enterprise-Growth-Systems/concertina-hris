@@ -159,7 +159,7 @@ export async function approveManualTimeRequest(requestId: string) {
             await tx.auditLog.create({
                 data: {
                     action: "MANUAL_TIME_APPROVED",
-                    userId: session!.user!.id,
+                    userId: session!.user!.id as string,
                     details: `Approved ${request.logType} request ${requestId} for user ${request.userId}`
                 }
             });
@@ -210,7 +210,7 @@ export async function rejectManualTimeRequest(requestId: string) {
         await prisma.auditLog.create({
             data: {
                 action: "MANUAL_TIME_REJECTED",
-                userId: session!.user!.id,
+                userId: session!.user!.id as string,
                 details: `Rejected manual time request ${requestId}`
             }
         });

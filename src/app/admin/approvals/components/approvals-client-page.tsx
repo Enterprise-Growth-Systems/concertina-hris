@@ -187,10 +187,10 @@ export function ApprovalsClientPage({
                                             </div>
 
                                             <div className="flex sm:flex-col gap-2 shrink-0">
-                                                <form action={updateLeaveRequestStatus.bind(null, request.id, "APPROVED")}>
+                                                <form action={updateLeaveRequestStatus.bind(null, request.id, "APPROVED") as any}>
                                                     <SubmitButton variant="success" className="w-full sm:w-32">Approve</SubmitButton>
                                                 </form>
-                                                <form action={updateLeaveRequestStatus.bind(null, request.id, "REJECTED")}>
+                                                <form action={updateLeaveRequestStatus.bind(null, request.id, "REJECTED") as any}>
                                                     <SubmitButton variant="outline" className="w-full sm:w-32 text-destructive border-destructive hover:bg-destructive hover:text-white">Reject</SubmitButton>
                                                 </form>
                                             </div>
