@@ -24,11 +24,18 @@ export async function submitOvertime(formData: FormData) {
     }
 
     try {
+        const startDate = new Date(startDateStr);
+        const endDate = new Date(endDateStr);
+
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            return { success: false, error: "Invalid date format." };
+        }
+
         await prisma.overtimeRequest.create({
             data: {
                 userId: session.user.id,
-                startDate: new Date(startDateStr),
-                endDate: new Date(endDateStr),
+                startDate: startDate,
+                endDate: endDate,
                 startTime,
                 endTime,
                 reason,

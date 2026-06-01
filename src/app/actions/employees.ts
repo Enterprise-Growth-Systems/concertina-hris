@@ -17,8 +17,8 @@ export async function addEmployee(formData: FormData) {
     const role = formData.get("role") as string;
     const pffdBalance = parseInt(formData.get("pffdBalance") as string, 10);
 
-    if (!name || !email || !role || isNaN(pffdBalance)) {
-        throw new Error("Missing required fields.");
+    if (!name || !email || !role || isNaN(pffdBalance) || pffdBalance < 0) {
+        throw new Error("Missing required fields or invalid balance.");
     }
 
     try {

@@ -23,6 +23,10 @@ export async function submitManualTimeRequest(formData: FormData) {
     try {
         const logDateTime = new Date(logDateTimeStr);
         
+        if (isNaN(logDateTime.getTime())) {
+            return { success: false, error: "Invalid date format." };
+        }
+
         await prisma.manualTimeRequest.create({
             data: {
                 userId: session.user.id,
