@@ -64,6 +64,9 @@ export async function upsertSpecialSchedule(userId: string, dateStr: string, sta
   }
 
   const date = new Date(dateStr);
+  if (isNaN(date.getTime())) {
+    throw new Error("Invalid date format.");
+  }
 
   await prisma.specialSchedule.upsert({
     where: {

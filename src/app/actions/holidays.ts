@@ -23,10 +23,15 @@ export async function createHoliday(formData: FormData) {
     throw new Error("Name, date, and type are required.");
   }
 
+  const dateObj = new Date(dateStr);
+  if (isNaN(dateObj.getTime())) {
+    throw new Error("Invalid date format.");
+  }
+
   await prisma.holiday.create({
     data: {
       name,
-      date: new Date(dateStr),
+      date: dateObj,
       type,
       description,
     },
@@ -85,11 +90,16 @@ export async function createAssignedHoliday(formData: FormData) {
     throw new Error("Missing required fields.");
   }
 
+  const dateObj = new Date(dateStr);
+  if (isNaN(dateObj.getTime())) {
+    throw new Error("Invalid date format.");
+  }
+
   await prisma.assignedHoliday.create({
     data: {
       userId,
       name,
-      date: new Date(dateStr),
+      date: dateObj,
       description,
     },
   });
