@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import { PrismaClient } from "@prisma/client";
 import { formatInTimeZone } from "date-fns-tz";
 import { format } from "date-fns";
-import { LayoutDashboard, CalendarDays, Clock } from "lucide-react";
+import { Clock, Calendar, FileText, CheckCircle2 } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 
 const prisma = new PrismaClient();
 

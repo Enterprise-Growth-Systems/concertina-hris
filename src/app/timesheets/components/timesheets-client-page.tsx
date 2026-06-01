@@ -41,11 +41,6 @@ export function TimesheetsClientPage({ initialEvents }: { initialEvents: LogEven
         });
     }, [initialEvents, startDateFilter, endDateFilter]);
 
-    // Reset pagination when filters change
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [startDateFilter, endDateFilter]);
-
     const totalPages = Math.ceil(filteredLogs.length / ITEMS_PER_PAGE);
     const paginatedLogs = filteredLogs.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
@@ -55,6 +50,7 @@ export function TimesheetsClientPage({ initialEvents }: { initialEvents: LogEven
     const clearFilters = () => {
         setStartDateFilter("");
         setEndDateFilter("");
+        setCurrentPage(1);
     };
 
     const hasActiveFilters = startDateFilter !== "" || endDateFilter !== "";
@@ -71,7 +67,10 @@ export function TimesheetsClientPage({ initialEvents }: { initialEvents: LogEven
                         <input
                             type="date"
                             value={startDateFilter}
-                            onChange={(e) => setStartDateFilter(e.target.value)}
+                            onChange={(e) => {
+                                setStartDateFilter(e.target.value);
+                                setCurrentPage(1);
+                            }}
                             className="w-full bg-background border text-foreground rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                             aria-label="Start Date"
                         />
@@ -84,7 +83,10 @@ export function TimesheetsClientPage({ initialEvents }: { initialEvents: LogEven
                         <input
                             type="date"
                             value={endDateFilter}
-                            onChange={(e) => setEndDateFilter(e.target.value)}
+                            onChange={(e) => {
+                                setEndDateFilter(e.target.value);
+                                setCurrentPage(1);
+                            }}
                             className="w-full bg-background border text-foreground rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                             aria-label="End Date"
                         />
