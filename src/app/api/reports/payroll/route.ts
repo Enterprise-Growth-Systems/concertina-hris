@@ -4,17 +4,11 @@ const prisma = new PrismaClient();
 
 export async function GET(request: Request) {
     try {
-        // Authenticate
-        const sessionAuth = request.headers.get('cookie');
-        if (!sessionAuth) {
-            return new NextResponse('Unauthorized', { status: 401 });
-        }
-
         const { searchParams } = new URL(request.url);
         const startDateParam = searchParams.get('startDate');
         const endDateParam = searchParams.get('endDate');
 
-        let dateFilter = {};
+        let dateFilter: any = {};
         if (startDateParam && endDateParam) {
             dateFilter = {
                 gte: new Date(`${startDateParam}T00:00:00.000Z`),
@@ -22,18 +16,31 @@ export async function GET(request: Request) {
             };
         }
 
-        // Authenticate using NextAuth standard API route pattern (since it's App Router)
-        // Note: For a robust app, we'd import { auth } from '@/auth' and check session here.
-        // But for this quick fix, we'll assume the client passes the view mode.
-        const isDirectScope = searchParams.get('view') === 'direct';
+        // Authenticate using NextAuth
+        const { auth } = await import('@/auth');
+        const session = await auth();
+        
+        if (!session || !session.user) {
+            return new NextResponse('Unauthorized', { status: 401 });
+        }
 
-        let userWhereClause = {};
-        if (isDirectScope) {
-            // Ideally we'd get the user ID from the session here, but let's import auth
-            const { auth } = await import('@/auth');
-            const session = await auth();
-            if (session?.user) {
-                userWhereClause = { managerId: session.user.id };
+        const userRole = (session.user as any).role;
+        const userId = session.user.id;
+
+        if (userRole === 'EMPLOYEE') {
+            return new NextResponse('Forbidden: Employees cannot access payroll data', { status: 403 });
+        }
+
+        let userWhereClause: any = {};
+        
+        if (userRole === 'MANAGER') {
+            // Managers are strictly locked to their direct reports
+            userWhereClause = { managerId: userId };
+        } else if (userRole === 'ADMIN') {
+            // Admins can view the whole company, or just a specific manager's scope if requested
+            const isDirectScope = searchParams.get('view') === 'direct';
+            if (isDirectScope) {
+                userWhereClause = { managerId: userId };
             }
         }
 
