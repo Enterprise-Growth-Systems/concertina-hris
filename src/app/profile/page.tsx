@@ -32,6 +32,20 @@ export default async function ProfilePage() {
         <p className="text-muted-foreground">View and update your personal information.</p>
       </div>
 
+      {sessionUser.requiresPasswordChange && (
+        <div className="mb-8 p-4 bg-destructive/15 border border-destructive/30 rounded-lg flex items-start gap-4">
+          <svg className="w-6 h-6 text-destructive flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <div>
+            <h3 className="text-destructive font-semibold text-lg">Action Required: Change Your Password</h3>
+            <p className="text-destructive/90 mt-1">
+              You are currently using a default insecure password. You must set a new password below before you can access the rest of the application.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Read-Only Employment Information */}
         <div className="bg-card border rounded-xl p-6 shadow-sm">

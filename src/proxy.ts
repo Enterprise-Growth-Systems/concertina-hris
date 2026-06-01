@@ -21,6 +21,16 @@ export default auth((req) => {
         return NextResponse.redirect(redirectUrl);
     }
 
+    // Force default password change
+    if (isLoggedIn) {
+        const requiresPasswordChange = (req.auth?.user as any)?.requiresPasswordChange;
+        const isPasswordChangePath = nextUrl.pathname.startsWith("/profile");
+
+        if (requiresPasswordChange && !isPasswordChangePath && !nextUrl.pathname.startsWith("/api/auth")) {
+            return NextResponse.redirect(new URL("/profile", nextUrl.origin));
+        }
+    }
+
     // Redirect users who are already logged in away from the login page
     if (isLoggedIn && nextUrl.pathname === "/login") {
         return NextResponse.redirect(new URL("/", nextUrl.origin));

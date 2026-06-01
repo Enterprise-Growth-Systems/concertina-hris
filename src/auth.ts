@@ -54,6 +54,8 @@ export const {
             if (user) {
                 token.id = user.id;
                 token.role = (user as any).role || "EMPLOYEE";
+                // If user.password is null/falsy, they are using the default password
+                token.requiresPasswordChange = !(user as any).password;
             }
             return token;
         },
@@ -61,6 +63,7 @@ export const {
             if (token && session.user) {
                 session.user.id = token.id as string;
                 (session.user as any).role = token.role;
+                (session.user as any).requiresPasswordChange = token.requiresPasswordChange;
             }
             return session;
         }
