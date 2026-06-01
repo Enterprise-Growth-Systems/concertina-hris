@@ -52,11 +52,16 @@ export async function approveManualTimeRequest(requestId: string) {
     try {
         // Find the request
         const request = await prisma.manualTimeRequest.findUnique({
-            where: { id: requestId }
+            where: { id: requestId },
+            include: { user: true }
         });
 
         if (!request) {
             return { success: false, error: "Request not found" };
+        }
+
+        if (role === "MANAGER" && request.user.managerId !== session!.user!.id) {
+            throw new Error("Unauthorized: You can only approve requests for your direct reports.");
         }
         
         if (request.status !== "PENDING") {
@@ -168,6 +173,19 @@ export async function rejectManualTimeRequest(requestId: string) {
     }
 
     try {
+        const request = await prisma.manualTimeRequest.findUnique({
+            where: { id: requestId },
+            include: { user: true }
+        });
+
+        if (!request) {
+            return { success: false, error: "Request not found" };
+        }
+
+        if (role === "MANAGER" && request.user.managerId !== session!.user!.id) {
+            throw new Error("Unauthorized: You can only reject requests for your direct reports.");
+        }
+
         await prisma.manualTimeRequest.update({
             where: { id: requestId },
             data: {

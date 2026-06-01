@@ -2,11 +2,19 @@
 
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
 
 const prisma = new PrismaClient();
 
 export async function updateLeaveRequestStatus(requestId: string, status: "APPROVED" | "REJECTED") {
     try {
+        const session = await auth();
+        const userRole = session?.user ? (session.user as any).role : null;
+        
+        if (userRole !== "ADMIN" && userRole !== "MANAGER") {
+            throw new Error("Unauthorized: Only Admins and Managers can update leave requests.");
+        }
+
         const request = await prisma.leaveRequest.findUnique({
             where: { id: requestId },
             include: { user: true }
@@ -14,6 +22,10 @@ export async function updateLeaveRequestStatus(requestId: string, status: "APPRO
 
         if (!request) {
             return { success: false, error: "Request not found" };
+        }
+
+        if (userRole === "MANAGER" && request.user.managerId !== session!.user!.id) {
+            throw new Error("Unauthorized: You can only approve requests for your direct reports.");
         }
 
         // If status hasn't changed, do nothing

@@ -88,6 +88,13 @@ export async function updatePffdBalance(userId: string, newBalance: number) {
         throw new Error("Unauthorized: Only Admins and Managers can edit PFFD balances.");
     }
 
+    if (role === "MANAGER") {
+        const employee = await prisma.user.findUnique({ where: { id: userId } });
+        if (!employee || employee.managerId !== session!.user!.id) {
+            throw new Error("Unauthorized: You can only edit balances for your direct reports.");
+        }
+    }
+
     if (isNaN(newBalance) || newBalance < 0) {
         return { success: false, error: "Invalid balance." };
     }
@@ -149,6 +156,13 @@ export async function updateEmployee(
     
     if (currentUserRole !== "ADMIN" && currentUserRole !== "MANAGER") {
         throw new Error("Unauthorized: Only Admins and Managers can edit employees.");
+    }
+
+    if (currentUserRole === "MANAGER") {
+        const employee = await prisma.user.findUnique({ where: { id: userId } });
+        if (!employee || employee.managerId !== session!.user!.id) {
+            throw new Error("Unauthorized: You can only edit details for your direct reports.");
+        }
     }
 
     try {
