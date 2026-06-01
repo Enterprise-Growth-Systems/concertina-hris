@@ -33,7 +33,19 @@ export default async function AdminManagementPage({ searchParams }: { searchPara
     const users = await prisma.user.findMany({
         where: userWhereClause,
         orderBy: { name: 'asc' },
-        include: {
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            createdAt: true,
+            contactNumber: true,
+            emergencyContact: true,
+            address: true,
+            department: true,
+            position: true,
+            icId: true,
+            managerId: true,
             leaveBalances: {
                 where: { leaveType: 'PFFD' }
             },

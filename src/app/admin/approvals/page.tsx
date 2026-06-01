@@ -34,7 +34,11 @@ export default async function AdminApprovalsPage({ searchParams }: { searchParam
     // 1. Fetch Leaves
     const leaveRequestsRaw = await prisma.leaveRequest.findMany({
         where: managerWhereClause,
-        include: { user: true },
+        include: { 
+            user: {
+                select: { name: true, email: true }
+            }
+        },
         orderBy: { createdAt: "asc" },
         take: 1000,
     });
