@@ -74,16 +74,21 @@ export async function approveManualTimeRequest(requestId: string) {
         const dateEnd = new Date(request.logDateTime);
         dateEnd.setHours(23, 59, 59, 999);
 
-        // Transaction to update request and mutate timelog
+        // Atomically lock the request to prevent double-approval race conditions
+        const updateResult = await prisma.manualTimeRequest.updateMany({
+            where: { id: requestId, status: "PENDING" },
+            data: {
+                status: "APPROVED",
+                managerId: session!.user!.id
+            }
+        });
+
+        if (updateResult.count === 0) {
+            return { success: false, error: "Request was already processed by another user." };
+        }
+
+        // Transaction to mutate timelog safely since we hold the atomic status change
         await prisma.$transaction(async (tx) => {
-            // Update request status
-            await tx.manualTimeRequest.update({
-                where: { id: requestId },
-                data: {
-                    status: "APPROVED",
-                    managerId: session!.user!.id
-                }
-            });
 
             if (request.logType === "Clock In") {
                 // If it's a Clock In, we create a new TimeLog for that day (or update if there's somehow a phantom log)
@@ -186,13 +191,17 @@ export async function rejectManualTimeRequest(requestId: string) {
             throw new Error("Unauthorized: You can only reject requests for your direct reports.");
         }
 
-        await prisma.manualTimeRequest.update({
-            where: { id: requestId },
+        const updateResult = await prisma.manualTimeRequest.updateMany({
+            where: { id: requestId, status: "PENDING" },
             data: {
                 status: "REJECTED",
                 managerId: session!.user!.id
             }
         });
+
+        if (updateResult.count === 0) {
+            return { success: false, error: "Request was already processed by another user." };
+        }
 
         await prisma.auditLog.create({
             data: {

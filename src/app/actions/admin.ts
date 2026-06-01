@@ -62,7 +62,7 @@ export async function updateLeaveRequestStatus(requestId: string, status: "APPRO
         const daysRequested = calculateWorkingDays(request.startDate, request.endDate, schedules);
 
         if (status === "APPROVED" && request.status !== "APPROVED") {
-            // Verify they still have enough balance
+            // Verify they still have enough balance BEFORE locking
             const balanceRecord = await prisma.leaveBalance.findUnique({
                 where: {
                     userId_leaveType: {
@@ -76,7 +76,20 @@ export async function updateLeaveRequestStatus(requestId: string, status: "APPRO
             if (daysRequested > currentBalance) {
                 return { success: false, error: `Insufficient balance. Employee requested ${daysRequested} days, but only has ${currentBalance} left.` };
             }
+        }
 
+        // 2. Atomically lock and update the request status
+        const updateResult = await prisma.leaveRequest.updateMany({
+            where: { id: requestId, status: request.status },
+            data: { status }
+        });
+
+        // If count is 0, another concurrent request already processed it!
+        if (updateResult.count === 0) {
+            return { success: false, error: "Request was already updated by another process." };
+        }
+
+        if (status === "APPROVED" && request.status !== "APPROVED") {
             // Deduct from balance
             await prisma.leaveBalance.updateMany({
                 where: { userId: request.userId, leaveType: request.leaveType },
@@ -89,12 +102,6 @@ export async function updateLeaveRequestStatus(requestId: string, status: "APPRO
                 data: { balance: { increment: daysRequested } }
             });
         }
-
-        // 2. Update the request status
-        await prisma.leaveRequest.update({
-            where: { id: requestId },
-            data: { status },
-        });
 
         // Revalidate affected paths
         revalidatePath("/");
