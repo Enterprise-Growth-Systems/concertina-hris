@@ -22,12 +22,8 @@ const ADMIN_ROUTES = [
     { name: "Reports Dashboard", href: "/admin/reports", icon: ClipboardList },
 ];
 
-export function AppShell({ user, children }: { user: any, children: React.ReactNode }) {
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const pathname = usePathname();
-    const showAdminPanel = user && (user.role === "ADMIN" || user.role === "MANAGER");
-
-    const NavContent = () => (
+function NavContent({ user, pathname, setIsMobileMenuOpen, showAdminPanel }: any) {
+    return (
         <div className="flex flex-col h-full w-full">
             <div className="flex flex-col gap-1 pl-2 mb-4">
                 <Image 
@@ -122,12 +118,18 @@ export function AppShell({ user, children }: { user: any, children: React.ReactN
             </div>
         </div>
     );
+}
+
+export function AppShell({ user, children }: { user: any, children: React.ReactNode }) {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const pathname = usePathname();
+    const showAdminPanel = user && (user.role === "ADMIN" || user.role === "MANAGER");
 
     return (
         <div className="flex w-full min-h-screen bg-background">
             {/* Desktop Sidebar */}
             <aside className="hidden lg:flex w-64 flex-col px-4 py-6 gap-8 sticky top-0 h-screen z-20">
-                <NavContent />
+                <NavContent user={user} pathname={pathname} setIsMobileMenuOpen={setIsMobileMenuOpen} showAdminPanel={showAdminPanel} />
             </aside>
 
             {/* Mobile Menu Overlay */}
@@ -144,7 +146,7 @@ export function AppShell({ user, children }: { user: any, children: React.ReactN
                         >
                             <X className="size-5" />
                         </button>
-                        <NavContent />
+                        <NavContent user={user} pathname={pathname} setIsMobileMenuOpen={setIsMobileMenuOpen} showAdminPanel={showAdminPanel} />
                     </div>
                 </div>
             )}

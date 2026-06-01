@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { format, isSameDay, parseISO, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { Calendar as CalendarIcon, X } from "lucide-react";
@@ -42,7 +42,7 @@ export function TimesheetsClientPage({ initialEvents }: { initialEvents: LogEven
     }, [initialEvents, startDateFilter, endDateFilter]);
 
     // Reset pagination when filters change
-    useMemo(() => {
+    useEffect(() => {
         setCurrentPage(1);
     }, [startDateFilter, endDateFilter]);
 
