@@ -6,16 +6,21 @@ import { auth } from "@/auth";
 
 const prisma = new PrismaClient();
 
-function calculateWorkingDays(start: Date, end: Date): number {
+function calculateWorkingDays(start: Date, end: Date, schedules: { dayOfWeek: number }[]): number {
     let count = 0;
     const current = new Date(start);
     current.setHours(0, 0, 0, 0);
     const endDate = new Date(end);
     endDate.setHours(0, 0, 0, 0);
 
+    // If no schedule exists, fallback to standard Mon-Fri (1-5)
+    const workingDays = schedules.length > 0 
+        ? new Set(schedules.map(s => s.dayOfWeek))
+        : new Set([1, 2, 3, 4, 5]);
+
     while (current <= endDate) {
         const day = current.getDay();
-        if (day !== 0 && day !== 6) { // 0 = Sunday, 6 = Saturday
+        if (workingDays.has(day)) {
             count++;
         }
         current.setDate(current.getDate() + 1);
@@ -48,10 +53,16 @@ export async function submitLeaveRequest(formData: FormData) {
         }
 
         const employeeId = session.user.id;
-        const daysRequested = calculateWorkingDays(startDate, endDate);
+        
+        const schedules = await prisma.schedule.findMany({
+            where: { userId: employeeId },
+            select: { dayOfWeek: true }
+        });
+
+        const daysRequested = calculateWorkingDays(startDate, endDate, schedules);
 
         if (daysRequested <= 0) {
-            return { success: false, error: "Leave request must include at least one working day" };
+            return { success: false, error: "Leave request must include at least one working day based on your schedule" };
         }
 
         // Verify balance

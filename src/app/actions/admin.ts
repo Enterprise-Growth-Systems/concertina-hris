@@ -6,16 +6,20 @@ import { auth } from "@/auth";
 
 const prisma = new PrismaClient();
 
-function calculateWorkingDays(start: Date, end: Date): number {
+function calculateWorkingDays(start: Date, end: Date, schedules: { dayOfWeek: number }[]): number {
     let count = 0;
     const current = new Date(start);
     current.setHours(0, 0, 0, 0);
     const endDate = new Date(end);
     endDate.setHours(0, 0, 0, 0);
 
+    const workingDays = schedules.length > 0 
+        ? new Set(schedules.map(s => s.dayOfWeek))
+        : new Set([1, 2, 3, 4, 5]);
+
     while (current <= endDate) {
         const day = current.getDay();
-        if (day !== 0 && day !== 6) {
+        if (workingDays.has(day)) {
             count++;
         }
         current.setDate(current.getDate() + 1);
@@ -51,7 +55,11 @@ export async function updateLeaveRequestStatus(requestId: string, status: "APPRO
         }
 
         // 1. Calculate working days
-        const daysRequested = calculateWorkingDays(request.startDate, request.endDate);
+        const schedules = await prisma.schedule.findMany({
+            where: { userId: request.userId },
+            select: { dayOfWeek: true }
+        });
+        const daysRequested = calculateWorkingDays(request.startDate, request.endDate, schedules);
 
         if (status === "APPROVED" && request.status !== "APPROVED") {
             // Verify they still have enough balance

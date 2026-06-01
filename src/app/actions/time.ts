@@ -16,16 +16,12 @@ export async function toggleClockStatus() {
         const employeeId = session.user.id;
 
         const now = new Date();
-        
-        // Vercel servers run in UTC. To calculate thresholds correctly, we construct a 
-        // "pseudo-Date" that represents the exact local time in Manila.
         const manilaStr = now.toLocaleString("en-US", { timeZone: "Asia/Manila", hour12: false });
         const nowPHT = new Date(manilaStr);
-
         const startOfToday = new Date(nowPHT.getFullYear(), nowPHT.getMonth(), nowPHT.getDate(), 0, 0, 0);
 
-        // 1. Check if the user has an active (open) time log
-        const activeLog = await prisma.timeLog.findFirst({
+        // Fetch ALL active logs to gracefully handle any race-condition duplicates
+        const activeLogs = await prisma.timeLog.findMany({
             where: {
                 userId: employeeId,
                 clockOut: null,
@@ -35,40 +31,27 @@ export async function toggleClockStatus() {
             },
         });
 
-        if (activeLog) {
-            // Did they forget to clock out yesterday?
-            // Convert their actual UTC clockIn to a Manila pseudo-Date for accurate comparison
+        if (activeLogs.length > 0) {
+            // Did they forget to clock out yesterday on ANY of the active logs?
+            const activeLog = activeLogs[0];
             const activeLogInManila = new Date(activeLog.clockIn.toLocaleString("en-US", { timeZone: "Asia/Manila", hour12: false }));
             
             if (activeLogInManila < startOfToday) {
-                // Force close yesterday's log at 23:59:59 PHT (which is calculated based on startOfToday)
-                // We use the absolute `now` to close it, OR we could use end of yesterday.
-                // We'll just close it using the absolute UTC time of right now, or you can calculate exact end of yesterday.
-                // Let's use `now` for simplicity to record exactly when the forced checkout triggered.
-                await prisma.timeLog.update({
-                    where: { id: activeLog.id },
+                // Force close yesterday's log(s)
+                await prisma.timeLog.updateMany({
+                    where: { userId: employeeId, clockOut: null },
                     data: { clockOut: now },
                 });
                 
                 await prisma.auditLog.create({
-                    data: { action: "FORCED_CLOCK_OUT", userId: employeeId, details: "System forcefully closed stale time log from previous day." }
+                    data: { action: "FORCED_CLOCK_OUT", userId: employeeId, details: "System forcefully closed stale time log(s) from previous day." }
                 });
-                // We let it continue below to create their new clock-in for today!
+                // Let it continue below to create their new clock-in for today
             } else {
-                // Normal clock out for today
-                const clockInDayOfWeek = activeLogInManila.getDay();
-                const schedule = await prisma.schedule.findUnique({
-                    where: {
-                        userId_dayOfWeek: {
-                            userId: employeeId,
-                            dayOfWeek: clockInDayOfWeek,
-                        }
-                    }
-                });
-
-                await prisma.timeLog.update({
-                    where: { id: activeLog.id },
-                    data: { clockOut: now }, // Keep actual UTC time for clockOut
+                // Normal clock out for today. Close ALL duplicate active logs if they exist.
+                await prisma.timeLog.updateMany({
+                    where: { userId: employeeId, clockOut: null },
+                    data: { clockOut: now },
                 });
 
                 await prisma.auditLog.create({
@@ -80,32 +63,34 @@ export async function toggleClockStatus() {
             }
         }
 
-        // 2. User is clocking in (either standard, or after an auto-checkout)
-        const todayDayOfWeek = nowPHT.getDay();
-        const schedule = await prisma.schedule.findUnique({
-            where: {
-                userId_dayOfWeek: {
-                    userId: employeeId,
-                    dayOfWeek: todayDayOfWeek,
-                }
+        // 2. User is clocking in. Verify no active logs exist right now to prevent double-click race condition.
+        // We do a fast transaction to ensure idempotency.
+        const result = await prisma.$transaction(async (tx) => {
+            const currentActive = await tx.timeLog.findFirst({
+                where: { userId: employeeId, clockOut: null }
+            });
+
+            if (currentActive) {
+                return { success: true }; // Silently succeed if they are already clocked in (race condition caught)
             }
+
+            await tx.timeLog.create({
+                data: {
+                    userId: employeeId,
+                    clockIn: now,
+                },
+            });
+
+            await tx.auditLog.create({
+                data: { action: "CLOCK_IN", userId: employeeId, details: "User clocked in" }
+            });
+
+            return { success: true };
         });
 
-        await prisma.timeLog.create({
-            data: {
-                userId: employeeId,
-                clockIn: now, // Save actual UTC time to database
-            },
-        });
-
-        await prisma.auditLog.create({
-            data: { action: "CLOCK_IN", userId: employeeId, details: "User clocked in" }
-        });
-
-        // Refresh the dashboard data
         revalidatePath("/");
+        return result;
 
-        return { success: true };
     } catch (error) {
         console.error("Error toggling clock status:", error);
         return { success: false, error: "Failed to update time log" };
