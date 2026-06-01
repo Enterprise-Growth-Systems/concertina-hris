@@ -81,6 +81,7 @@ export default async function AdminManagementPage({ searchParams }: { searchPara
     });
 
     const assignedHolidays = await prisma.assignedHoliday.findMany({
+        where: isDirectScope ? { user: { managerId: session.user.id } } : {},
         orderBy: { date: "asc" },
         include: {
             user: { select: { name: true, email: true } }

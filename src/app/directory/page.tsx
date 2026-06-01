@@ -11,13 +11,22 @@ export default async function DirectoryPage() {
     return <div>Unauthorized</div>;
   }
 
-  // Fetch all active users, ordered by name
+  // Fetch all active users, ordered by name, selecting only necessary public fields
   const users = await prisma.user.findMany({
     orderBy: {
       name: 'asc'
     },
-    include: {
-      manager: true,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      department: true,
+      position: true,
+      contactNumber: true,
+      manager: {
+        select: { name: true }
+      }
     }
   });
 
