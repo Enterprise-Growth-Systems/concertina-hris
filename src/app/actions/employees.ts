@@ -65,9 +65,6 @@ export async function deleteEmployee(userId: string) {
             prisma.auditLog.deleteMany({ where: { userId } }),
             // Remove them as a manager from any direct reports
             prisma.user.updateMany({ where: { managerId: userId }, data: { managerId: null } }),
-            // Delete the authored content or reassign? We'll delete for now.
-            prisma.announcement.deleteMany({ where: { authorId: userId } }),
-            prisma.page.deleteMany({ where: { authorId: userId } }),
             // Finally delete the user
             prisma.user.delete({ where: { id: userId } })
         ]);

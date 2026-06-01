@@ -35,8 +35,7 @@ model User {
   timeLogs         TimeLog[]
   leaveBalances    LeaveBalance[]
   leaveRequests    LeaveRequest[]
-  announcements    Announcement[] // Link to authored announcements
-  pages            Page[]         // Link to authored knowledge base pages
+
   schedules        Schedule[]     // Assigned weekly schedules
   specialSchedules SpecialSchedule[] // Overrides for specific dates
   assignedHolidays AssignedHoliday[] // Holidays specific to this user
@@ -83,29 +82,6 @@ model LeaveRequest {
   updatedAt     DateTime @updatedAt
 }
 
-model Announcement {
-  id        String   @id @default(cuid())
-  title     String
-  content   String
-  authorId  String
-  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Page {
-  id        String   @id @default(cuid())
-  title     String
-  slug      String   @unique
-  content   String?  // Optional for empty folders
-  authorId  String
-  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  parentId  String?  // Self-relation for infinite nesting
-  parent    Page?    @relation("PageOrganization", fields: [parentId], references: [id], onDelete: Cascade)
-  children  Page[]   @relation("PageOrganization")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
 
 model Holiday {
   id          String   @id @default(cuid())
