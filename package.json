@@ -10,8 +10,6 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@auth/core": "^0.41.0",
-    "@auth/prisma-adapter": "^2.11.1",
     "@prisma/client": "^5.22.0",
     "@supabase/supabase-js": "^2.106.1",
     "@vercel/analytics": "^2.0.1",
