@@ -62,9 +62,16 @@ export async function deleteEmployee(userId: string) {
             prisma.leaveBalance.deleteMany({ where: { userId } }),
             prisma.leaveRequest.deleteMany({ where: { userId } }),
             prisma.schedule.deleteMany({ where: { userId } }),
+            prisma.specialSchedule.deleteMany({ where: { userId } }),
+            prisma.assignedHoliday.deleteMany({ where: { userId } }),
             prisma.auditLog.deleteMany({ where: { userId } }),
+            prisma.overtimeRequest.deleteMany({ where: { userId } }),
+            prisma.manualTimeRequest.deleteMany({ where: { userId } }),
             // Remove them as a manager from any direct reports
             prisma.user.updateMany({ where: { managerId: userId }, data: { managerId: null } }),
+            // Remove their manager signature from any requests they approved
+            prisma.overtimeRequest.updateMany({ where: { managerId: userId }, data: { managerId: null } }),
+            prisma.manualTimeRequest.updateMany({ where: { managerId: userId }, data: { managerId: null } }),
             // Finally delete the user
             prisma.user.delete({ where: { id: userId } })
         ]);
