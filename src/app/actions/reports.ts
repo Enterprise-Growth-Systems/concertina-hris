@@ -15,11 +15,17 @@ export async function generateTimesheetReport(startDate: string, endDate: string
 
   const managerWhereClause = isDirectScope || user.role === "MANAGER" ? { managerId: user.id } : {};
 
+  const parsedStart = new Date(`${startDate}T00:00:00.000Z`);
+  const parsedEnd = new Date(`${endDate}T23:59:59.999Z`);
+  if (isNaN(parsedStart.getTime()) || isNaN(parsedEnd.getTime())) {
+    throw new Error("Invalid date format");
+  }
+
   const logs = await prisma.timeLog.findMany({
     where: {
       clockIn: {
-        gte: new Date(`${startDate}T00:00:00.000Z`),
-        lte: new Date(`${endDate}T23:59:59.999Z`),
+        gte: parsedStart,
+        lte: parsedEnd,
       },
       user: managerWhereClause
     },
@@ -71,13 +77,19 @@ export async function generateLeaveReport(startDate: string, endDate: string, is
 
   const managerWhereClause = isDirectScope || user.role === "MANAGER" ? { managerId: user.id } : {};
 
+  const parsedStart = new Date(`${startDate}T00:00:00.000Z`);
+  const parsedEnd = new Date(`${endDate}T23:59:59.999Z`);
+  if (isNaN(parsedStart.getTime()) || isNaN(parsedEnd.getTime())) {
+    throw new Error("Invalid date format");
+  }
+
   const requests = await prisma.leaveRequest.findMany({
     where: {
       startDate: {
-        gte: new Date(`${startDate}T00:00:00.000Z`),
+        gte: parsedStart,
       },
       endDate: {
-        lte: new Date(`${endDate}T23:59:59.999Z`),
+        lte: parsedEnd,
       },
       user: managerWhereClause
     },

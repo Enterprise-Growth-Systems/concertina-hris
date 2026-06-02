@@ -10,9 +10,16 @@ export async function GET(request: Request) {
 
         let dateFilter: any = {};
         if (startDateParam && endDateParam) {
+            const parsedStart = new Date(`${startDateParam}T00:00:00.000Z`);
+            const parsedEnd = new Date(`${endDateParam}T23:59:59.999Z`);
+            
+            if (isNaN(parsedStart.getTime()) || isNaN(parsedEnd.getTime())) {
+                return new NextResponse('Bad Request: Invalid date format', { status: 400 });
+            }
+
             dateFilter = {
-                gte: new Date(`${startDateParam}T00:00:00.000Z`),
-                lte: new Date(`${endDateParam}T23:59:59.999Z`),
+                gte: parsedStart,
+                lte: parsedEnd,
             };
         }
 
