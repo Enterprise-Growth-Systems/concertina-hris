@@ -4,8 +4,31 @@ import { auth } from "./auth";
 // Protect all routes under /admin, /leaves, /timesheets, and the root / dashboard
 const protectedRoutes = ["/", "/timesheets", "/leaves", "/admin/leaves"];
 
+// Simple In-Memory Rate Limiter (Token Bucket) per Edge Isolate
+const RATE_LIMIT = 20; // max requests
+const WINDOW_MS = 10 * 1000; // 10 seconds
+const ipTracker = new Map<string, { count: number; resetAt: number }>();
+
 export default auth((req) => {
     const { nextUrl } = req;
+    
+    // --- RATE LIMITING LOGIC ---
+    // Extract IP address from standard Vercel/Next.js headers
+    const ip = req.headers.get("x-forwarded-for") || "unknown-ip";
+    const now = Date.now();
+    
+    let rateData = ipTracker.get(ip);
+    if (!rateData || now > rateData.resetAt) {
+        rateData = { count: 1, resetAt: now + WINDOW_MS };
+        ipTracker.set(ip, rateData);
+    } else {
+        rateData.count++;
+        if (rateData.count > RATE_LIMIT) {
+            return new NextResponse("429 Too Many Requests - Please slow down.", { status: 429 });
+        }
+    }
+    // ---------------------------
+
     const isLoggedIn = !!req.auth;
 
     const isProtectedRoute = protectedRoutes.some(route =>
