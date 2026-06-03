@@ -21,19 +21,21 @@ export default auth((req) => {
         return NextResponse.redirect(redirectUrl);
     }
 
+    let response = NextResponse.next();
+
     // Force default password change
     if (isLoggedIn) {
         const requiresPasswordChange = (req.auth?.user as any)?.requiresPasswordChange;
         const isPasswordChangePath = nextUrl.pathname.startsWith("/profile");
 
         if (requiresPasswordChange && !isPasswordChangePath && !nextUrl.pathname.startsWith("/api/auth")) {
-            return NextResponse.redirect(new URL("/profile", nextUrl.origin));
+            response = NextResponse.redirect(new URL("/profile", nextUrl.origin));
         }
     }
 
     // Redirect users who are already logged in away from the login page
     if (isLoggedIn && nextUrl.pathname === "/login") {
-        return NextResponse.redirect(new URL("/", nextUrl.origin));
+        response = NextResponse.redirect(new URL("/", nextUrl.origin));
     }
 
     // Role-based protection for /admin routes
@@ -42,7 +44,7 @@ export default auth((req) => {
         
         // 1. Block regular employees entirely from /admin
         if (userRole !== "ADMIN" && userRole !== "MANAGER") {
-            return NextResponse.redirect(new URL("/", nextUrl.origin));
+            response = NextResponse.redirect(new URL("/", nextUrl.origin));
         }
 
         // 2. Strict Supervisor (MANAGER) Restrictions
@@ -54,12 +56,18 @@ export default auth((req) => {
             );
             
             if (isRestricted) {
-                return NextResponse.redirect(new URL("/", nextUrl.origin));
+                response = NextResponse.redirect(new URL("/", nextUrl.origin));
             }
         }
     }
 
-    return;
+    // Apply strict security headers to the final response to foolproof against XSS and Clickjacking
+    response.headers.set("X-Frame-Options", "DENY");
+    response.headers.set("X-Content-Type-Options", "nosniff");
+    response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+    response.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+
+    return response;
 });
 
 export const config = {
