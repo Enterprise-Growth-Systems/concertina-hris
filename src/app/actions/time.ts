@@ -32,23 +32,25 @@ export async function toggleClockStatus() {
         });
 
         if (activeLogs.length > 0) {
-            // Did they forget to clock out yesterday on ANY of the active logs?
             const activeLog = activeLogs[0];
-            const activeLogInManila = new Date(activeLog.clockIn.toLocaleString("en-US", { timeZone: "Asia/Manila", hour12: false }));
+            const hoursSinceClockIn = (now.getTime() - activeLog.clockIn.getTime()) / (1000 * 60 * 60);
             
-            if (activeLogInManila < startOfToday) {
-                // Force close yesterday's log(s)
+            if (hoursSinceClockIn > 16) {
+                // They forgot to clock out. Force close their stale log(s) at 9 hours after clock-in (standard shift length)
+                // rather than keeping them clocked in for 16+ hours.
+                const forcedClockOut = new Date(activeLog.clockIn.getTime() + (9 * 60 * 60 * 1000));
+
                 await prisma.timeLog.updateMany({
                     where: { userId: employeeId, clockOut: null },
-                    data: { clockOut: now },
+                    data: { clockOut: forcedClockOut },
                 });
                 
                 await prisma.auditLog.create({
-                    data: { action: "FORCED_CLOCK_OUT", userId: employeeId, details: "System forcefully closed stale time log(s) from previous day." }
+                    data: { action: "FORCED_CLOCK_OUT", userId: employeeId, details: "System forcefully closed stale time log (>16 hours) using standard 9h shift." }
                 });
-                // Let it continue below to create their new clock-in for today
+                // Let it continue below to create their NEW clock-in for today
             } else {
-                // Normal clock out for today. Close ALL duplicate active logs if they exist.
+                // Normal clock out (handles graveyard shifts spanning midnight correctly)
                 await prisma.timeLog.updateMany({
                     where: { userId: employeeId, clockOut: null },
                     data: { clockOut: now },
