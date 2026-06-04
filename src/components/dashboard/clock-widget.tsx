@@ -35,8 +35,9 @@ export function ClockWidget() {
         try {
             // Note: In the future, we can pass projectInput and notesInput to the action
             const res = await toggleClockStatus();
-            if (res.success) {
-                setIsClockedIn(!isClockedIn);
+            if (res.success && res.isClockedIn !== undefined) {
+                // Strictly reflect the database's true state rather than blindly toggling local state
+                setIsClockedIn(res.isClockedIn);
             }
         } finally {
             setIsPending(false);

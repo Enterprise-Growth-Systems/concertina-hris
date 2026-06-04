@@ -6,7 +6,7 @@ import { auth } from "@/auth"; // import the auth module
 
 const prisma = new PrismaClient();
 
-export async function toggleClockStatus() {
+export async function toggleClockStatus(): Promise<{ success: boolean; isClockedIn?: boolean; error?: string }> {
     try {
         const session = await auth();
         if (!session || !session.user || !session.user.id) {
@@ -14,11 +14,7 @@ export async function toggleClockStatus() {
         }
 
         const employeeId = session.user.id;
-
         const now = new Date();
-        const manilaStr = now.toLocaleString("en-US", { timeZone: "Asia/Manila", hour12: false });
-        const nowPHT = new Date(manilaStr);
-        const startOfToday = new Date(nowPHT.getFullYear(), nowPHT.getMonth(), nowPHT.getDate(), 0, 0, 0);
 
         // Fetch ALL active logs to gracefully handle any race-condition duplicates
         const activeLogs = await prisma.timeLog.findMany({
@@ -37,7 +33,6 @@ export async function toggleClockStatus() {
             
             if (hoursSinceClockIn > 16) {
                 // They forgot to clock out. Force close their stale log(s) at 9 hours after clock-in (standard shift length)
-                // rather than keeping them clocked in for 16+ hours.
                 const forcedClockOut = new Date(activeLog.clockIn.getTime() + (9 * 60 * 60 * 1000));
 
                 await prisma.timeLog.updateMany({
@@ -48,7 +43,10 @@ export async function toggleClockStatus() {
                 await prisma.auditLog.create({
                     data: { action: "FORCED_CLOCK_OUT", userId: employeeId, details: "System forcefully closed stale time log (>16 hours) using standard 9h shift." }
                 });
-                // Let it continue below to create their NEW clock-in for today
+                
+                revalidatePath("/");
+                // DO NOT automatically clock them back in. Return clocked out state.
+                return { success: true, isClockedIn: false };
             } else {
                 // Normal clock out (handles graveyard shifts spanning midnight correctly)
                 await prisma.timeLog.updateMany({
@@ -61,7 +59,7 @@ export async function toggleClockStatus() {
                 });
 
                 revalidatePath("/");
-                return { success: true };
+                return { success: true, isClockedIn: false };
             }
         }
 
@@ -73,7 +71,8 @@ export async function toggleClockStatus() {
             });
 
             if (currentActive) {
-                return { success: true }; // Silently succeed if they are already clocked in (race condition caught)
+                // Race condition caught! They are already clocked in.
+                return { success: true, isClockedIn: true }; 
             }
 
             await tx.timeLog.create({
@@ -87,7 +86,7 @@ export async function toggleClockStatus() {
                 data: { action: "CLOCK_IN", userId: employeeId, details: "User clocked in" }
             });
 
-            return { success: true };
+            return { success: true, isClockedIn: true };
         });
 
         revalidatePath("/");
