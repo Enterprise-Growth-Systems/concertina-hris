@@ -28,6 +28,11 @@ export async function submitManualTimeRequest(formData: FormData) {
             return { success: false, error: "Invalid date format." };
         }
 
+        const employee = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            include: { manager: true }
+        });
+
         await prisma.manualTimeRequest.create({
             data: {
                 userId: session.user.id,
@@ -37,6 +42,26 @@ export async function submitManualTimeRequest(formData: FormData) {
                 status: "PENDING"
             }
         });
+
+        // Send Email Notification to Manager
+        if (employee?.manager && employee.manager.email) {
+            const subject = `New Manual Time Request: ${employee.name}`;
+            const html = `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+                    <h2 style="color: #2563eb;">New Manual Time Request Submitted</h2>
+                    <p>Hello ${employee.manager.name},</p>
+                    <p><strong>${employee.name}</strong> has submitted a new manual time request for your review.</p>
+                    <p><strong>Log Type:</strong> ${logType}</p>
+                    <p><strong>Date & Time:</strong> ${logDateTime.toDateString()} at ${logDateTime.toLocaleTimeString()}</p>
+                    <p><strong>Reason:</strong> ${reason}</p>
+                    <br/>
+                    <p>Please log in to the Concertina HR dashboard to approve or reject this request.</p>
+                    <br/>
+                    <p>Best regards,<br/>Concertina HR System</p>
+                </div>
+            `;
+            sendEmail(employee.manager.email, subject, html).catch(console.error);
+        }
 
         revalidatePath("/requests");
         return { success: true };

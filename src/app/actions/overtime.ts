@@ -32,6 +32,11 @@ export async function submitOvertime(formData: FormData) {
             return { success: false, error: "Invalid date format." };
         }
 
+        const employee = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            include: { manager: true }
+        });
+
         await prisma.overtimeRequest.create({
             data: {
                 userId: session.user.id,
@@ -53,6 +58,26 @@ export async function submitOvertime(formData: FormData) {
                 details: `Requested overtime for ${startDateStr} to ${endDateStr}`
             }
         });
+
+        // Send Email Notification to Manager
+        if (employee?.manager && employee.manager.email) {
+            const subject = `New Overtime Request: ${employee.name}`;
+            const html = `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+                    <h2 style="color: #2563eb;">New Overtime Request Submitted</h2>
+                    <p>Hello ${employee.manager.name},</p>
+                    <p><strong>${employee.name}</strong> has submitted a new overtime request for your review.</p>
+                    <p><strong>Dates:</strong> ${startDate.toDateString()} to ${endDate.toDateString()}</p>
+                    <p><strong>Hours:</strong> ${startTime} to ${endTime}</p>
+                    <p><strong>Reason:</strong> ${reason}</p>
+                    <br/>
+                    <p>Please log in to the Concertina HR dashboard to approve or reject this request.</p>
+                    <br/>
+                    <p>Best regards,<br/>Concertina HR System</p>
+                </div>
+            `;
+            sendEmail(employee.manager.email, subject, html).catch(console.error);
+        }
 
         revalidatePath("/overtime");
         return { success: true };

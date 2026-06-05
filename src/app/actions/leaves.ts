@@ -3,6 +3,7 @@
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
+import { sendEmail } from "@/lib/email";
 
 const prisma = new PrismaClient();
 
@@ -53,7 +54,16 @@ export async function submitLeaveRequest(formData: FormData) {
         }
 
         const employeeId = session.user.id;
-        
+        // Fetch employee and their manager
+        const employee = await prisma.user.findUnique({
+            where: { id: employeeId },
+            include: { manager: true }
+        });
+
+        if (!employee) {
+            return { success: false, error: "Employee not found" };
+        }
+
         const schedules = await prisma.schedule.findMany({
             where: { userId: employeeId },
             select: { dayOfWeek: true }
@@ -91,6 +101,25 @@ export async function submitLeaveRequest(formData: FormData) {
                 status: "PENDING",
             },
         });
+
+        // Send Email Notification to Manager
+        if (employee.manager && employee.manager.email) {
+            const subject = `New Leave Request: ${employee.name}`;
+            const html = `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+                    <h2 style="color: #2563eb;">New Leave Request Submitted</h2>
+                    <p>Hello ${employee.manager.name},</p>
+                    <p><strong>${employee.name}</strong> has submitted a new <strong>${leaveType}</strong> leave request for your review.</p>
+                    <p><strong>Dates:</strong> ${startDate.toDateString()} to ${endDate.toDateString()}</p>
+                    <p><strong>Reason:</strong> ${reason}</p>
+                    <br/>
+                    <p>Please log in to the Concertina HR dashboard to approve or reject this request.</p>
+                    <br/>
+                    <p>Best regards,<br/>Concertina HR System</p>
+                </div>
+            `;
+            sendEmail(employee.manager.email, subject, html).catch(console.error);
+        }
 
         revalidatePath("/leaves");
         return { success: true };
