@@ -262,7 +262,7 @@ export function RequestsClientPage({
                             <form onSubmit={handlePffdSubmit} className="space-y-4">
                                 <div>
                                     <label className="text-sm font-medium mb-1.5 block" htmlFor="leaveType">Time-Off Type</label>
-                                    <input type="hidden" name="leaveType" value="LEAVE_CREDITS" id="leaveType" />
+                                    <input type="hidden" name="leaveType" value="PFFD" id="leaveType" />
                                     <div className="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-muted-foreground items-center">
                                         PFFD Credits
                                     </div>
@@ -329,7 +329,7 @@ export function RequestsClientPage({
                                             paginatedLeaveRequests.map((request: any) => (
                                                 <tr key={request.id} className="hover:bg-muted/50 transition-colors">
                                                     <td className="px-6 py-4 font-medium capitalize">
-                                                        {request.leaveType === 'LEAVE_CREDITS' ? 'PFFD Credits' : request.leaveType.toLowerCase()}
+                                                        {request.leaveType === 'PFFD' ? 'PFFD Credits' : request.leaveType.toLowerCase()}
                                                     </td>
                                                     <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
                                                         {format(request.startDate, "MMM d")} - {format(request.endDate, "MMM d, yyyy")}
