@@ -261,11 +261,23 @@ export function RequestsClientPage({
                             <h2 className="font-semibold text-lg mb-4">New Request</h2>
                             <form onSubmit={handlePffdSubmit} className="space-y-4">
                                 <div>
-                                    <label className="text-sm font-medium mb-1.5 block" htmlFor="leaveType">Time-Off Type</label>
-                                    <input type="hidden" name="leaveType" value="PFFD" id="leaveType" />
-                                    <div className="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-muted-foreground items-center">
-                                        PFFD Credits
-                                    </div>
+                                    <label className="text-sm font-medium mb-1.5 block text-foreground" htmlFor="leaveType">Time-Off Type</label>
+                                    <select 
+                                        name="leaveType" 
+                                        id="leaveType" 
+                                        required
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                    >
+                                        {balances.length > 0 ? (
+                                            balances.map((balance: any) => (
+                                                <option key={balance.id} value={balance.leaveType}>
+                                                    {balance.leaveType === 'PFFD' ? 'PFFD Credits' : balance.leaveType} ({balance.balance} available)
+                                                </option>
+                                            ))
+                                        ) : (
+                                            <option value="" disabled>No leave balances available</option>
+                                        )}
+                                    </select>
                                 </div>
                                 <div className="flex flex-col gap-4">
                                     <div>
