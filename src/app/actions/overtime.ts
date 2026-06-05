@@ -3,6 +3,7 @@
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
+import { sendEmail } from "@/lib/email";
 
 const prisma = new PrismaClient();
 
@@ -104,6 +105,22 @@ export async function updateOvertimeStatus(requestId: string, status: "APPROVED"
                 details: `${status} overtime request ${requestId}`
             }
         });
+
+        // Send Email Notification
+        if (overtime.user.email) {
+            const subject = `Overtime Request ${status.charAt(0) + status.slice(1).toLowerCase()}`;
+            const html = `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+                    <h2 style="color: #2563eb;">Overtime Request Update</h2>
+                    <p>Hello ${overtime.user.name},</p>
+                    <p>Your overtime request for <strong>${overtime.startDate.toDateString()} to ${overtime.endDate.toDateString()}</strong> has been <strong>${status}</strong> by your manager.</p>
+                    <p>Requested Hours: ${overtime.startTime} - ${overtime.endTime}</p>
+                    <br/>
+                    <p>Best regards,<br/>Concertina HR System</p>
+                </div>
+            `;
+            sendEmail(overtime.user.email, subject, html).catch(console.error);
+        }
 
         revalidatePath("/admin/overtime");
         return { success: true };

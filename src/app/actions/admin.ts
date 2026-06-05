@@ -3,6 +3,7 @@
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
+import { sendEmail } from "@/lib/email";
 
 const prisma = new PrismaClient();
 
@@ -101,6 +102,23 @@ export async function updateLeaveRequestStatus(requestId: string, status: "APPRO
                 where: { userId: request.userId, leaveType: request.leaveType },
                 data: { balance: { increment: daysRequested } }
             });
+        }
+
+        // Send Email Notification
+        if (request.user.email) {
+            const subject = `Leave Request ${status.charAt(0) + status.slice(1).toLowerCase()}`;
+            const html = `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+                    <h2 style="color: #2563eb;">Leave Request Update</h2>
+                    <p>Hello ${request.user.name},</p>
+                    <p>Your leave request for <strong>${request.startDate.toDateString()} to ${request.endDate.toDateString()}</strong> has been <strong>${status}</strong> by your manager.</p>
+                    <p>Type: ${request.leaveType}</p>
+                    <br/>
+                    <p>Best regards,<br/>Concertina HR System</p>
+                </div>
+            `;
+            // Fire and forget (don't await to avoid blocking the UI)
+            sendEmail(request.user.email, subject, html).catch(console.error);
         }
 
         // Revalidate affected paths

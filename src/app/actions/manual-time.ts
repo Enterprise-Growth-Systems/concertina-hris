@@ -3,6 +3,7 @@
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
+import { sendEmail } from "@/lib/email";
 
 const prisma = new PrismaClient();
 
@@ -155,7 +156,7 @@ export async function approveManualTimeRequest(requestId: string) {
                 }
             }
             
-            // Audit Log
+        // Audit Log
             await tx.auditLog.create({
                 data: {
                     action: "MANUAL_TIME_APPROVED",
@@ -164,6 +165,22 @@ export async function approveManualTimeRequest(requestId: string) {
                 }
             });
         });
+
+        // Send Email Notification
+        if (request.user.email) {
+            const subject = `Manual Time Request Approved`;
+            const html = `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+                    <h2 style="color: #10b981;">Manual Time Request Approved</h2>
+                    <p>Hello ${request.user.name},</p>
+                    <p>Your manual time request for <strong>${request.logDateTime.toDateString()} at ${request.logDateTime.toLocaleTimeString()}</strong> has been <strong>APPROVED</strong> by your manager.</p>
+                    <p>Log Type: ${request.logType}</p>
+                    <br/>
+                    <p>Best regards,<br/>Concertina HR System</p>
+                </div>
+            `;
+            sendEmail(request.user.email, subject, html).catch(console.error);
+        }
 
         revalidatePath("/admin/manual-time");
         return { success: true };
@@ -214,6 +231,22 @@ export async function rejectManualTimeRequest(requestId: string) {
                 details: `Rejected manual time request ${requestId}`
             }
         });
+
+        // Send Email Notification
+        if (request.user.email) {
+            const subject = `Manual Time Request Rejected`;
+            const html = `
+                <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+                    <h2 style="color: #ef4444;">Manual Time Request Rejected</h2>
+                    <p>Hello ${request.user.name},</p>
+                    <p>Your manual time request for <strong>${request.logDateTime.toDateString()} at ${request.logDateTime.toLocaleTimeString()}</strong> has been <strong>REJECTED</strong> by your manager.</p>
+                    <p>Log Type: ${request.logType}</p>
+                    <br/>
+                    <p>Best regards,<br/>Concertina HR System</p>
+                </div>
+            `;
+            sendEmail(request.user.email, subject, html).catch(console.error);
+        }
 
         revalidatePath("/admin/manual-time");
         return { success: true };
