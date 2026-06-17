@@ -131,7 +131,6 @@ export function RequestsClientPage({
     const [manualReason, setManualReason] = useState("");
     const [isSubmittingManual, setIsSubmittingManual] = useState(false);
 
-    const [isHalfDay, setIsHalfDay] = useState(false);
     const [isSubmittingPffd, setIsSubmittingPffd] = useState(false);
 
     const handlePffdSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -154,7 +153,6 @@ export function RequestsClientPage({
                 formData.append('attachmentUrl', url || '');
             }
 
-            formData.append('isHalfDay', String(isHalfDay));
 
             const res = await submitLeaveRequest(formData);
             if (res.success) {
@@ -284,26 +282,12 @@ export function RequestsClientPage({
                                 </div>
                                 <div className="flex flex-col gap-4">
                                     <div>
-                                        <label className="text-sm font-medium mb-1.5 block text-foreground" htmlFor="startDate">Start Date</label>
-                                        <input type="date" name="startDate" id="startDate" required className="block h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" style={{ colorScheme: 'light' }} />
+                                        <label className="text-sm font-medium mb-1.5 block text-foreground" htmlFor="startDate">Start Date & Time</label>
+                                        <input type="datetime-local" name="startDate" id="startDate" required className="block h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" style={{ colorScheme: 'light' }} />
                                     </div>
-                                    {!isHalfDay && (
-                                        <div>
-                                            <label className="text-sm font-medium mb-1.5 block text-foreground" htmlFor="endDate">End Date</label>
-                                            <input type="date" name="endDate" id="endDate" required={!isHalfDay} className="block h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" style={{ colorScheme: 'light' }} />
-                                        </div>
-                                    )}
-                                    <div className="flex items-center gap-2 mt-1">
-                                        <input
-                                            type="checkbox"
-                                            id="isHalfDay"
-                                            checked={isHalfDay}
-                                            onChange={(e) => setIsHalfDay(e.target.checked)}
-                                            className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
-                                        />
-                                        <label htmlFor="isHalfDay" className="text-sm font-medium text-foreground cursor-pointer">
-                                            Half-Day (0.5 Credits)
-                                        </label>
+                                    <div>
+                                        <label className="text-sm font-medium mb-1.5 block text-foreground" htmlFor="endDate">End Date & Time</label>
+                                        <input type="datetime-local" name="endDate" id="endDate" required className="block h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" style={{ colorScheme: 'light' }} />
                                     </div>
                                 </div>
                                 <div>
@@ -361,7 +345,7 @@ export function RequestsClientPage({
                                                         {request.leaveType === 'PFFD' ? 'PFFD Credits' : request.leaveType.toLowerCase()}
                                                     </td>
                                                     <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
-                                                        {format(request.startDate, "MMM d")} - {format(request.endDate, "MMM d, yyyy")}
+                                                        {format(request.startDate, "MMM d, h:mm a")} - {format(request.endDate, "MMM d, h:mm a")}
                                                     </td>
                                                     <td className="px-6 py-4">
                                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${request.status === 'APPROVED'

@@ -7,26 +7,74 @@ import { sendEmail } from "@/lib/email";
 
 const prisma = new PrismaClient();
 
-function calculateWorkingDays(start: Date, end: Date, schedules: { dayOfWeek: number }[]): number {
-    let count = 0;
+function timeStringToMinutes(timeStr: string): number {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
+}
+
+function calculatePreciseDeduction(
+    start: Date, 
+    end: Date, 
+    schedules: { dayOfWeek: number, startTime: string, endTime: string }[]
+): number {
+    let totalDeduction = 0;
     const current = new Date(start);
     current.setHours(0, 0, 0, 0);
     const endDate = new Date(end);
     endDate.setHours(0, 0, 0, 0);
 
-    // If no schedule exists, fallback to standard Mon-Fri (1-5)
-    const workingDays = schedules.length > 0 
-        ? new Set(schedules.map(s => s.dayOfWeek))
-        : new Set([1, 2, 3, 4, 5]);
+    // Build schedule map
+    const scheduleMap = new Map<number, {start: number, end: number}>();
+    if (schedules.length > 0) {
+        schedules.forEach(s => {
+            scheduleMap.set(s.dayOfWeek, {
+                start: timeStringToMinutes(s.startTime),
+                end: timeStringToMinutes(s.endTime)
+            });
+        });
+    } else {
+        // Fallback: Mon-Fri, 09:00 - 18:00
+        for (let i = 1; i <= 5; i++) {
+            scheduleMap.set(i, { start: 9 * 60, end: 18 * 60 });
+        }
+    }
+
+    const startMinutes = start.getHours() * 60 + start.getMinutes();
+    const endMinutes = end.getHours() * 60 + end.getMinutes();
 
     while (current <= endDate) {
         const day = current.getDay();
-        if (workingDays.has(day)) {
-            count++;
+        const sched = scheduleMap.get(day);
+        
+        if (sched) {
+            const shiftDuration = sched.end - sched.start;
+            if (shiftDuration > 0) {
+                const isFirstDay = current.getTime() === new Date(start).setHours(0, 0, 0, 0);
+                const isLastDay = current.getTime() === new Date(end).setHours(0, 0, 0, 0);
+
+                let reqStart = sched.start;
+                let reqEnd = sched.end;
+
+                if (isFirstDay && startMinutes > sched.start) {
+                    reqStart = startMinutes;
+                }
+                if (isLastDay && endMinutes < sched.end) {
+                    reqEnd = endMinutes;
+                }
+
+                const overlapStart = Math.max(reqStart, sched.start);
+                const overlapEnd = Math.min(reqEnd, sched.end);
+
+                if (overlapStart < overlapEnd) {
+                    const overlapMinutes = overlapEnd - overlapStart;
+                    totalDeduction += overlapMinutes / shiftDuration;
+                }
+            }
         }
         current.setDate(current.getDate() + 1);
     }
-    return count;
+
+    return Math.round(totalDeduction * 100) / 100;
 }
 
 export async function submitLeaveRequest(formData: FormData) {
@@ -41,9 +89,8 @@ export async function submitLeaveRequest(formData: FormData) {
             return { success: false, error: "Missing required fields, including Attachment Link" };
         }
 
-        const isHalfDay = formData.get("isHalfDay") === "true";
         const startDate = new Date(startDateStr);
-        const endDate = isHalfDay ? new Date(startDateStr) : new Date(endDateStr);
+        const endDate = new Date(endDateStr);
 
         if (startDate > endDate) {
             return { success: false, error: "Start date must be before end date" };
@@ -68,10 +115,10 @@ export async function submitLeaveRequest(formData: FormData) {
 
         const schedules = await prisma.schedule.findMany({
             where: { userId: employeeId },
-            select: { dayOfWeek: true }
+            select: { dayOfWeek: true, startTime: true, endTime: true }
         });
 
-        const daysRequested = isHalfDay ? 0.5 : calculateWorkingDays(startDate, endDate, schedules);
+        const daysRequested = calculatePreciseDeduction(startDate, endDate, schedules);
 
         if (daysRequested <= 0) {
             return { success: false, error: "Leave request must include at least one working day based on your schedule" };
