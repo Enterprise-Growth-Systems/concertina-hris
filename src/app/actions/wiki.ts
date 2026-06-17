@@ -62,6 +62,18 @@ export async function createWikiPage(data: { title: string; content?: string; pa
             }
         });
 
+        // Notify all users about the new Wiki page
+        const users = await prisma.user.findMany({ select: { id: true } });
+        await prisma.notification.createMany({
+            data: users.map(u => ({
+                userId: u.id,
+                title: "New Wiki Document",
+                message: `A new document "${data.title}" has been added to the Company Wiki.`,
+                href: `/wiki/${slug}`,
+                type: "INFO"
+            }))
+        });
+
         return { success: true, page };
     } catch (error: any) {
         return { success: false, error: error.message };

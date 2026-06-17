@@ -168,6 +168,17 @@ export async function submitLeaveRequest(formData: FormData) {
                 </div>
             `;
             sendEmail(employee.manager.email, subject, html).catch(console.error);
+            
+            // Also create an in-app notification
+            await prisma.notification.create({
+                data: {
+                    userId: employee.managerId as string,
+                    title: "New Leave Request",
+                    message: `${employee.name} has requested ${leaveType} from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}.`,
+                    href: "/admin/requests",
+                    type: "INFO"
+                }
+            });
         }
 
         revalidatePath("/leaves");

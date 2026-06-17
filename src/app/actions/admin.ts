@@ -119,6 +119,17 @@ export async function updateLeaveRequestStatus(requestId: string, status: "APPRO
             `;
             // Fire and forget (don't await to avoid blocking the UI)
             sendEmail(request.user.email, subject, html).catch(console.error);
+            
+            // Also create an in-app notification
+            await prisma.notification.create({
+                data: {
+                    userId: request.userId,
+                    title: `Leave Request ${status.charAt(0) + status.slice(1).toLowerCase()}`,
+                    message: `Your request for ${request.leaveType} (${request.startDate.toLocaleDateString()} to ${request.endDate.toLocaleDateString()}) was ${status.toLowerCase()}.`,
+                    href: "/requests",
+                    type: "INFO"
+                }
+            });
         }
 
         // Revalidate affected paths
