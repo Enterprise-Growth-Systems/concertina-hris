@@ -131,6 +131,7 @@ export function RequestsClientPage({
     const [manualReason, setManualReason] = useState("");
     const [isSubmittingManual, setIsSubmittingManual] = useState(false);
 
+    const [isHalfDay, setIsHalfDay] = useState(false);
     const [isSubmittingPffd, setIsSubmittingPffd] = useState(false);
 
     const handlePffdSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -152,6 +153,8 @@ export function RequestsClientPage({
                 }
                 formData.append('attachmentUrl', url || '');
             }
+
+            formData.append('isHalfDay', String(isHalfDay));
 
             const res = await submitLeaveRequest(formData);
             if (res.success) {
@@ -284,9 +287,23 @@ export function RequestsClientPage({
                                         <label className="text-sm font-medium mb-1.5 block text-foreground" htmlFor="startDate">Start Date</label>
                                         <input type="date" name="startDate" id="startDate" required className="block h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" style={{ colorScheme: 'light' }} />
                                     </div>
-                                    <div>
-                                        <label className="text-sm font-medium mb-1.5 block text-foreground" htmlFor="endDate">End Date</label>
-                                        <input type="date" name="endDate" id="endDate" required className="block h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" style={{ colorScheme: 'light' }} />
+                                    {!isHalfDay && (
+                                        <div>
+                                            <label className="text-sm font-medium mb-1.5 block text-foreground" htmlFor="endDate">End Date</label>
+                                            <input type="date" name="endDate" id="endDate" required={!isHalfDay} className="block h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" style={{ colorScheme: 'light' }} />
+                                        </div>
+                                    )}
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <input
+                                            type="checkbox"
+                                            id="isHalfDay"
+                                            checked={isHalfDay}
+                                            onChange={(e) => setIsHalfDay(e.target.checked)}
+                                            className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                        />
+                                        <label htmlFor="isHalfDay" className="text-sm font-medium text-foreground cursor-pointer">
+                                            Half-Day (0.5 Credits)
+                                        </label>
                                     </div>
                                 </div>
                                 <div>

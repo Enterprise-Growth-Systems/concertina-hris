@@ -11,7 +11,7 @@ type EmployeeData = {
     name: string;
     email: string;
     role: string;
-    leaveBalance: number;
+    leaveBalances: { id: string, leaveType: string, balance: number }[];
     joined: string;
     contactNumber?: string | null;
     emergencyContact?: string | null;
@@ -35,7 +35,7 @@ export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: 
     // Edit Employee State
     const [employeeToEdit, setEmployeeToEdit] = useState<EmployeeData | null>(null);
     const [editRole, setEditRole] = useState<string>("");
-    const [editPffdBalance, setEditPffdBalance] = useState<string>("");
+    const [editLeaveBalances, setEditLeaveBalances] = useState<{ id: string, leaveType: string, balance: number }[]>([]);
     const [editContactNumber, setEditContactNumber] = useState<string>("");
     const [editEmergencyContact, setEditEmergencyContact] = useState<string>("");
     const [editAddress, setEditAddress] = useState<string>("");
@@ -86,12 +86,12 @@ export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: 
     };
 
     const handleEditEmployee = async () => {
-        if (!employeeToEdit || isNaN(parseFloat(editPffdBalance))) return;
+        if (!employeeToEdit) return;
         setIsSaving(true);
         try {
             const res = await updateEmployee(employeeToEdit.id, {
                 role: editRole,
-                pffdBalance: parseFloat(editPffdBalance),
+                leaveBalances: editLeaveBalances,
                 contactNumber: editContactNumber,
                 emergencyContact: editEmergencyContact,
                 address: editAddress,
@@ -155,7 +155,7 @@ export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: 
                             <tr>
                                 <th className="px-6 py-4 font-semibold">Employee</th>
                                 <th className="px-6 py-4 font-semibold">Role</th>
-                                <th className="px-6 py-4 font-semibold text-center">PFFD Balance</th>
+                                <th className="px-6 py-4 font-semibold text-center">Leave Balances</th>
                                 <th className="px-6 py-4 font-semibold text-right">Joined</th>
                                 <th className="px-6 py-4 font-semibold text-right w-16"></th>
                             </tr>
@@ -186,7 +186,7 @@ export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: 
                                     </td>
                                     <td className="px-6 py-4 text-center">
                                         <span className="font-mono font-medium text-emerald-600">
-                                            {user.leaveBalance}
+                                            {user.leaveBalances.reduce((sum, lb) => sum + lb.balance, 0)} Total
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right text-muted-foreground whitespace-nowrap">
@@ -199,7 +199,7 @@ export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: 
                                                     onClick={() => {
                                                         setEmployeeToEdit(user);
                                                         setEditRole(user.role);
-                                                        setEditPffdBalance(user.leaveBalance.toString());
+                                                        setEditLeaveBalances(user.leaveBalances);
                                                         setEditContactNumber(user.contactNumber || "");
                                                         setEditEmergencyContact(user.emergencyContact || "");
                                                         setEditAddress(user.address || "");
@@ -446,15 +446,64 @@ export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: 
                                 </>
                             )}
                             <div className="pt-4 mt-2 border-t border-border">
-                                <label className="block text-sm font-medium text-foreground mb-1.5">PFFD Balance</label>
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    value={editPffdBalance}
-                                    onChange={(e) => setEditPffdBalance(e.target.value)}
-                                    className="w-full bg-background border text-foreground rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                                    placeholder="e.g. 5.5"
-                                />
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-sm font-bold text-foreground">Leave Balances</h3>
+                                    <button
+                                        onClick={() => setEditLeaveBalances([...editLeaveBalances, { id: Math.random().toString(), leaveType: "", balance: 0 }])}
+                                        className="text-xs font-semibold text-primary hover:text-primary/80 flex items-center gap-1"
+                                    >
+                                        <Plus className="size-3" />
+                                        Add Leave Type
+                                    </button>
+                                </div>
+                                <div className="space-y-3 max-h-[200px] overflow-y-auto pr-2">
+                                    {editLeaveBalances.map((lb, index) => (
+                                        <div key={lb.id} className="flex gap-2 items-start">
+                                            <div className="flex-1">
+                                                <input
+                                                    type="text"
+                                                    value={lb.leaveType}
+                                                    onChange={(e) => {
+                                                        const newLbs = [...editLeaveBalances];
+                                                        newLbs[index].leaveType = e.target.value;
+                                                        setEditLeaveBalances(newLbs);
+                                                    }}
+                                                    className="w-full bg-background border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                                    placeholder="Leave Name (e.g. Sick)"
+                                                />
+                                            </div>
+                                            <div className="w-24">
+                                                <input
+                                                    type="number"
+                                                    step="0.5"
+                                                    value={lb.balance}
+                                                    onChange={(e) => {
+                                                        const newLbs = [...editLeaveBalances];
+                                                        newLbs[index].balance = parseFloat(e.target.value) || 0;
+                                                        setEditLeaveBalances(newLbs);
+                                                    }}
+                                                    className="w-full bg-background border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                                    placeholder="Bal"
+                                                />
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    const newLbs = [...editLeaveBalances];
+                                                    newLbs.splice(index, 1);
+                                                    setEditLeaveBalances(newLbs);
+                                                }}
+                                                className="p-2 text-muted-foreground hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0"
+                                            >
+                                                <Trash2 className="size-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {editLeaveBalances.length === 0 && (
+                                        <div className="text-sm text-muted-foreground text-center py-4 bg-muted/50 rounded-lg">
+                                            No leave balances assigned.
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
@@ -468,7 +517,7 @@ export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: 
                             </button>
                             <button
                                 onClick={handleEditEmployee}
-                                disabled={isSaving || isNaN(parseFloat(editPffdBalance))}
+                                disabled={isSaving}
                                 className="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors shadow-sm disabled:opacity-50"
                             >
                                 {isSaving ? (

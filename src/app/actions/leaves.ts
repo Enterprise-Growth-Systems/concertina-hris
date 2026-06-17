@@ -41,8 +41,9 @@ export async function submitLeaveRequest(formData: FormData) {
             return { success: false, error: "Missing required fields, including Attachment Link" };
         }
 
+        const isHalfDay = formData.get("isHalfDay") === "true";
         const startDate = new Date(startDateStr);
-        const endDate = new Date(endDateStr);
+        const endDate = isHalfDay ? new Date(startDateStr) : new Date(endDateStr);
 
         if (startDate > endDate) {
             return { success: false, error: "Start date must be before end date" };
@@ -64,12 +65,13 @@ export async function submitLeaveRequest(formData: FormData) {
             return { success: false, error: "Employee not found" };
         }
 
+
         const schedules = await prisma.schedule.findMany({
             where: { userId: employeeId },
             select: { dayOfWeek: true }
         });
 
-        const daysRequested = calculateWorkingDays(startDate, endDate, schedules);
+        const daysRequested = isHalfDay ? 0.5 : calculateWorkingDays(startDate, endDate, schedules);
 
         if (daysRequested <= 0) {
             return { success: false, error: "Leave request must include at least one working day based on your schedule" };

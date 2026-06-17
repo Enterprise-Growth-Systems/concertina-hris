@@ -46,9 +46,7 @@ export default async function AdminManagementPage({ searchParams }: { searchPara
             position: true,
             icId: true,
             managerId: true,
-            leaveBalances: {
-                where: { leaveType: 'PFFD' }
-            },
+            leaveBalances: true,
             schedules: true,
             specialSchedules: true
         }
@@ -64,7 +62,7 @@ export default async function AdminManagementPage({ searchParams }: { searchPara
         name: u.name,
         email: u.email,
         role: u.role,
-        leaveBalance: u.leaveBalances[0]?.balance || 0,
+        leaveBalances: u.leaveBalances.map(lb => ({ id: lb.id, leaveType: lb.leaveType, balance: lb.balance })),
         joined: format(u.createdAt, 'MMM d, yyyy'),
         contactNumber: u.contactNumber,
         emergencyContact: u.emergencyContact,

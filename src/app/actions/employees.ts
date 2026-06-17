@@ -143,7 +143,7 @@ export async function updateEmployee(
     userId: string, 
     data: { 
         role?: string, 
-        pffdBalance?: number,
+        leaveBalances?: { leaveType: string, balance: number }[],
         contactNumber?: string,
         emergencyContact?: string,
         address?: string,
@@ -194,24 +194,16 @@ export async function updateEmployee(
                     data: updateData
                 })
             ] : []),
-            // Update PFFD Balance
-            ...(data.pffdBalance !== undefined ? [
-                prisma.leaveBalance.upsert({
-                    where: {
-                        userId_leaveType: {
-                            userId: userId,
-                            leaveType: "PFFD"
-                        }
-                    },
-                    update: {
-                        balance: data.pffdBalance
-                    },
-                    create: {
+            // Update Leave Balances
+            ...(data.leaveBalances !== undefined ? [
+                prisma.leaveBalance.deleteMany({ where: { userId } }),
+                ...data.leaveBalances.map(lb => prisma.leaveBalance.create({
+                    data: {
                         userId: userId,
-                        leaveType: "PFFD",
-                        balance: data.pffdBalance
+                        leaveType: lb.leaveType,
+                        balance: lb.balance
                     }
-                })
+                }))
             ] : [])
         ]);
 
