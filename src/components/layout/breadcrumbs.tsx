@@ -18,16 +18,8 @@ const routeLabels: Record<string, string> = {
 export function Breadcrumbs() {
   const pathname = usePathname();
   
-  // For the dashboard itself, we want to show "Dashboard"
-  if (pathname === "/") {
-      return (
-          <nav aria-label="Breadcrumb" className="mb-6 flex items-center space-x-1 text-sm text-muted-foreground">
-              <div className="flex items-center space-x-1">
-                  <span className="font-medium text-foreground">Dashboard</span>
-              </div>
-          </nav>
-      );
-  }
+  // Hide breadcrumbs on the root dashboard page
+  if (pathname === "/") return null;
 
   const paths = pathname.split("/").filter((path) => path);
 
