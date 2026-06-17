@@ -51,7 +51,7 @@ export function HolidayManagerClient({
 
             // Reset form
             setName(""); setDate(""); setDescription("");
-        } catch (error) {
+        } catch {
             alert("Failed to create holiday.");
         } finally {
             setIsSubmitting(false);

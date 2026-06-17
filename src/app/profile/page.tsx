@@ -1,6 +1,5 @@
 import { auth } from "@/auth";
 import { PrismaClient } from "@prisma/client";
-import { SubmitButton } from "@/components/ui/submit-button";
 import { PasswordForm } from "./components/password-form";
 
 const prisma = new PrismaClient();

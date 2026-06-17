@@ -1,4 +1,4 @@
-import { auth, signIn } from "@/auth";
+import { signIn } from "@/auth";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { AuthError } from "next-auth";

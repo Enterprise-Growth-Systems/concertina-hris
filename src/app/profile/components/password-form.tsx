@@ -22,7 +22,7 @@ export function PasswordForm() {
             } else {
                 setMessage({ type: "error", text: result.error || "Failed to update password." });
             }
-        } catch (err) {
+        } catch {
             setMessage({ type: "error", text: "An unexpected error occurred." });
         } finally {
             setIsPending(false);

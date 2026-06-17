@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Plus, UserCog, User, ShieldAlert, Search, Trash2, Loader2 } from "lucide-react";
 import { AddEmployeeForm } from "./add-employee-form";
 import { deleteEmployee, updateEmployee } from "@/app/actions/employees";
@@ -58,7 +58,7 @@ export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: 
     }, [initialUsers, searchQuery]);
 
     // Reset pagination when search changes
-    useMemo(() => {
+    useEffect(() => {
         setCurrentPage(1);
     }, [searchQuery]);
 
@@ -78,7 +78,7 @@ export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: 
             } else {
                 alert(res.error);
             }
-        } catch (error) {
+        } catch {
             alert("Failed to delete employee.");
         } finally {
             setIsDeleting(false);
@@ -107,7 +107,7 @@ export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: 
             } else {
                 alert(res.error);
             }
-        } catch (error) {
+        } catch {
             alert("Failed to update employee.");
         } finally {
             setIsSaving(false);

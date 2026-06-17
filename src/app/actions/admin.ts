@@ -28,7 +28,7 @@ function calculateWorkingDays(start: Date, end: Date, schedules: { dayOfWeek: nu
     return count;
 }
 
-export async function updateLeaveRequestStatus(requestId: string, status: "APPROVED" | "REJECTED", formData?: FormData) {
+export async function updateLeaveRequestStatus(requestId: string, status: "APPROVED" | "REJECTED") {
     try {
         const session = await auth();
         const userRole = session?.user ? (session.user as any).role : null;

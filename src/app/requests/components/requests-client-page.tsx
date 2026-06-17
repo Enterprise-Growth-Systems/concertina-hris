@@ -5,7 +5,6 @@ import { Plus, Clock, ExternalLink, Loader2, CalendarHeart } from "lucide-react"
 import { submitOvertime } from "@/app/actions/overtime";
 import { submitLeaveRequest } from "@/app/actions/leaves";
 import { submitManualTimeRequest } from "@/app/actions/manual-time";
-import { SubmitButton } from "@/components/ui/submit-button";
 import { format } from "date-fns";
 import { Pagination } from "@/components/ui/pagination";
 import { uploadFileToSupabase } from "@/lib/supabase-client";

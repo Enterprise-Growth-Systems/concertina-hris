@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { format, isSameDay, parseISO, startOfDay, endOfDay, isWithinInterval } from "date-fns";
+import { useState, useMemo } from "react";
+import { parseISO, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { Calendar as CalendarIcon, X } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";

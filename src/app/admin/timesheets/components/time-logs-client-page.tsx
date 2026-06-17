@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { parseISO, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
-import { Search, Filter, Calendar as CalendarIcon, X } from "lucide-react";
+import { Search, Calendar as CalendarIcon, X } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
 
 type TimeLogData = {
@@ -24,14 +24,18 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
     const ITEMS_PER_PAGE = 100;
 
     type LogEvent = { id: string; type: "IN" | "OUT"; time: Date; user: { name: string; email: string; } };
-    const events: LogEvent[] = [];
-    initialLogs.forEach(log => {
-        if (log.clockOut) {
-            events.push({ id: `${log.id}-out`, type: "OUT", time: log.clockOut, user: log.user });
-        }
-        events.push({ id: `${log.id}-in`, type: "IN", time: log.clockIn, user: log.user });
-    });
-    events.sort((a, b) => b.time.getTime() - a.time.getTime());
+    
+    const events = useMemo(() => {
+        const evts: LogEvent[] = [];
+        initialLogs.forEach(log => {
+            if (log.clockOut) {
+                evts.push({ id: `${log.id}-out`, type: "OUT", time: log.clockOut, user: log.user });
+            }
+            evts.push({ id: `${log.id}-in`, type: "IN", time: log.clockIn, user: log.user });
+        });
+        evts.sort((a, b) => b.time.getTime() - a.time.getTime());
+        return evts;
+    }, [initialLogs]);
 
     const filteredLogs = useMemo(() => {
         return events.filter(event => {
