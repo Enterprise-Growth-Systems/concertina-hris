@@ -34,7 +34,7 @@ export function AnnouncementsClient({ announcements: initialAnnouncements, isAdm
 
     return (
         <>
-            <div className="space-y-4 max-h-[700px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-4 flex-1 min-h-0 overflow-y-auto pr-2 custom-scrollbar">
                 {announcements.map((a: any) => (
                     <div 
                         key={a.id} 
