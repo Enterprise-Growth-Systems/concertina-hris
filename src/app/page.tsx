@@ -1,5 +1,4 @@
 import { ClockWidget } from "@/components/dashboard/clock-widget";
-import { AnimatedClockWidget } from "@/components/dashboard/animated-clock";
 import { AnnouncementsWidget } from "@/components/dashboard/announcements-widget";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -57,9 +56,6 @@ export default async function DashboardPage() {
         <div className="text-center md:text-left">
           <h2 className="text-sm font-bold text-primary mb-1 tracking-widest uppercase">WELCOME</h2>
           <h1 className="text-2xl font-bold text-foreground mb-1">{firstName}, here&apos;s your workday snapshot.</h1>
-        </div>
-        <div className="flex justify-center md:justify-end">
-          <AnimatedClockWidget />
         </div>
       </div>
 

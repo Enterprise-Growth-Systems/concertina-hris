@@ -103,10 +103,6 @@ function NavContent({ user, pathname, setIsMobileMenuOpen, showAdminPanel }: any
                             {(user?.role === "ADMIN" || user?.role === "SUPERADMIN") && !(user?.name || "").toLowerCase().includes("admin") ? " (Admin)" : ""}
                         </p>
                     </div>
-                    <div className="flex items-center gap-1">
-                        <NotificationsDropdown />
-                        <ThemeToggle />
-                    </div>
                 </div>
                 <form action={handleSignOut} className="w-full">
                     <button type="submit" className="w-full flex items-center justify-center gap-2 py-2 bg-background hover:bg-destructive hover:text-white text-muted-foreground text-xs font-medium rounded-lg border shadow-sm transition-all duration-200">
@@ -118,15 +114,11 @@ function NavContent({ user, pathname, setIsMobileMenuOpen, showAdminPanel }: any
             <div className="bg-primary/5 rounded-xl p-4 border border-primary/10 mt-auto shrink-0 lg:hidden mb-4">
                 <p className="text-sm font-medium text-foreground">{user?.name || "Employee"}</p>
                 <div className="flex items-center justify-between w-full mt-2">
-                    <form action={handleSignOut} className="flex-1 mr-2">
+                    <form action={handleSignOut} className="flex-1">
                         <button type="submit" className="w-full py-2 bg-destructive/10 rounded-md text-xs font-semibold text-destructive hover:bg-destructive/20 transition-colors">
                             Sign out
                         </button>
                     </form>
-                    <div className="flex items-center gap-1">
-                        <NotificationsDropdown />
-                        <ThemeToggle />
-                    </div>
                 </div>
             </div>
         </div>
@@ -182,7 +174,13 @@ export function AppShell({ user, children }: { user: any, children: React.ReactN
                 </header>
 
                 <main className="flex-1 p-4 lg:p-6 lg:pl-0 shrink-0 flex flex-col">
-                    <Breadcrumbs />
+                    <div className="flex items-center justify-between mb-4">
+                        <Breadcrumbs />
+                        <div className="flex items-center gap-2">
+                            <NotificationsDropdown />
+                            <ThemeToggle />
+                        </div>
+                    </div>
                     <div className="bg-card rounded-2xl border shadow-sm w-full flex-1 p-6 relative overflow-hidden">
                         {children}
                     </div>
