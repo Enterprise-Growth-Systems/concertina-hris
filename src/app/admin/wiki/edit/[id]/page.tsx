@@ -13,7 +13,7 @@ import Link from "next/link";
 // Since it's a 'use client' page directly right now, we can fetch it in a useEffect.
 // Actually, it's better to wrap it in a server component, but we will just fetch it directly.
 
-import { getWikiPageBySlug } from "@/app/actions/wiki"; // Wait, we only have by slug. Let's add by id or just fetch all and find.
+
 
 export default function EditWikiPage(props: { params: Promise<{ id: string }> }) {
     const params = use(props.params);

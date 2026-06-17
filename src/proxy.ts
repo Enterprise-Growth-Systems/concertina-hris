@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "./auth";
 
-// Protect all routes under /admin, /leaves, /timesheets, and the root / dashboard
-const protectedRoutes = ["/", "/timesheets", "/leaves", "/admin/leaves"];
+// Protect all routes under /admin, /leaves, /timesheets, /profile, /requests, /schedule, and the root / dashboard
+const protectedRoutes = ["/", "/timesheets", "/leaves", "/admin", "/profile", "/requests", "/schedule"];
 
 // Simple In-Memory Rate Limiter (Token Bucket) per Edge Isolate
 const RATE_LIMIT = 20; // max requests
