@@ -4,7 +4,7 @@ import { RecentTimeLogsWidget } from "@/components/dashboard/recent-time-logs-wi
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
-import { formatInTimeZone } from "date-fns-tz";
+
 import { format } from "date-fns";
 import { Clock, CalendarDays } from "lucide-react";
 
