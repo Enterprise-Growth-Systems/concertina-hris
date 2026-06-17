@@ -1,4 +1,6 @@
 import { ClockWidget } from "@/components/dashboard/clock-widget";
+import { AnimatedClockWidget } from "@/components/dashboard/animated-clock";
+import { AnnouncementsWidget } from "@/components/dashboard/announcements-widget";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { PrismaClient } from "@prisma/client";
@@ -51,15 +53,23 @@ export default async function DashboardPage() {
 
 
       {/* Welcome Banner */}
-      <div className="mb-8 text-center md:text-left">
-        <h2 className="text-sm font-bold text-primary mb-1 tracking-widest uppercase">WELCOME</h2>
-        <h1 className="text-2xl font-bold text-foreground mb-1">{firstName}, here&apos;s your workday snapshot.</h1>
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="text-center md:text-left">
+          <h2 className="text-sm font-bold text-primary mb-1 tracking-widest uppercase">WELCOME</h2>
+          <h1 className="text-2xl font-bold text-foreground mb-1">{firstName}, here&apos;s your workday snapshot.</h1>
+        </div>
+        <div className="flex justify-center md:justify-end">
+          <AnimatedClockWidget />
+        </div>
       </div>
 
-      {/* Centered Content: Clock & Logs */}
-      <div className="max-w-lg mx-auto w-full space-y-8 mb-8">
-        {/* Today's Schedule Box */}
-        <div className="rounded-2xl border bg-card p-5 relative overflow-hidden transition-all bg-primary/5 border-primary shadow-sm shadow-primary/20">
+      {/* Main Content Grid */}
+      <div className="max-w-5xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        
+        {/* Left Column: Schedule & Time Tracking */}
+        <div className="space-y-8">
+          {/* Today's Schedule Box */}
+          <div className="rounded-2xl border bg-card p-5 relative overflow-hidden transition-all bg-primary/5 border-primary shadow-sm shadow-primary/20">
           <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-bl-lg z-10">
             Today
           </div>
@@ -132,6 +142,12 @@ export default async function DashboardPage() {
               </table>
             </div>
           )}
+        </div>
+        </div>
+        
+        {/* Right Column: Announcements */}
+        <div>
+          <AnnouncementsWidget />
         </div>
       </div>
 

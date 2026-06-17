@@ -16,7 +16,7 @@ export function TimesheetsClientPage({ initialEvents }: { initialEvents: LogEven
     const [startDateFilter, setStartDateFilter] = useState("");
     const [endDateFilter, setEndDateFilter] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const ITEMS_PER_PAGE = 100;
+    const ITEMS_PER_PAGE = 25;
 
     const filteredLogs = useMemo(() => {
         return initialEvents.filter(event => {

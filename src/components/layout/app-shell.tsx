@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X, Clock, LayoutDashboard, CalendarHeart, Users, History, UserCircle, ClipboardList, ClipboardCheck } from "lucide-react";
+import { Menu, X, Clock, LayoutDashboard, CalendarHeart, Users, History, UserCircle, ClipboardList, ClipboardCheck, BookOpen } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { handleSignOut } from "@/app/actions/auth";
-
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
+import { NotificationsDropdown } from "@/components/layout/notifications-dropdown";
 const EMP_ROUTES = [
     { name: "Dashboard", href: "/", icon: LayoutDashboard },
     { name: "Timesheets", href: "/timesheets", icon: Clock },
     { name: "Requests", href: "/requests", icon: CalendarHeart },
+    { name: "Wiki", href: "/wiki", icon: BookOpen },
     { name: "My Profile", href: "/profile", icon: UserCircle },
 ];
 
@@ -100,6 +103,10 @@ function NavContent({ user, pathname, setIsMobileMenuOpen, showAdminPanel }: any
                             {(user?.role === "ADMIN" || user?.role === "SUPERADMIN") && !(user?.name || "").toLowerCase().includes("admin") ? " (Admin)" : ""}
                         </p>
                     </div>
+                    <div className="flex items-center gap-1">
+                        <NotificationsDropdown />
+                        <ThemeToggle />
+                    </div>
                 </div>
                 <form action={handleSignOut} className="w-full">
                     <button type="submit" className="w-full flex items-center justify-center gap-2 py-2 bg-background hover:bg-destructive hover:text-white text-muted-foreground text-xs font-medium rounded-lg border shadow-sm transition-all duration-200">
@@ -110,11 +117,17 @@ function NavContent({ user, pathname, setIsMobileMenuOpen, showAdminPanel }: any
             {/* Mobile-oriented signout block */}
             <div className="bg-primary/5 rounded-xl p-4 border border-primary/10 mt-auto shrink-0 lg:hidden mb-4">
                 <p className="text-sm font-medium text-foreground">{user?.name || "Employee"}</p>
-                <form action={handleSignOut}>
-                    <button type="submit" className="w-full py-2 bg-destructive/10 rounded-md text-xs font-semibold text-destructive hover:bg-destructive/20 transition-colors">
-                        Sign out
-                    </button>
-                </form>
+                <div className="flex items-center justify-between w-full mt-2">
+                    <form action={handleSignOut} className="flex-1 mr-2">
+                        <button type="submit" className="w-full py-2 bg-destructive/10 rounded-md text-xs font-semibold text-destructive hover:bg-destructive/20 transition-colors">
+                            Sign out
+                        </button>
+                    </form>
+                    <div className="flex items-center gap-1">
+                        <NotificationsDropdown />
+                        <ThemeToggle />
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -169,6 +182,7 @@ export function AppShell({ user, children }: { user: any, children: React.ReactN
                 </header>
 
                 <main className="flex-1 p-4 lg:p-6 lg:pl-0 shrink-0 flex flex-col">
+                    <Breadcrumbs />
                     <div className="bg-card rounded-2xl border shadow-sm w-full flex-1 p-6 relative overflow-hidden">
                         {children}
                     </div>
