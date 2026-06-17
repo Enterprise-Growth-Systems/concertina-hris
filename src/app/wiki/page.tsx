@@ -59,6 +59,10 @@ export default async function WikiDirectoryPage() {
                                     </div>
                                     <ChevronRight className="size-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
+                                <h4 className="font-bold text-foreground mb-1 group-hover:text-primary transition-colors">{page.title}</h4>
+                                <p className="text-xs text-muted-foreground">
+                                    {page._count.children > 0 ? `${page._count.children} sub-pages` : "Document"}
+                                </p>
                             </Link>
                         ))}
                     </div>
