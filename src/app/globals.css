@@ -74,6 +74,34 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  /* Global Typography Overrides */
+  .prose {
+    color: hsl(var(--foreground)) !important;
+  }
+  .prose p, .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6, .prose li, .prose strong, .prose span, .prose blockquote {
+    color: hsl(var(--foreground)) !important;
+  }
+  .prose a {
+    color: hsl(var(--primary)) !important;
+    font-weight: 600;
+  }
+  .prose a:hover {
+    text-decoration: underline;
+  }
+  .prose code {
+    color: hsl(var(--primary)) !important;
+    background-color: hsl(var(--primary) / 0.1) !important;
+    padding: 0.125rem 0.375rem !important;
+    border-radius: 0.25rem !important;
+    font-weight: 600 !important;
+  }
+  .prose code::before, .prose code::after {
+    content: none !important;
+  }
+  .prose ul li::marker, .prose ol li::marker {
+    color: hsl(var(--foreground)) !important;
+  }
 }
 
 @layer utilities {
