@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TipTapEditor } from "@/components/wiki/tiptap-editor";
+import { IconPicker } from "@/components/wiki/icon-picker";
 import { createWikiPage } from "@/app/actions/wiki";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
 import Link from "next/link";
@@ -11,6 +12,7 @@ export default function NewWikiPage() {
     const router = useRouter();
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    const [icon, setIcon] = useState("FileText");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState("");
 
@@ -23,7 +25,7 @@ export default function NewWikiPage() {
         setIsSubmitting(true);
         setError("");
 
-        const res = await createWikiPage({ title, content });
+        const res = await createWikiPage({ title, content, icon });
         
         if (res.success && res.page) {
             router.push(`/wiki/${res.page.slug}`);
@@ -69,8 +71,17 @@ export default function NewWikiPage() {
                 )}
 
                 <div className="space-y-6 flex-1 flex flex-col">
-                    <div>
-                        <label className="block text-sm font-semibold text-foreground mb-2">Document Title</label>
+                    <div className="mb-8">
+                        <label className="block text-sm font-bold text-foreground mb-3">
+                            Document Icon
+                        </label>
+                        <IconPicker value={icon} onChange={setIcon} />
+                    </div>
+
+                    <div className="mb-8">
+                        <label htmlFor="title" className="block text-sm font-bold text-foreground mb-2">
+                            Document Title
+                        </label>
                         <input 
                             type="text" 
                             value={title}

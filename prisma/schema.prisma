@@ -171,6 +171,7 @@ model Page {
   title     String
   slug      String   @unique
   content   String?
+  icon      String   @default("FileText")
   authorId  String
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   parentId  String?

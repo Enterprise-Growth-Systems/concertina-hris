@@ -31,7 +31,13 @@ export function Breadcrumbs() {
       {paths.map((path, index) => {
         const href = "/" + paths.slice(0, index + 1).join("/");
         const isLast = index === paths.length - 1;
-        const label = routeLabels[href] || path.charAt(0).toUpperCase() + path.slice(1);
+        
+        let label = routeLabels[href] || path.charAt(0).toUpperCase() + path.slice(1);
+        
+        // If the path looks like a CUID or UUID (length > 20)
+        if (path.length > 20) {
+            label = "Document";
+        }
 
         return (
           <div key={href} className="flex items-center space-x-1">

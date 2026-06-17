@@ -60,7 +60,7 @@ export default async function WikiDocumentPage(props: { params: Promise<{ slug: 
                 </div>
 
                 <div 
-                    className="prose prose-sm md:prose-base dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-primary prose-a:no-underline hover:prose-a:underline"
+                    className="prose prose-sm md:prose-base dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-p:text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-ul:text-foreground prose-li:text-foreground prose-ol:text-foreground prose-blockquote:text-foreground/80 prose-blockquote:border-primary"
                     dangerouslySetInnerHTML={{ __html: page.content || "" }}
                 />
             </div>

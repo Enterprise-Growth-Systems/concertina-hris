@@ -40,7 +40,7 @@ export async function getWikiPageBySlug(slug: string) {
     }
 }
 
-export async function createWikiPage(data: { title: string; content?: string; parentId?: string }) {
+export async function createWikiPage(data: { title: string; content?: string; parentId?: string; icon?: string }) {
     try {
         const session = await auth();
         const userRole = session?.user ? (session.user as any).role : null;
@@ -56,6 +56,7 @@ export async function createWikiPage(data: { title: string; content?: string; pa
                 title: data.title,
                 slug,
                 content: data.content || "",
+                icon: data.icon || "FileText",
                 parentId: data.parentId || null,
                 authorId: session.user.id
             }
@@ -67,7 +68,7 @@ export async function createWikiPage(data: { title: string; content?: string; pa
     }
 }
 
-export async function updateWikiPage(id: string, data: { title?: string; content?: string; parentId?: string | null }) {
+export async function updateWikiPage(id: string, data: { title?: string; content?: string; parentId?: string | null; icon?: string }) {
     try {
         const session = await auth();
         const userRole = session?.user ? (session.user as any).role : null;

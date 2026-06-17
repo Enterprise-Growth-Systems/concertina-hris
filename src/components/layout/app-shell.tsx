@@ -7,7 +7,6 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { handleSignOut } from "@/app/actions/auth";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { NotificationsDropdown } from "@/components/layout/notifications-dropdown";
 const EMP_ROUTES = [
@@ -174,11 +173,12 @@ export function AppShell({ user, children }: { user: any, children: React.ReactN
                 </header>
 
                 <main className="flex-1 p-4 lg:p-6 lg:pl-0 shrink-0 flex flex-col">
-                    <div className="flex items-center justify-between mb-4">
-                        <Breadcrumbs />
-                        <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between mb-4 min-h-6">
+                        <div>
+                            <Breadcrumbs />
+                        </div>
+                        <div className="flex items-center gap-2 ml-auto">
                             <NotificationsDropdown />
-                            <ThemeToggle />
                         </div>
                     </div>
                     <div className="bg-card rounded-2xl border shadow-sm w-full flex-1 p-6 relative overflow-hidden">

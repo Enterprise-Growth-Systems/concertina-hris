@@ -1,5 +1,6 @@
 import { getWikiPages } from "@/app/actions/wiki";
 import { BookOpen, FolderOpen, FileText, ChevronRight } from "lucide-react";
+import { DynamicIcon } from "@/components/wiki/icon-picker";
 import Link from "next/link";
 import { auth } from "@/auth";
 
@@ -47,18 +48,16 @@ export default async function WikiDirectoryPage() {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {pages.map((page: any) => (
-                            <Link key={page.id} href={`/wiki/${page.slug}`}>
-                                <div className="group border rounded-xl p-5 hover:border-primary hover:shadow-md transition-all cursor-pointer bg-background">
-                                    <div className="flex items-start justify-between mb-3">
-                                        <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                                            <FileText className="size-5" />
-                                        </div>
-                                        <ChevronRight className="size-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <Link 
+                                key={page.id} 
+                                href={`/wiki/${page.slug}`}
+                                className="group flex flex-col p-6 rounded-2xl border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all shadow-sm"
+                            >
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                        <DynamicIcon name={(page as any).icon || "FileText"} className="size-5" />
                                     </div>
-                                    <h4 className="font-bold text-foreground mb-1 group-hover:text-primary transition-colors">{page.title}</h4>
-                                    <p className="text-xs text-muted-foreground">
-                                        {page._count.children > 0 ? `${page._count.children} sub-pages` : "Document"}
-                                    </p>
+                                    <ChevronRight className="size-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
                             </Link>
                         ))}

@@ -125,7 +125,7 @@ export function TipTapEditor({ content, onChange }: TipTapEditorProps) {
         content: content,
         editorProps: {
             attributes: {
-                class: 'prose prose-sm sm:prose-base dark:prose-invert max-w-none focus:outline-none min-h-[300px] p-4',
+                class: 'prose prose-sm sm:prose-base dark:prose-invert max-w-none focus:outline-none min-h-[300px] p-4 prose-p:text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-ul:text-foreground prose-li:text-foreground prose-ol:text-foreground prose-blockquote:text-foreground/80 prose-blockquote:border-primary',
             },
         },
         onUpdate: ({ editor }) => {

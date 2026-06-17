@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { TipTapEditor } from "@/components/wiki/tiptap-editor";
+import { IconPicker } from "@/components/wiki/icon-picker";
 import { updateWikiPage } from "@/app/actions/wiki";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
 import Link from "next/link";
@@ -19,6 +20,7 @@ export default function EditWikiPage(props: { params: Promise<{ id: string }> })
     const router = useRouter();
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    const [icon, setIcon] = useState("FileText");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
@@ -35,6 +37,7 @@ export default function EditWikiPage(props: { params: Promise<{ id: string }> })
                 if (page) {
                     setTitle(page.title);
                     setContent(page.content || "");
+                    setIcon((page as any).icon || "FileText");
                     setSlug(page.slug);
                 } else {
                     setError("Page not found");
@@ -54,7 +57,7 @@ export default function EditWikiPage(props: { params: Promise<{ id: string }> })
         setIsSubmitting(true);
         setError("");
 
-        const res = await updateWikiPage(params.id, { title, content });
+        const res = await updateWikiPage(params.id, { title, content, icon });
         
         if (res.success && res.page) {
             router.push(`/wiki/${res.page.slug}`);
@@ -104,8 +107,17 @@ export default function EditWikiPage(props: { params: Promise<{ id: string }> })
                 )}
 
                 <div className="space-y-6 flex-1 flex flex-col">
-                    <div>
-                        <label className="block text-sm font-semibold text-foreground mb-2">Document Title</label>
+                    <div className="mb-8">
+                        <label className="block text-sm font-bold text-foreground mb-3">
+                            Document Icon
+                        </label>
+                        <IconPicker value={icon} onChange={setIcon} />
+                    </div>
+
+                    <div className="mb-8">
+                        <label htmlFor="title" className="block text-sm font-bold text-foreground mb-2">
+                            Document Title
+                        </label>
                         <input 
                             type="text" 
                             value={title}
