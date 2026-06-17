@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { formatInTimeZone } from "date-fns-tz";
 
 export function AnimatedClockWidget() {
   const [time, setTime] = useState<Date | null>(null);
@@ -14,31 +15,32 @@ export function AnimatedClockWidget() {
 
   if (!time) {
     return (
-      <div className="flex items-center space-x-2 text-foreground font-mono text-2xl h-[32px]">
-        <span>--:--:--</span>
+      <div className="flex items-center justify-center h-[72px] animate-pulse">
+        <div className="w-48 h-12 bg-muted rounded-lg"></div>
       </div>
     );
   }
 
-  const hours = time.getHours();
-  const minutes = time.getMinutes();
-  const seconds = time.getSeconds();
-  
-  const formattedHours = hours % 12 || 12;
-  const ampm = hours >= 12 ? "PM" : "AM";
-  
-  const pad = (num: number) => num.toString().padStart(2, "0");
+  const hours = formatInTimeZone(time, "Asia/Manila", "hh");
+  const minutes = formatInTimeZone(time, "Asia/Manila", "mm");
+  const seconds = formatInTimeZone(time, "Asia/Manila", "ss");
+  const ampm = formatInTimeZone(time, "Asia/Manila", "a");
 
   return (
-    <div className="flex items-center space-x-2 font-mono text-3xl font-bold tracking-tight text-foreground bg-card px-4 py-2 rounded-xl shadow-sm border">
-      <div className="flex space-x-1">
-        <span>{pad(formattedHours)}</span>
-        <span className="animate-pulse">:</span>
-        <span>{pad(minutes)}</span>
-        <span className="animate-pulse text-muted-foreground">:</span>
-        <span className="text-muted-foreground">{pad(seconds)}</span>
+    <div className="flex flex-col items-center justify-center">
+      <div className="flex items-end space-x-2">
+        <div className="flex items-center space-x-1.5 font-sans text-5xl md:text-6xl tracking-tighter font-black text-foreground">
+          <span>{hours}</span>
+          <span className="text-primary/40 pb-2 animate-pulse">:</span>
+          <span>{minutes}</span>
+          <span className="text-primary/40 pb-2 animate-pulse">:</span>
+          <span className="text-primary">{seconds}</span>
+        </div>
+        <div className="flex flex-col justify-end pb-2">
+          <span className="text-xl font-bold text-muted-foreground uppercase leading-none">{ampm}</span>
+          <span className="text-xs font-black text-primary uppercase leading-none mt-1.5 tracking-wider">PHT</span>
+        </div>
       </div>
-      <span className="text-base font-semibold text-muted-foreground uppercase">{ampm}</span>
     </div>
   );
 }
