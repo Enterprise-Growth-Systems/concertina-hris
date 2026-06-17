@@ -27,7 +27,7 @@ export function AnnouncementsClient({ announcements }: { announcements: any[] })
 
     return (
         <>
-            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-4 max-h-[700px] overflow-y-auto pr-2 custom-scrollbar">
                 {announcements.map((a: any) => (
                     <div 
                         key={a.id} 
