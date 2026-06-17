@@ -5,9 +5,9 @@ import { formatInTimeZone } from "date-fns-tz";
 import { Play, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toggleClockStatus, getClockStatus } from "@/app/actions/time";
+import { AnimatedClockWidget } from "./animated-clock";
 
 export function ClockWidget() {
-    const [time, setTime] = useState<Date | null>(null);
     const [isClockedIn, setIsClockedIn] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [hasLoadedStatus, setHasLoadedStatus] = useState(false);
@@ -19,13 +19,6 @@ export function ClockWidget() {
             setIsClockedIn(status.isClockedIn);
             setHasLoadedStatus(true);
         });
-
-        setTime(new Date());
-        const interval = setInterval(() => {
-            setTime(new Date());
-        }, 1000);
-
-        return () => clearInterval(interval);
     }, []);
 
     const handleToggleClock = async () => {
@@ -44,7 +37,7 @@ export function ClockWidget() {
         }
     };
 
-    if (!time) {
+    if (!hasLoadedStatus) {
         return (
             <div className="rounded-2xl border bg-card p-6 flex flex-col items-center justify-center min-h-[150px] animate-pulse">
                 <div className="h-8 w-32 bg-muted rounded-md mb-4"></div>
@@ -65,6 +58,9 @@ export function ClockWidget() {
                 </span>
             </div>
 
+            <div className="flex-1 flex items-center justify-center mb-8">
+                <AnimatedClockWidget />
+            </div>
 
             <div className="flex flex-col items-center mt-auto">
                 {!hasLoadedStatus ? (

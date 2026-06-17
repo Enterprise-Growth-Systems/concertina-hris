@@ -6,10 +6,9 @@ export function AnimatedClockWidget() {
   const [time, setTime] = useState<Date | null>(null);
 
   useEffect(() => {
-    setTime(new Date());
-    const interval = setInterval(() => {
-      setTime(new Date());
-    }, 1000);
+    const updateTime = () => setTime(new Date());
+    setTimeout(updateTime, 0); // avoid synchronous setState warning
+    const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
   }, []);
 
