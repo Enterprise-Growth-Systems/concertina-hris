@@ -4,8 +4,8 @@ import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { TipTapEditor } from "@/components/wiki/tiptap-editor";
 import { IconPicker } from "@/components/wiki/icon-picker";
-import { updateWikiPage } from "@/app/actions/wiki";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { updateWikiPage, deleteWikiPage } from "@/app/actions/wiki";
+import { ArrowLeft, Loader2, Save, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 // We have to fetch the page client-side or pass it down. 
@@ -22,6 +22,7 @@ export default function EditWikiPage(props: { params: Promise<{ id: string }> })
     const [content, setContent] = useState("");
     const [icon, setIcon] = useState("FileText");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
     const [slug, setSlug] = useState("");
@@ -68,6 +69,23 @@ export default function EditWikiPage(props: { params: Promise<{ id: string }> })
         }
     };
 
+    const handleDelete = async () => {
+        if (!confirm("Are you sure you want to delete this page? This action cannot be undone.")) return;
+        
+        setIsDeleting(true);
+        setError("");
+        
+        const res = await deleteWikiPage(params.id);
+        
+        if (res.success) {
+            router.push("/wiki");
+            router.refresh();
+        } else {
+            setError(res.error || "Failed to delete page");
+            setIsDeleting(false);
+        }
+    };
+
     if (isLoading) {
         return <div className="flex items-center justify-center h-[50vh]"><Loader2 className="size-8 animate-spin text-primary" /></div>;
     }
@@ -90,8 +108,16 @@ export default function EditWikiPage(props: { params: Promise<{ id: string }> })
                             Cancel
                         </Link>
                         <button 
+                            onClick={handleDelete}
+                            disabled={isSubmitting || isDeleting}
+                            className="px-4 py-2 bg-destructive/10 text-destructive text-sm font-semibold rounded-lg hover:bg-destructive/20 transition-colors shadow-sm inline-flex items-center gap-2 disabled:opacity-50"
+                        >
+                            {isDeleting ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
+                            Delete
+                        </button>
+                        <button 
                             onClick={handleSave}
-                            disabled={isSubmitting}
+                            disabled={isSubmitting || isDeleting}
                             className="px-6 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/90 transition-colors shadow-sm inline-flex items-center gap-2 disabled:opacity-50"
                         >
                             {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}

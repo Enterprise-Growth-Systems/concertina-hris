@@ -2,10 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { X } from "lucide-react";
+import { X, Trash2, Loader2 } from "lucide-react";
+import { deleteAnnouncement } from "@/app/actions/announcements";
 
-export function AnnouncementsClient({ announcements }: { announcements: any[] }) {
+export function AnnouncementsClient({ announcements: initialAnnouncements, isAdmin }: { announcements: any[], isAdmin?: boolean }) {
+    const [announcements, setAnnouncements] = useState(initialAnnouncements);
     const [selectedAnnouncement, setSelectedAnnouncement] = useState<any>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    useEffect(() => {
+        setAnnouncements(initialAnnouncements);
+    }, [initialAnnouncements]);
 
     // Prevent background scrolling when modal is open
     useEffect(() => {
@@ -64,12 +71,36 @@ export function AnnouncementsClient({ announcements }: { announcements: any[] })
                                     Posted by {selectedAnnouncement.author?.name || "Admin"} • {formatDistanceToNow(new Date(selectedAnnouncement.createdAt), { addSuffix: true })}
                                 </p>
                             </div>
-                            <button 
-                                onClick={() => setSelectedAnnouncement(null)}
-                                className="p-2 -mr-2 -mt-2 rounded-full hover:bg-muted text-muted-foreground transition-colors"
-                            >
-                                <X className="size-5" />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                {isAdmin && (
+                                    <button 
+                                        onClick={async () => {
+                                            if (confirm("Are you sure you want to delete this announcement?")) {
+                                                setIsDeleting(true);
+                                                const res = await deleteAnnouncement(selectedAnnouncement.id);
+                                                setIsDeleting(false);
+                                                if (res.success) {
+                                                    setAnnouncements(announcements.filter((a: any) => a.id !== selectedAnnouncement.id));
+                                                    setSelectedAnnouncement(null);
+                                                } else {
+                                                    alert("Failed to delete: " + res.error);
+                                                }
+                                            }
+                                        }}
+                                        disabled={isDeleting}
+                                        className="p-2 -mt-2 rounded-full hover:bg-destructive/10 text-destructive transition-colors disabled:opacity-50 flex items-center justify-center"
+                                        title="Delete Announcement"
+                                    >
+                                        {isDeleting ? <Loader2 className="size-5 animate-spin" /> : <Trash2 className="size-5" />}
+                                    </button>
+                                )}
+                                <button 
+                                    onClick={() => setSelectedAnnouncement(null)}
+                                    className="p-2 -mr-2 -mt-2 rounded-full hover:bg-muted text-muted-foreground transition-colors"
+                                >
+                                    <X className="size-5" />
+                                </button>
+                            </div>
                         </div>
                         <div className="p-6 overflow-y-auto custom-scrollbar">
                             <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none prose-p:text-foreground prose-headings:text-foreground prose-a:text-primary">

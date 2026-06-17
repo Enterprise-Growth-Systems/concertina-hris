@@ -60,3 +60,20 @@ export async function createAnnouncement(title: string, content: string) {
         return { success: false, error: error.message };
     }
 }
+
+export async function deleteAnnouncement(id: string) {
+    try {
+        const session = await auth();
+        const userRole = session?.user ? (session.user as any).role : null;
+        
+        if (!session?.user?.id || (userRole !== "ADMIN" && userRole !== "MANAGER" && userRole !== "SUPERADMIN")) {
+            return { success: false, error: "Unauthorized" };
+        }
+
+        await prisma.announcement.delete({ where: { id } });
+
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+}

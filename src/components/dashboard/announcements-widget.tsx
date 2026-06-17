@@ -16,7 +16,7 @@ export async function AnnouncementsWidget() {
         <div className="rounded-2xl border bg-card p-5 relative overflow-hidden transition-all shadow-sm flex flex-col h-full">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-lg flex items-center justify-center bg-blue-500/10 text-blue-600">
+                    <div className="size-10 rounded-lg flex items-center justify-center bg-primary/10 text-primary">
                         <Megaphone className="size-5" />
                     </div>
                     <div>
@@ -34,7 +34,7 @@ export async function AnnouncementsWidget() {
                 )}
             </div>
 
-            <AnnouncementsClient announcements={announcements} />
+            <AnnouncementsClient announcements={announcements} isAdmin={isAdmin} />
         </div>
     );
 }
