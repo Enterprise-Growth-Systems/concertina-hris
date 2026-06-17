@@ -296,7 +296,7 @@ export function RequestsClientPage({
                                 
                                 <div className="p-4 rounded-xl border-2 border-primary/20 bg-primary/5">
                                     <label className="text-sm font-bold mb-1.5 block text-foreground" htmlFor="attachmentFile">
-                                        Attachment Proof <span className="text-muted-foreground font-normal">(Required, JPG/PNG)</span>
+                                        Attachment Proof <span className="block text-xs text-muted-foreground font-normal mt-0.5">(Required, JPG / PNG)</span>
                                     </label>
                                     <input 
                                         type="file" 
@@ -494,7 +494,9 @@ export function RequestsClientPage({
                                         <textarea required value={reason} onChange={e => setReason(e.target.value)} rows={3} className="w-full bg-background border text-foreground rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 resize-none" placeholder="Provide details on why overtime is required..." />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-foreground mb-1.5">Attachment Proof <span className="text-muted-foreground font-normal">(Required, JPG/PNG)</span></label>
+                                        <label className="block text-sm font-medium text-foreground mb-1.5">
+                                            Attachment Proof <span className="block text-xs text-muted-foreground font-normal mt-0.5">(Required, JPG / PNG)</span>
+                                        </label>
                                         <input 
                                             type="file" 
                                             required 
