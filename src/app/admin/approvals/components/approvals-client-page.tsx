@@ -175,7 +175,7 @@ export function ApprovalsClientPage({
                                                     <span className="capitalize text-foreground">{request.leaveType === 'LEAVE_CREDITS' ? 'PFFD Credits' : request.leaveType.toLowerCase() + ' PFFD'}</span> • {format(request.startDate, "MMM d")} to {format(request.endDate, "MMM d, yyyy")}
                                                 </p>
                                                 {request.reason && (
-                                                    <p className="text-sm mt-3 pt-3 border-t italic text-muted-foreground max-w-2xl">"{request.reason}"</p>
+                                                    <p className="text-sm mt-3 pt-3 border-t italic text-muted-foreground max-w-2xl">&quot;{request.reason}&quot;</p>
                                                 )}
                                                 {request.attachmentUrl && (
                                                     <div className="mt-2">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search, X } from "lucide-react";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { upsertSchedule, upsertSpecialSchedule, deleteSpecialSchedule } from "@/app/actions/schedules";
@@ -20,7 +20,8 @@ export function ScheduleClientPage({ initialUsers }: { initialUsers: any[] }) {
         );
     }, [initialUsers, searchQuery]);
 
-    useMemo(() => {
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCurrentPage(1);
     }, [searchQuery]);
 
@@ -162,7 +163,7 @@ export function ScheduleClientPage({ initialUsers }: { initialUsers: any[] }) {
 
                 {paginatedUsers.length === 0 && (
                     <div className="text-center text-muted-foreground py-12 bg-card rounded-2xl border">
-                        No employees found matching "{searchQuery}".
+                        No employees found matching &quot;{searchQuery}&quot;.
                     </div>
                 )}
                 

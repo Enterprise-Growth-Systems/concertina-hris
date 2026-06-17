@@ -63,6 +63,7 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
 
     // Reset pagination when filters change
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCurrentPage(1);
     }, [searchQuery, startDateFilter, endDateFilter]);
 

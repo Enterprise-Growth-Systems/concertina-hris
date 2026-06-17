@@ -53,7 +53,7 @@ export default async function DashboardPage() {
       {/* Welcome Banner */}
       <div className="mb-8 text-center md:text-left">
         <h2 className="text-sm font-bold text-primary mb-1 tracking-widest uppercase">WELCOME</h2>
-        <h1 className="text-2xl font-bold text-foreground mb-1">{firstName}, here's your workday snapshot.</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-1">{firstName}, here&apos;s your workday snapshot.</h1>
       </div>
 
       {/* Centered Content: Clock & Logs */}

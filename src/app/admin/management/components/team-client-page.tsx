@@ -234,7 +234,7 @@ export function EmployeeClientPage({ initialUsers, currentUserRole, managers }: 
                     
                     {filteredUsers.length === 0 && (
                         <div className="p-12 text-center text-muted-foreground">
-                            No employees found matching "{searchQuery}".
+                            No employees found matching &quot;{searchQuery}&quot;.
                         </div>
                     )}
                 </div>
