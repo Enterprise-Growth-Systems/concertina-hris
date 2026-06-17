@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X, Clock, LayoutDashboard, CalendarHeart, Users, Settings, History, Megaphone, BookOpen, BookUser, UserCircle, Calendar, CalendarDays, ClipboardList, ClipboardCheck } from "lucide-react";
+import { Menu, X, Clock, LayoutDashboard, CalendarHeart, Users, History, UserCircle, ClipboardList, ClipboardCheck } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";

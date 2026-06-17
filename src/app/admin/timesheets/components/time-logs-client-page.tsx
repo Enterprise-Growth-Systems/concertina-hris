@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { format, isSameDay, parseISO, startOfDay, endOfDay, isWithinInterval } from "date-fns";
+import { useState, useMemo, useEffect } from "react";
+import { parseISO, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { Search, Filter, Calendar as CalendarIcon, X } from "lucide-react";
 import { Pagination } from "@/components/ui/pagination";
@@ -62,7 +62,7 @@ export function TimeLogsClientPage({ initialLogs }: { initialLogs: TimeLogData[]
     }, [events, searchQuery, startDateFilter, endDateFilter]);
 
     // Reset pagination when filters change
-    useMemo(() => {
+    useEffect(() => {
         setCurrentPage(1);
     }, [searchQuery, startDateFilter, endDateFilter]);
 
