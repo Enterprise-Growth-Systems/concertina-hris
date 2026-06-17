@@ -142,8 +142,10 @@ export default async function DashboardPage() {
         </div>
         
         {/* Right Column: Announcements */}
-        <div className="min-h-0">
-          <AnnouncementsWidget />
+        <div className="relative min-h-[600px] lg:min-h-0 lg:h-full">
+          <div className="static h-full lg:absolute lg:inset-0">
+            <AnnouncementsWidget />
+          </div>
         </div>
       </div>
 
