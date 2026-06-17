@@ -142,7 +142,7 @@ export default async function DashboardPage() {
         </div>
         
         {/* Right Column: Announcements */}
-        <div>
+        <div className="min-h-0">
           <AnnouncementsWidget />
         </div>
       </div>

@@ -47,7 +47,7 @@ export function AnnouncementsClient({ announcements: initialAnnouncements, isAdm
                                 {formatDistanceToNow(new Date(a.createdAt), { addSuffix: true })}
                             </span>
                         </div>
-                        <div className="text-sm text-muted-foreground line-clamp-2 prose-sm prose-p:my-0">
+                        <div className="text-sm text-muted-foreground line-clamp-[8] prose-sm prose-p:my-0">
                             <div dangerouslySetInnerHTML={{ __html: a.content }} />
                         </div>
                         <p className="text-xs text-muted-foreground mt-3 pt-3 border-t font-medium">
