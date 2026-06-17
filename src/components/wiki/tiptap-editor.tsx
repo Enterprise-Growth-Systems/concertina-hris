@@ -3,7 +3,9 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Bold, Italic, Strikethrough, List, ListOrdered, Quote, Heading2 } from "lucide-react";
+import Image from "@tiptap/extension-image";
+import Link from "@tiptap/extension-link";
+import { Bold, Italic, Strikethrough, List, ListOrdered, Quote, Heading2, ImageIcon, LinkIcon } from "lucide-react";
 
 interface TipTapEditorProps {
     content: string;
@@ -72,6 +74,31 @@ const MenuBar = ({ editor }: { editor: any }) => {
             >
                 <Quote className="size-4" />
             </button>
+            <div className="w-px h-6 bg-border mx-1" />
+            <button
+                type="button"
+                onClick={() => {
+                    const url = window.prompt('URL');
+                    if (url) {
+                        editor.chain().focus().setLink({ href: url }).run();
+                    }
+                }}
+                className={`p-2 rounded-md hover:bg-muted transition-colors ${editor.isActive('link') ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}
+            >
+                <LinkIcon className="size-4" />
+            </button>
+            <button
+                type="button"
+                onClick={() => {
+                    const url = window.prompt('Image URL');
+                    if (url) {
+                        editor.chain().focus().setImage({ src: url }).run();
+                    }
+                }}
+                className={`p-2 rounded-md hover:bg-muted transition-colors text-muted-foreground`}
+            >
+                <ImageIcon className="size-4" />
+            </button>
         </div>
     );
 };
@@ -82,6 +109,17 @@ export function TipTapEditor({ content, onChange }: TipTapEditorProps) {
             StarterKit,
             Placeholder.configure({
                 placeholder: 'Start writing your policy or handbook here...',
+            }),
+            Image.configure({
+                HTMLAttributes: {
+                    class: 'rounded-xl max-w-full h-auto shadow-sm my-4',
+                },
+            }),
+            Link.configure({
+                openOnClick: false,
+                HTMLAttributes: {
+                    class: 'text-primary underline cursor-pointer',
+                },
             }),
         ],
         content: content,

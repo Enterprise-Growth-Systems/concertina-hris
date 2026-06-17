@@ -46,10 +46,9 @@ export function ClockWidget() {
 
     if (!time) {
         return (
-            <div className="rounded-2xl border bg-card p-6 flex flex-col items-center justify-center min-h-[350px] animate-pulse">
-                <div className="h-8 w-32 bg-muted rounded-md mb-8"></div>
-                <div className="h-12 w-48 bg-muted rounded-lg mb-4"></div>
-                <div className="h-6 w-32 bg-muted rounded-md"></div>
+            <div className="rounded-2xl border bg-card p-6 flex flex-col items-center justify-center min-h-[150px] animate-pulse">
+                <div className="h-8 w-32 bg-muted rounded-md mb-4"></div>
+                <div className="h-10 w-full bg-muted rounded-md"></div>
             </div>
         );
     }
@@ -66,16 +65,6 @@ export function ClockWidget() {
                 </span>
             </div>
 
-            <div className="flex flex-col items-center justify-center mb-6">
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">CURRENT TIME</p>
-                <h2 className="text-4xl font-bold tracking-tight text-foreground tabular-nums">
-                    {formatInTimeZone(time, 'Asia/Manila', "HH:mm:ss")}
-                </h2>
-                <p className="text-xs font-medium text-muted-foreground mt-1">
-                    {formatInTimeZone(time, 'Asia/Manila', "EEEE, MMM d")} (PHT)
-                </p>
-            </div>
-
 
             <div className="flex flex-col items-center mt-auto">
                 {!hasLoadedStatus ? (
@@ -85,7 +74,7 @@ export function ClockWidget() {
                         onClick={handleToggleClock}
                         disabled={isPending}
                         className={cn(
-                            "flex items-center justify-center gap-2 px-8 py-2.5 rounded-md font-bold text-sm transition-all w-40",
+                            "flex items-center justify-center gap-2 px-8 py-2.5 rounded-md font-bold text-sm transition-all w-full",
                             isClockedIn
                                 ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                 : "bg-emerald-600 text-white hover:bg-emerald-700"

@@ -52,12 +52,12 @@ export function NotificationsDropdown() {
         <div className="relative">
             <button 
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+                className="relative flex items-center justify-center size-9 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
                 title="Notifications"
             >
                 <Bell className="h-5 w-5" />
                 {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 flex h-2 w-2 rounded-full bg-destructive" />
+                    <span className="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-destructive" />
                 )}
             </button>
 
