@@ -1,11 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { X } from "lucide-react";
 
 export function AnnouncementsClient({ announcements }: { announcements: any[] }) {
     const [selectedAnnouncement, setSelectedAnnouncement] = useState<any>(null);
+
+    // Prevent background scrolling when modal is open
+    useEffect(() => {
+        if (selectedAnnouncement) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "auto";
+        }
+        return () => { document.body.style.overflow = "auto"; };
+    }, [selectedAnnouncement]);
 
     if (announcements.length === 0) {
         return (
@@ -30,9 +40,7 @@ export function AnnouncementsClient({ announcements }: { announcements: any[] })
                                 {formatDistanceToNow(new Date(a.createdAt), { addSuffix: true })}
                             </span>
                         </div>
-                        {/* We use line-clamp to limit the preview snippet */}
                         <div className="text-sm text-muted-foreground line-clamp-2 prose-sm prose-p:my-0">
-                            {/* If it contains HTML, we strip it for the preview, or just render it safely with line-clamp */}
                             <div dangerouslySetInnerHTML={{ __html: a.content }} />
                         </div>
                         <p className="text-xs text-muted-foreground mt-3 pt-3 border-t font-medium">
@@ -42,23 +50,35 @@ export function AnnouncementsClient({ announcements }: { announcements: any[] })
                 ))}
             </div>
 
-            <Dialog open={!!selectedAnnouncement} onOpenChange={(open) => !open && setSelectedAnnouncement(null)}>
-                <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto custom-scrollbar">
-                    {selectedAnnouncement && (
-                        <>
-                            <DialogHeader>
-                                <DialogTitle className="text-2xl font-bold">{selectedAnnouncement.title}</DialogTitle>
-                                <DialogDescription className="text-xs font-semibold uppercase tracking-wider mt-2">
+            {selectedAnnouncement && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+                    <div 
+                        className="absolute inset-0" 
+                        onClick={() => setSelectedAnnouncement(null)} 
+                    />
+                    <div className="relative z-10 w-full max-w-2xl bg-card rounded-2xl border shadow-xl flex flex-col max-h-[85vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex items-start justify-between p-6 border-b shrink-0">
+                            <div>
+                                <h2 className="text-2xl font-bold text-foreground leading-tight">{selectedAnnouncement.title}</h2>
+                                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mt-2">
                                     Posted by {selectedAnnouncement.author?.name || "Admin"} • {formatDistanceToNow(new Date(selectedAnnouncement.createdAt), { addSuffix: true })}
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="mt-6 prose prose-sm md:prose-base dark:prose-invert max-w-none prose-p:text-foreground prose-headings:text-foreground prose-a:text-primary">
+                                </p>
+                            </div>
+                            <button 
+                                onClick={() => setSelectedAnnouncement(null)}
+                                className="p-2 -mr-2 -mt-2 rounded-full hover:bg-muted text-muted-foreground transition-colors"
+                            >
+                                <X className="size-5" />
+                            </button>
+                        </div>
+                        <div className="p-6 overflow-y-auto custom-scrollbar">
+                            <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none prose-p:text-foreground prose-headings:text-foreground prose-a:text-primary">
                                 <div dangerouslySetInnerHTML={{ __html: selectedAnnouncement.content }} />
                             </div>
-                        </>
-                    )}
-                </DialogContent>
-            </Dialog>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
