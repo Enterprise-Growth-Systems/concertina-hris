@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createAnnouncement } from "@/app/actions/announcements";
+import { TipTapEditor } from "@/components/wiki/tiptap-editor";
 import { ArrowLeft, Loader2, Send } from "lucide-react";
 import Link from "next/link";
 
@@ -73,12 +74,12 @@ export default function NewAnnouncementPage() {
                         <label className="block text-sm font-bold text-foreground mb-2">
                             Message Content
                         </label>
-                        <textarea
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            className="w-full h-48 px-4 py-3 rounded-xl border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none"
-                            placeholder="Type your message here..."
-                        />
+                        <div className="border rounded-xl bg-background overflow-hidden">
+                            <TipTapEditor 
+                                content={content} 
+                                onChange={setContent} 
+                            />
+                        </div>
                     </div>
 
                     <div className="flex justify-end pt-4 border-t">
