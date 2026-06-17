@@ -24,11 +24,11 @@ export function RecentTimeLogsWidget({ events }: { events: LogEvent[] }) {
                 {/* Expand Button */}
                 <button 
                     onClick={() => setIsModalOpen(true)}
-                    className="absolute top-0 right-0 p-2 text-muted-foreground hover:text-primary bg-muted/50 hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
+                    className="absolute top-0 right-0 flex items-center gap-1.5 bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground text-xs font-semibold px-3 py-1.5 rounded-md transition-colors"
                     title="View All Timesheets"
                 >
-                    <Maximize2 className="size-4" />
-                    <span className="text-xs font-semibold uppercase tracking-wider hidden sm:inline-block">Expand</span>
+                    <Maximize2 className="size-3.5" />
+                    <span className="hidden sm:inline-block">Expand</span>
                 </button>
             </div>
 

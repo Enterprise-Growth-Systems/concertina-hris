@@ -53,7 +53,10 @@ export function ClockWidget() {
                     <h3 className="font-bold text-foreground text-sm">Clock-in</h3>
                     <p className="text-xs text-muted-foreground mt-0.5">Live attendance tracker</p>
                 </div>
-                <span className="px-2.5 py-1 bg-muted rounded-md text-[10px] font-semibold text-muted-foreground border">
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
+                    !hasLoadedStatus ? "bg-muted text-muted-foreground border-transparent" :
+                    isClockedIn ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-muted text-muted-foreground border-border"
+                }`}>
                     {hasLoadedStatus ? (isClockedIn ? "Active" : "Ready") : "..."}
                 </span>
             </div>

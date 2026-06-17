@@ -22,6 +22,8 @@ export function Breadcrumbs() {
 
   const paths = pathname.split("/").filter((path) => path);
 
+  const unclickablePaths = ["/admin", "/admin/announcements", "/admin/wiki"];
+
   return (
     <nav className="flex items-center space-x-1 text-sm text-muted-foreground mb-6">
       <Link href="/" className="hover:text-foreground transition-colors flex items-center">
@@ -39,11 +41,13 @@ export function Breadcrumbs() {
             label = "Document";
         }
 
+        const isUnclickable = unclickablePaths.includes(href);
+
         return (
-          <div key={href} className="flex items-center space-x-1">
+          <div key={path} className="flex items-center space-x-1">
             <ChevronRight className="h-4 w-4" />
-            {isLast ? (
-              <span className="font-medium text-foreground">{label}</span>
+            {isLast || isUnclickable ? (
+              <span className={`font-semibold ${isLast ? "text-foreground" : "text-muted-foreground"}`}>{label}</span>
             ) : (
               <Link href={href} className="hover:text-foreground transition-colors">
                 {label}

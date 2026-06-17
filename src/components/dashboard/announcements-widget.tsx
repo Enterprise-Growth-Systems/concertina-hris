@@ -27,8 +27,9 @@ export async function AnnouncementsWidget() {
                 {isAdmin && (
                     <Link 
                         href="/admin/announcements/new"
-                        className="flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary/80 transition-colors bg-primary/10 px-3 py-1.5 rounded-md"
+                        className="flex items-center gap-1.5 bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground text-xs font-semibold px-3 py-1.5 rounded-md transition-colors"
                     >
+                        <Megaphone className="size-3.5" />
                         <span>Post New</span>
                     </Link>
                 )}
