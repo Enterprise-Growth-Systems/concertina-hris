@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 export async function GET(request: Request) {
     try {
@@ -31,7 +30,7 @@ export async function GET(request: Request) {
             return new NextResponse('Unauthorized', { status: 401 });
         }
 
-        const userRole = (session.user as any).role;
+        const userRole = session?.user?.role;
         const userId = session.user.id;
 
         if (userRole === 'EMPLOYEE') {

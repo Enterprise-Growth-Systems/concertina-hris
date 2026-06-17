@@ -2,12 +2,12 @@ import { ClockWidget } from "@/components/dashboard/clock-widget";
 import { AnnouncementsWidget } from "@/components/dashboard/announcements-widget";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { formatInTimeZone } from "date-fns-tz";
 import { format } from "date-fns";
 import { Clock, CalendarDays } from "lucide-react";
 
-const prisma = new PrismaClient();
+
 
 export const dynamic = "force-dynamic";
 

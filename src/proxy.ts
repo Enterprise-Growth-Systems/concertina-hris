@@ -48,7 +48,7 @@ export default auth((req) => {
 
     // Force default password change
     if (isLoggedIn) {
-        const requiresPasswordChange = (req.auth?.user as any)?.requiresPasswordChange;
+        const requiresPasswordChange = req.auth?.user?.requiresPasswordChange;
         const isPasswordChangePath = nextUrl.pathname.startsWith("/profile");
 
         if (requiresPasswordChange && !isPasswordChangePath && !nextUrl.pathname.startsWith("/api/auth")) {
@@ -63,7 +63,7 @@ export default auth((req) => {
 
     // Role-based protection for /admin routes
     if (isLoggedIn && nextUrl.pathname.startsWith("/admin")) {
-        const userRole = (req.auth?.user as any)?.role;
+        const userRole = req.auth?.user?.role;
         
         // 1. Block regular employees entirely from /admin
         if (userRole !== "ADMIN" && userRole !== "MANAGER") {

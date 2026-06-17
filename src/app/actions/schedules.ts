@@ -1,14 +1,14 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 
-const prisma = new PrismaClient();
+
 
 export async function upsertSchedule(userId: string, dayOfWeek: number, startTime: string, endTime: string) {
   const session = await auth();
-  const user = session?.user as any;
+  const user = session?.user;
 
   if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
     throw new Error("Unauthorized: Only Admins and Managers can manage schedules.");
@@ -46,7 +46,7 @@ export async function upsertSchedule(userId: string, dayOfWeek: number, startTim
 
 export async function upsertSpecialSchedule(userId: string, dateStr: string, startTime: string, endTime: string, reason?: string) {
   const session = await auth();
-  const user = session?.user as any;
+  const user = session?.user;
 
   if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
     throw new Error("Unauthorized");
@@ -82,7 +82,7 @@ export async function upsertSpecialSchedule(userId: string, dateStr: string, sta
 
 export async function deleteSpecialSchedule(id: string) {
   const session = await auth();
-  const user = session?.user as any;
+  const user = session?.user;
 
   if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
     throw new Error("Unauthorized");

@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminReportsPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
     const session = await auth();
     const resolvedParams = await searchParams;
-    const user = session?.user as any;
+    const user = session?.user;
     if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER" && user.role !== "SUPERADMIN")) {
         redirect("/login");
     }

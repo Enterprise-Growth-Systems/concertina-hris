@@ -1,11 +1,11 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { sendEmail } from "@/lib/email";
 
-const prisma = new PrismaClient();
+
 
 export async function submitManualTimeRequest(formData: FormData) {
     const session = await auth();
@@ -73,7 +73,7 @@ export async function submitManualTimeRequest(formData: FormData) {
 
 export async function approveManualTimeRequest(requestId: string) {
     const session = await auth();
-    const role = session?.user ? (session.user as any).role : null;
+    const role = session?.user ? session.user.role : null;
     
     if (role !== "ADMIN" && role !== "MANAGER") {
         throw new Error("Unauthorized: Only Admins and Managers can approve requests.");
@@ -217,7 +217,7 @@ export async function approveManualTimeRequest(requestId: string) {
 
 export async function rejectManualTimeRequest(requestId: string) {
     const session = await auth();
-    const role = session?.user ? (session.user as any).role : null;
+    const role = session?.user ? session.user.role : null;
     
     if (role !== "ADMIN" && role !== "MANAGER") {
         throw new Error("Unauthorized: Only Admins and Managers can reject requests.");

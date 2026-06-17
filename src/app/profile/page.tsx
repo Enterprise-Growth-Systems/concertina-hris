@@ -1,12 +1,12 @@
 import { auth } from "@/auth";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { PasswordForm } from "./components/password-form";
 
-const prisma = new PrismaClient();
+
 
 export default async function ProfilePage() {
   const session = await auth();
-  const sessionUser = session?.user as any;
+  const sessionUser = session?.user;
 
   if (!session || !sessionUser) {
     return <div>Unauthorized</div>;

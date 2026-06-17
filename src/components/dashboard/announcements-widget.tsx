@@ -9,7 +9,7 @@ export async function AnnouncementsWidget() {
     const announcements = res.success && res.announcements ? res.announcements : [];
     
     const session = await auth();
-    const userRole = session?.user ? (session.user as any).role : null;
+    const userRole = session?.user ? session?.user?.role : null;
     const isAdmin = userRole === "ADMIN" || userRole === "SUPERADMIN" || userRole === "MANAGER";
 
     return (

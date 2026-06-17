@@ -1,14 +1,14 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 
-const prisma = new PrismaClient();
+
 
 export async function addEmployee(formData: FormData) {
     const session = await auth();
-    if (!session || !session.user || (session.user as any).role !== "ADMIN") {
+    if (!session || !session.user || session.user.role !== "ADMIN") {
         throw new Error("Unauthorized: Only Admins can add employees.");
     }
 
@@ -46,7 +46,7 @@ export async function addEmployee(formData: FormData) {
 
 export async function deleteEmployee(userId: string) {
     const session = await auth();
-    if (!session || !session.user || (session.user as any).role !== "ADMIN") {
+    if (!session || !session.user || session.user.role !== "ADMIN") {
         throw new Error("Unauthorized: Only Admins can delete employees.");
     }
 
@@ -86,7 +86,7 @@ export async function deleteEmployee(userId: string) {
 
 export async function updatePffdBalance(userId: string, newBalance: number) {
     const session = await auth();
-    const role = session?.user ? (session.user as any).role : null;
+    const role = session?.user ? session.user.role : null;
     
     if (role !== "ADMIN" && role !== "MANAGER") {
         throw new Error("Unauthorized: Only Admins and Managers can edit PFFD balances.");
@@ -156,7 +156,7 @@ export async function updateEmployee(
     }
 ) {
     const session = await auth();
-    const currentUserRole = session?.user ? (session.user as any).role : null;
+    const currentUserRole = session?.user ? session.user.role : null;
     
     if (currentUserRole !== "ADMIN" && currentUserRole !== "MANAGER") {
         throw new Error("Unauthorized: Only Admins and Managers can edit employees.");

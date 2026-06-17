@@ -1,11 +1,9 @@
 import { auth } from "@/auth";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 export default async function DirectoryPage() {
   const session = await auth();
-  const sessionUser = session?.user as any;
+  const sessionUser = session?.user;
 
   if (!session || !sessionUser) {
     return <div>Unauthorized</div>;

@@ -1,18 +1,18 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { TimeLogsClientPage } from "./components/time-logs-client-page";
 
 import { AdminScopeToggle } from "@/components/admin/admin-scope-toggle";
 
-const prisma = new PrismaClient();
+
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminTimesheetsPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
     const session = await auth();
     const resolvedParams = await searchParams;
-    const user = session?.user as any;
+    const user = session?.user;
     if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
         redirect("/login");
     }

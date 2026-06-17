@@ -1,14 +1,14 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 
-const prisma = new PrismaClient();
+
 
 export async function createHoliday(formData: FormData) {
   const session = await auth();
-  const user = session?.user as any;
+  const user = session?.user;
 
   if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
     throw new Error("Unauthorized: Only admins and managers can create holidays.");
@@ -44,7 +44,7 @@ export async function createHoliday(formData: FormData) {
 
 export async function deleteHoliday(holidayId: string) {
   const session = await auth();
-  const user = session?.user as any;
+  const user = session?.user;
 
   if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
     throw new Error("Unauthorized: Only admins and managers can delete holidays.");
@@ -63,7 +63,7 @@ export async function deleteHoliday(holidayId: string) {
 
 export async function createAssignedHoliday(formData: FormData) {
   const session = await auth();
-  const user = session?.user as any;
+  const user = session?.user;
 
   if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
     throw new Error("Unauthorized");
@@ -109,7 +109,7 @@ export async function createAssignedHoliday(formData: FormData) {
 
 export async function deleteAssignedHoliday(holidayId: string) {
   const session = await auth();
-  const user = session?.user as any;
+  const user = session?.user;
 
   if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
     throw new Error("Unauthorized");

@@ -1,10 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { TimesheetsClientPage } from "./components/timesheets-client-page";
 
-const prisma = new PrismaClient();
+
 
 export const dynamic = "force-dynamic";
 

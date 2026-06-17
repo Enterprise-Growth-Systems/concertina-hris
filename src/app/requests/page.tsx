@@ -1,10 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { RequestsClientPage } from "./components/requests-client-page";
 
-const prisma = new PrismaClient();
+
 
 export const dynamic = "force-dynamic";
 

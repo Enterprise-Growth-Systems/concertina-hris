@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { format } from "date-fns";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -6,7 +6,7 @@ import { ApprovalsClientPage } from "./components/approvals-client-page";
 
 import { AdminScopeToggle } from "@/components/admin/admin-scope-toggle";
 
-const prisma = new PrismaClient();
+
 export const dynamic = "force-dynamic";
 
 export default async function AdminApprovalsPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {

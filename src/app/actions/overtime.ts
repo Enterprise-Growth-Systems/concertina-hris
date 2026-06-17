@@ -1,11 +1,11 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { sendEmail } from "@/lib/email";
 
-const prisma = new PrismaClient();
+
 
 export async function submitOvertime(formData: FormData) {
     const session = await auth();
@@ -93,7 +93,7 @@ export async function updateOvertimeStatus(requestId: string, status: "APPROVED"
         throw new Error("Unauthorized");
     }
 
-    const userRole = (session.user as any).role;
+    const userRole = session.user.role;
     
     if (userRole !== "ADMIN" && userRole !== "MANAGER") {
         throw new Error("Unauthorized");

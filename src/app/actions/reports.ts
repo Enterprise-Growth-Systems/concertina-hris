@@ -1,13 +1,13 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 
-const prisma = new PrismaClient();
+
 
 export async function generateTimesheetReport(startDate: string, endDate: string, isDirectScope: boolean = false) {
   const session = await auth();
-  const user = session?.user as any;
+  const user = session?.user;
 
   if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
     throw new Error("Unauthorized");
@@ -69,7 +69,7 @@ export async function generateTimesheetReport(startDate: string, endDate: string
 
 export async function generateLeaveReport(startDate: string, endDate: string, isDirectScope: boolean = false) {
   const session = await auth();
-  const user = session?.user as any;
+  const user = session?.user;
 
   if (!session || !user || (user.role !== "ADMIN" && user.role !== "MANAGER")) {
     throw new Error("Unauthorized");

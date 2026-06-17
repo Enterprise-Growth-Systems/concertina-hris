@@ -12,7 +12,7 @@ export default async function WikiDocumentPage(props: { params: Promise<{ slug: 
     const { slug } = params;
     
     const session = await auth();
-    const isAdmin = session?.user && ["ADMIN", "SUPERADMIN", "MANAGER"].includes((session.user as any).role);
+    const isAdmin = session?.user && ["ADMIN", "SUPERADMIN", "MANAGER"].includes(session?.user?.role || "");
     
     const res = await getWikiPageBySlug(slug);
     if (!res.success || !res.page) {

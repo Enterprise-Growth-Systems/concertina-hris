@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function WikiDirectoryPage() {
     const session = await auth();
-    const isAdmin = session?.user && ["ADMIN", "SUPERADMIN", "MANAGER"].includes((session.user as any).role);
+    const isAdmin = session?.user && ["ADMIN", "SUPERADMIN", "MANAGER"].includes(session?.user?.role || "");
     
     const res = await getWikiPages(null);
     const pages = res.success && res.pages ? res.pages : [];

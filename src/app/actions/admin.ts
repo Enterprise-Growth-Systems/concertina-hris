@@ -1,11 +1,11 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { sendEmail } from "@/lib/email";
 
-const prisma = new PrismaClient();
+
 
 function calculateWorkingDays(start: Date, end: Date, schedules: { dayOfWeek: number }[]): number {
     let count = 0;
@@ -31,7 +31,7 @@ function calculateWorkingDays(start: Date, end: Date, schedules: { dayOfWeek: nu
 export async function updateLeaveRequestStatus(requestId: string, status: "APPROVED" | "REJECTED") {
     try {
         const session = await auth();
-        const userRole = session?.user ? (session.user as any).role : null;
+        const userRole = session?.user ? session.user.role : null;
         
         if (userRole !== "ADMIN" && userRole !== "MANAGER") {
             throw new Error("Unauthorized: Only Admins and Managers can update leave requests.");

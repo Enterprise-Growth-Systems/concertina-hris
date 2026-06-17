@@ -1,10 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { auth } from "@/auth"; // import the auth module
 
-const prisma = new PrismaClient();
+
 
 export async function toggleClockStatus(): Promise<{ success: boolean; isClockedIn?: boolean; error?: string }> {
     try {

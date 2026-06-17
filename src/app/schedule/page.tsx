@@ -1,10 +1,10 @@
 import { auth } from "@/auth";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { CalendarDays, Clock } from "lucide-react";
 
-const prisma = new PrismaClient();
+
 
 export const dynamic = "force-dynamic";
 

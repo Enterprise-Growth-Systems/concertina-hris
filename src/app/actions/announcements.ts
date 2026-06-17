@@ -1,9 +1,9 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 
-const prisma = new PrismaClient();
+
 
 export async function getAnnouncements() {
     try {
@@ -29,7 +29,7 @@ export async function getAnnouncements() {
 export async function createAnnouncement(title: string, content: string) {
     try {
         const session = await auth();
-        const userRole = session?.user ? (session.user as any).role : null;
+        const userRole = session?.user ? session.user.role : null;
         const userId = session?.user?.id;
         
         if (!userId || (userRole !== "ADMIN" && userRole !== "MANAGER" && userRole !== "SUPERADMIN")) {
@@ -64,7 +64,7 @@ export async function createAnnouncement(title: string, content: string) {
 export async function deleteAnnouncement(id: string) {
     try {
         const session = await auth();
-        const userRole = session?.user ? (session.user as any).role : null;
+        const userRole = session?.user ? session.user.role : null;
         
         if (!session?.user?.id || (userRole !== "ADMIN" && userRole !== "MANAGER" && userRole !== "SUPERADMIN")) {
             return { success: false, error: "Unauthorized" };

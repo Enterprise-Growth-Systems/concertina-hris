@@ -1,9 +1,9 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 
-const prisma = new PrismaClient();
+
 
 export async function getWikiPages(parentId: string | null = null) {
     try {
@@ -43,7 +43,7 @@ export async function getWikiPageBySlug(slug: string) {
 export async function createWikiPage(data: { title: string; content?: string; parentId?: string; icon?: string }) {
     try {
         const session = await auth();
-        const userRole = session?.user ? (session.user as any).role : null;
+        const userRole = session?.user ? session.user.role : null;
         
         if (!session?.user?.id || (userRole !== "ADMIN" && userRole !== "MANAGER" && userRole !== "SUPERADMIN")) {
             return { success: false, error: "Unauthorized" };
@@ -83,7 +83,7 @@ export async function createWikiPage(data: { title: string; content?: string; pa
 export async function updateWikiPage(id: string, data: { title?: string; content?: string; parentId?: string | null; icon?: string }) {
     try {
         const session = await auth();
-        const userRole = session?.user ? (session.user as any).role : null;
+        const userRole = session?.user ? session.user.role : null;
         
         if (!session?.user?.id || (userRole !== "ADMIN" && userRole !== "MANAGER" && userRole !== "SUPERADMIN")) {
             return { success: false, error: "Unauthorized" };
@@ -108,7 +108,7 @@ export async function updateWikiPage(id: string, data: { title?: string; content
 export async function deleteWikiPage(id: string) {
     try {
         const session = await auth();
-        const userRole = session?.user ? (session.user as any).role : null;
+        const userRole = session?.user ? session.user.role : null;
         
         if (!session?.user?.id || (userRole !== "ADMIN" && userRole !== "MANAGER" && userRole !== "SUPERADMIN")) {
             return { success: false, error: "Unauthorized" };
