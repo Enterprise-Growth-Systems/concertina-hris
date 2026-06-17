@@ -11,7 +11,6 @@ import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { NotificationsDropdown } from "@/components/layout/notifications-dropdown";
 const EMP_ROUTES = [
     { name: "Dashboard", href: "/", icon: LayoutDashboard },
-    { name: "Timesheets", href: "/timesheets", icon: Clock },
     { name: "Requests", href: "/requests", icon: CalendarHeart },
     { name: "Wiki", href: "/wiki", icon: BookOpen },
     { name: "My Profile", href: "/profile", icon: UserCircle },

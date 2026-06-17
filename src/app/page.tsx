@@ -1,5 +1,6 @@
 import { ClockWidget } from "@/components/dashboard/clock-widget";
 import { AnnouncementsWidget } from "@/components/dashboard/announcements-widget";
+import { RecentTimeLogsWidget } from "@/components/dashboard/recent-time-logs-widget";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
@@ -30,7 +31,7 @@ export default async function DashboardPage() {
   const recentLogs = await prisma.timeLog.findMany({
     where: { userId: session.user.id },
     orderBy: { clockIn: "desc" },
-    take: 5
+    take: 1000
   });
 
   const todaySchedule = await prisma.schedule.findFirst({
@@ -97,48 +98,7 @@ export default async function DashboardPage() {
         <ClockWidget />
 
         {/* Recent Time Logs Table */}
-        <div className="rounded-2xl border bg-card p-6">
-          <div className="text-center mb-6">
-            <h3 className="text-xs font-bold text-primary uppercase tracking-widest mb-1">RECENT TIME LOGS</h3>
-            <h2 className="text-xl font-bold text-foreground">Your latest activity</h2>
-          </div>
-
-          {events.length === 0 ? (
-            <div className="text-sm text-muted-foreground text-center py-12 border-t">
-              No recent activity to display.
-            </div>
-          ) : (
-            <div className="w-full overflow-x-auto">
-              <table className="w-full text-sm text-center">
-                <thead className="text-[10px] text-muted-foreground uppercase tracking-widest border-b">
-                  <tr>
-                    <th className="px-4 py-3 font-semibold text-left">DATE</th>
-                    <th className="px-4 py-3 font-semibold text-center">TYPE</th>
-                    <th className="px-4 py-3 font-semibold text-right">TIME</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50">
-                  {events.slice(0, 10).map((event) => {
-                    return (
-                      <tr key={event.id} className="hover:bg-muted/30 transition-colors">
-                        <td className="px-4 py-3 font-medium text-foreground whitespace-nowrap text-left">
-                          <span className="text-sm font-bold">{formatInTimeZone(event.time, 'Asia/Manila', "MMM d, yyyy")}</span>
-                          <span className="text-xs text-muted-foreground ml-1.5 uppercase">{formatInTimeZone(event.time, 'Asia/Manila', "EEE")}</span>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${event.type === 'IN' ? 'bg-primary/10 text-primary' : 'bg-amber-500/10 text-amber-600'}`}>{event.type}</span>
-                        </td>
-                        <td className="px-4 py-3 text-foreground whitespace-nowrap text-right font-medium">
-                          {formatInTimeZone(event.time, 'Asia/Manila', "hh:mm:ss a")}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        <RecentTimeLogsWidget events={events} />
         </div>
         
         {/* Right Column: Announcements */}
