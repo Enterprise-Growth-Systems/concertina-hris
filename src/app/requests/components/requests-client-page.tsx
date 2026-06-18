@@ -236,7 +236,7 @@ export function RequestsClientPage({
 
             {/* PFFD Tab Content */}
             {activeTab === "PFFD" && (
-                <div className="grid lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <div className="grid lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
                     <div className="lg:col-span-1 space-y-6">
                         {/* Balances */}
                         <div className="rounded-2xl border bg-card text-card-foreground shadow-sm p-6 bg-gradient-to-br from-primary/5 to-transparent">
@@ -316,7 +316,7 @@ export function RequestsClientPage({
                         </div>
                     </div>
 
-                    <div className="lg:col-span-2">
+                    <div className="lg:col-span-3">
                         <div className="rounded-2xl border bg-card text-card-foreground shadow-sm overflow-hidden h-full">
                             <div className="p-6 border-b">
                                 <h2 className="font-semibold text-lg">Request History</h2>
@@ -528,7 +528,7 @@ export function RequestsClientPage({
 
             {/* MANUAL TIME Tab Content */}
             {activeTab === "MANUAL_TIME" && (
-                <div className="grid lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <div className="grid lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
                     <div className="lg:col-span-1 space-y-6">
                         <div className="rounded-2xl border bg-card text-card-foreground shadow-sm p-6">
                             <h2 className="font-semibold text-lg mb-1">Manual Time Entry</h2>
@@ -582,7 +582,7 @@ export function RequestsClientPage({
                         </div>
                     </div>
 
-                    <div className="lg:col-span-2">
+                    <div className="lg:col-span-3">
                         <div className="bg-card border rounded-2xl overflow-hidden shadow-sm h-full flex flex-col">
                             <div className="p-6 border-b">
                                 <h2 className="font-semibold text-lg">Manual Entry History</h2>
