@@ -12,69 +12,33 @@ function timeStringToMinutes(timeStr: string): number {
     return hours * 60 + minutes;
 }
 
-function calculatePreciseDeduction(
+function calculateLeaveDays(
     start: Date, 
     end: Date, 
     schedules: { dayOfWeek: number, startTime: string, endTime: string }[]
 ): number {
-    let totalDeduction = 0;
+    let totalDays = 0;
     const current = new Date(start);
     current.setHours(0, 0, 0, 0);
     const endDate = new Date(end);
     endDate.setHours(0, 0, 0, 0);
 
-    // Build schedule map
-    const scheduleMap = new Map<number, {start: number, end: number}>();
+    const scheduledDays = new Set<number>();
     if (schedules.length > 0) {
-        schedules.forEach(s => {
-            scheduleMap.set(s.dayOfWeek, {
-                start: timeStringToMinutes(s.startTime),
-                end: timeStringToMinutes(s.endTime)
-            });
-        });
+        schedules.forEach(s => scheduledDays.add(s.dayOfWeek));
     } else {
-        // Fallback: Mon-Fri, 09:00 - 18:00
-        for (let i = 1; i <= 5; i++) {
-            scheduleMap.set(i, { start: 9 * 60, end: 18 * 60 });
-        }
+        // Fallback: Mon-Fri
+        [1, 2, 3, 4, 5].forEach(d => scheduledDays.add(d));
     }
 
-    const startMinutes = start.getHours() * 60 + start.getMinutes();
-    const endMinutes = end.getHours() * 60 + end.getMinutes();
-
     while (current <= endDate) {
-        const day = current.getDay();
-        const sched = scheduleMap.get(day);
-        
-        if (sched) {
-            const shiftDuration = sched.end - sched.start;
-            if (shiftDuration > 0) {
-                const isFirstDay = current.getTime() === new Date(start).setHours(0, 0, 0, 0);
-                const isLastDay = current.getTime() === new Date(end).setHours(0, 0, 0, 0);
-
-                let reqStart = sched.start;
-                let reqEnd = sched.end;
-
-                if (isFirstDay && startMinutes > sched.start) {
-                    reqStart = startMinutes;
-                }
-                if (isLastDay && endMinutes < sched.end) {
-                    reqEnd = endMinutes;
-                }
-
-                const overlapStart = Math.max(reqStart, sched.start);
-                const overlapEnd = Math.min(reqEnd, sched.end);
-
-                if (overlapStart < overlapEnd) {
-                    const overlapMinutes = overlapEnd - overlapStart;
-                    totalDeduction += overlapMinutes / shiftDuration;
-                }
-            }
+        if (scheduledDays.has(current.getDay())) {
+            totalDays++;
         }
         current.setDate(current.getDate() + 1);
     }
 
-    return Math.round(totalDeduction * 100) / 100;
+    return totalDays;
 }
 
 export async function submitLeaveRequest(formData: FormData) {
@@ -118,10 +82,25 @@ export async function submitLeaveRequest(formData: FormData) {
             select: { dayOfWeek: true, startTime: true, endTime: true }
         });
 
-        const daysRequested = calculatePreciseDeduction(startDate, endDate, schedules);
+        const daysRequested = calculateLeaveDays(startDate, endDate, schedules);
 
         if (daysRequested <= 0) {
             return { success: false, error: "Leave request must include at least one working day based on your schedule" };
+        }
+
+        // Check for overlapping leaves
+        const overlappingLeaves = await prisma.leaveRequest.findFirst({
+            where: {
+                userId: employeeId,
+                status: { in: ["PENDING", "APPROVED"] },
+                OR: [
+                    { startDate: { lte: endDate }, endDate: { gte: startDate } }
+                ]
+            }
+        });
+
+        if (overlappingLeaves) {
+            return { success: false, error: "You already have an existing leave request that overlaps with these dates." };
         }
 
         // Verify balance
