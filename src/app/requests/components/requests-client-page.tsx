@@ -325,11 +325,11 @@ export function RequestsClientPage({
                                 <table className="w-full text-sm text-left">
                                     <thead className="bg-muted/50 text-muted-foreground border-b text-xs uppercase tracking-wider">
                                         <tr>
-                                            <th className="px-6 py-4 font-semibold">Type</th>
-                                            <th className="px-6 py-4 font-semibold">Duration</th>
-                                            <th className="px-6 py-4 font-semibold">Consumed</th>
-                                            <th className="px-6 py-4 font-semibold">Status</th>
-                                            <th className="px-6 py-4 font-semibold">Date Filed</th>
+                                            <th className="px-6 py-4 font-semibold whitespace-nowrap">Type</th>
+                                            <th className="px-6 py-4 font-semibold whitespace-nowrap">Duration</th>
+                                            <th className="px-6 py-4 font-semibold whitespace-nowrap">Days Deducted</th>
+                                            <th className="px-6 py-4 font-semibold whitespace-nowrap">Status</th>
+                                            <th className="px-6 py-4 font-semibold whitespace-nowrap">Date Filed</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y">
@@ -361,7 +361,7 @@ export function RequestsClientPage({
                                                             {request.status}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 text-muted-foreground">
+                                                    <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
                                                         {format(request.createdAt, "MMM d, yyyy")}
                                                     </td>
                                                 </tr>
