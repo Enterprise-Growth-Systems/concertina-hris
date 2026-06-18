@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { RequestsClientPage } from "./components/requests-client-page";
+import { calculateLeaveDays } from "@/lib/leave-utils";
 
 
 
@@ -44,6 +45,11 @@ export default async function RequestsPage() {
         orderBy: { createdAt: "desc" },
     });
 
+    const schedules = await prisma.schedule.findMany({
+        where: { userId: employeeId },
+        select: { dayOfWeek: true, startTime: true, endTime: true }
+    });
+
     const leaveRequests = leaveRequestsRaw.map(req => ({
         id: req.id,
         leaveType: req.leaveType,
@@ -51,6 +57,7 @@ export default async function RequestsPage() {
         endDate: req.endDate,
         status: req.status,
         createdAt: req.createdAt,
+        daysRequested: calculateLeaveDays(req.startDate, req.endDate, schedules),
     }));
 
     const balances = await prisma.leaveBalance.findMany({

@@ -27,6 +27,7 @@ type LeaveRequestData = {
     endDate: Date;
     status: string;
     createdAt: Date;
+    daysRequested: number;
 };
 
 type LeaveBalanceData = {
@@ -326,6 +327,7 @@ export function RequestsClientPage({
                                         <tr>
                                             <th className="px-6 py-4 font-semibold">Type</th>
                                             <th className="px-6 py-4 font-semibold">Duration</th>
+                                            <th className="px-6 py-4 font-semibold">Consumed</th>
                                             <th className="px-6 py-4 font-semibold">Status</th>
                                             <th className="px-6 py-4 font-semibold">Date Filed</th>
                                         </tr>
@@ -333,7 +335,7 @@ export function RequestsClientPage({
                                     <tbody className="divide-y">
                                         {paginatedLeaveRequests.length === 0 ? (
                                             <tr>
-                                                <td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">
+                                                <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
                                                     No PFFD requests found.
                                                 </td>
                                             </tr>
@@ -344,7 +346,10 @@ export function RequestsClientPage({
                                                         {request.leaveType === 'PFFD' ? 'PFFD Credits' : request.leaveType.toLowerCase()}
                                                     </td>
                                                     <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
-                                                        {format(request.startDate, "MMM d, h:mm a")} - {format(request.endDate, "MMM d, h:mm a")}
+                                                        {format(request.startDate, "MMM d, yyyy")} - {format(request.endDate, "MMM d, yyyy")}
+                                                    </td>
+                                                    <td className="px-6 py-4 font-medium text-foreground">
+                                                        {request.daysRequested} {request.daysRequested === 1 ? 'day' : 'days'}
                                                     </td>
                                                     <td className="px-6 py-4">
                                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${request.status === 'APPROVED'
