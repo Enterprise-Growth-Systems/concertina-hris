@@ -10,7 +10,7 @@ export async function AnnouncementsWidget() {
     
     const session = await auth();
     const userRole = session?.user ? session?.user?.role : null;
-    const isAdmin = userRole === "ADMIN" || userRole === "SUPERADMIN" || userRole === "MANAGER";
+    const isAdmin = userRole === "ADMIN" || userRole === "SUPERADMIN";
 
     return (
         <div className="rounded-2xl border bg-card p-5 relative overflow-hidden transition-all shadow-sm flex flex-col h-full">

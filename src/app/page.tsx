@@ -28,10 +28,15 @@ export default async function DashboardPage() {
   const currentDayIndex = now.getDay();
   const currentDayName = DAYS[currentDayIndex];
 
+  const twoWeeksAgo = new Date();
+  twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
   const recentLogs = await prisma.timeLog.findMany({
-    where: { userId: session.user.id },
+    where: { 
+      userId: session.user.id,
+      clockIn: { gte: twoWeeksAgo }
+    },
     orderBy: { clockIn: "desc" },
-    take: 1000
   });
 
   const todaySchedule = await prisma.schedule.findFirst({

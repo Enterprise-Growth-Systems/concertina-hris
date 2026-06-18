@@ -50,9 +50,6 @@ export function AnnouncementsClient({ announcements: initialAnnouncements, isAdm
                         <div className="text-sm text-muted-foreground line-clamp-[8] prose-sm prose-p:my-0">
                             <div dangerouslySetInnerHTML={{ __html: a.content }} />
                         </div>
-                        <p className="text-xs text-muted-foreground mt-3 pt-3 border-t font-medium">
-                            Posted by {a.author?.name || "Admin"}
-                        </p>
                     </div>
                 ))}
             </div>
@@ -63,12 +60,12 @@ export function AnnouncementsClient({ announcements: initialAnnouncements, isAdm
                         className="absolute inset-0" 
                         onClick={() => setSelectedAnnouncement(null)} 
                     />
-                    <div className="relative z-10 w-full max-w-2xl bg-card rounded-2xl border shadow-xl flex flex-col max-h-[85vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="relative z-10 w-full max-w-4xl bg-card rounded-2xl border shadow-xl flex flex-col max-h-[85vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         <div className="flex items-start justify-between p-6 border-b shrink-0">
                             <div>
                                 <h2 className="text-2xl font-bold text-foreground leading-tight">{selectedAnnouncement.title}</h2>
                                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mt-2">
-                                    Posted by {selectedAnnouncement.author?.name || "Admin"} • {formatDistanceToNow(new Date(selectedAnnouncement.createdAt), { addSuffix: true })}
+                                    {formatDistanceToNow(new Date(selectedAnnouncement.createdAt), { addSuffix: true })}
                                 </p>
                             </div>
                             <div className="flex items-center gap-2">
