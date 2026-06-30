@@ -23,10 +23,10 @@ type OvertimeRequestData = {
 type LeaveRequestData = {
     id: string;
     leaveType: string;
-    startDate: Date;
-    endDate: Date;
+    startDate: string;
+    endDate: string;
     status: string;
-    createdAt: Date;
+    createdAt: string;
     daysRequested: number;
 };
 
@@ -39,7 +39,7 @@ type LeaveBalanceData = {
 type ManualRequestData = {
     id: string;
     logType: string;
-    logDateTime: Date;
+    logDateTime: string;
     reason: string;
     status: string;
     managerName: string;
@@ -346,7 +346,7 @@ export function RequestsClientPage({
                                                         {request.leaveType === 'PFFD' ? 'PFFD Credits' : request.leaveType.toLowerCase()}
                                                     </td>
                                                     <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
-                                                        {format(request.startDate, "MMM d, yyyy")} - {format(request.endDate, "MMM d, yyyy")}
+                                                        {format(new Date(request.startDate), "MMM d, yyyy")} - {format(new Date(request.endDate), "MMM d, yyyy")}
                                                     </td>
                                                     <td className="px-6 py-4 font-medium text-foreground">
                                                         {request.daysRequested} {request.daysRequested === 1 ? 'day' : 'days'}
@@ -362,7 +362,7 @@ export function RequestsClientPage({
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
-                                                        {format(request.createdAt, "MMM d, yyyy")}
+                                                        {format(new Date(request.createdAt), "MMM d, yyyy")}
                                                     </td>
                                                 </tr>
                                             ))
@@ -604,7 +604,7 @@ export function RequestsClientPage({
                                                     {req.logType}
                                                 </td>
                                                 <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
-                                                    {format(req.logDateTime, "MMM d, yyyy - h:mm a")}
+                                                    {format(new Date(req.logDateTime), "MMM d, yyyy - h:mm a")}
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
                                                     <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-bold border ${

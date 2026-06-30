@@ -53,10 +53,10 @@ export default async function RequestsPage() {
     const leaveRequests = leaveRequestsRaw.map(req => ({
         id: req.id,
         leaveType: req.leaveType,
-        startDate: req.startDate,
-        endDate: req.endDate,
+        startDate: req.startDate.toISOString(),
+        endDate: req.endDate.toISOString(),
         status: req.status,
-        createdAt: req.createdAt,
+        createdAt: req.createdAt.toISOString(),
         daysRequested: calculateLeaveDays(req.startDate, req.endDate, schedules),
     }));
 
@@ -78,7 +78,7 @@ export default async function RequestsPage() {
     const manualRequests = manualRequestsRaw.map(req => ({
         id: req.id,
         logType: req.logType,
-        logDateTime: req.logDateTime,
+        logDateTime: req.logDateTime.toISOString(),
         reason: req.reason,
         status: req.status,
         managerName: req.manager?.name || "Pending",
