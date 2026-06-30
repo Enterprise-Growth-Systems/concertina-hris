@@ -95,7 +95,7 @@ export default async function RequestsPage() {
             <div className="mb-8">
                 <h1 className="text-3xl font-bold tracking-tight text-foreground">Employee Requests</h1>
                 <p className="text-muted-foreground mt-1 text-lg">
-                    Manage your Pre-Funded Flex Days, Overtime, and Manual Time requests.
+                    Manage your Pre-Funded Flex Days, Overtime, and Manual Time requests. (Debug ID: {employeeId})
                 </p>
             </div>
             
