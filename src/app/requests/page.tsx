@@ -62,6 +62,11 @@ export default async function RequestsPage() {
 
     const balances = await prisma.leaveBalance.findMany({
         where: { userId: employeeId },
+        select: {
+            id: true,
+            leaveType: true,
+            balance: true
+        }
     });
 
     // Fetch Manual Time Data
