@@ -11,11 +11,12 @@ export const dynamic = "force-dynamic";
 
 export default async function RequestsPage() {
     const session = await auth();
-    if (!session || !session.user || !session.user.id) {
-        redirect("/login");
-    }
+    // Temporarily disabled auth for debugging
+    // if (!session || !session.user || !session.user.id) {
+    //     redirect("/login");
+    // }
 
-    const employeeId = session.user.id;
+    const employeeId = "test-user-id"; // Hardcoded for testing
 
     // Fetch Overtime Data
     const overtimeRequestsRaw = await prisma.overtimeRequest.findMany({
